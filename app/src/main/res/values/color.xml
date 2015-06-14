@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="transparent">#00000000</color>
+    <!-- 不透明纯白 -->
+    <color name="white">#ffffffff</color>
+    <color name="black">#000000</color>
+    <color name="white_80_alpha">#ccffffff</color>
+    <color name="white_50_alpha">#7FFFFFFF</color>
+    <color name="white_30_alpha">#4CFFFFFF</color>
+    <color name="divider_line_color_dark">#e2e2e2</color>
+    <color name="tab_select_text_color">#B483D6</color>
+    <color name="tab_text_color">#82858b</color>
+
+    <color name="title_bg_color">#FF2681</color>
+    <color name="content_bg_color">#F2F2F2</color>
+    <color name="main_color">#333333</color>
+    <color name="my_info_tab_unchecked">#999999</color>
+    <color name="cancel_follow_color">#bbbbbb</color>
+</resources>

@@ -1,0 +1,36 @@
+<resources>
+
+    <!-- 字体大小新规则 -->
+    <dimen name="size_big">20sp</dimen>
+    <!-- 30px -->
+    <dimen name="size_big_1">27sp</dimen>
+    <!-- 40px -->
+    <dimen name="size_big_1.5">24sp</dimen>
+    <!-- 40px -->
+    <dimen name="size_big_2">22sp</dimen>
+    <!-- 33px -->
+    <dimen name="size_1">18sp</dimen>
+    <!-- 27px -->
+    <dimen name="size_2">16sp</dimen>
+    <!-- 24px -->
+    <dimen name="size_2_1">15sp</dimen>
+    <!-- 22px -->
+    <dimen name="size_3">14sp</dimen>
+    <!-- 21px -->
+    <dimen name="size_3_1">13sp</dimen>
+    <!-- 20px -->
+    <dimen name="size_4">12sp</dimen>
+    <!-- 18px -->
+    <dimen name="size_4_1">11sp</dimen>
+    <!-- 16px -->
+    <dimen name="size_5">9sp</dimen>
+    <!-- 14px -->
+    <dimen name="size_6">24sp</dimen>
+    <dimen name="size_7">7sp</dimen>
+
+    <dimen name="border_radius_with_dimensions">0.5dp</dimen>
+
+    <dimen name="main_tab_height">48dp</dimen>
+    <dimen name="main_title_height">48dp</dimen>
+    <dimen name="button_height">45dp</dimen>
+</resources>

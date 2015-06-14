@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Wrriormedia</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="imie_info">IMIE:<xliff:g>%1$s</xliff:g></string>
+    <string name="serial_info">Serial:<xliff:g>%1$s</xliff:g></string>
+    <string name="address_info">Address:<xliff:g>%1$s</xliff:g></string>
+</resources>

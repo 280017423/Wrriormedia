@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.wrriormedia.app">
+
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- 可选的权限： -->
+    <uses-permission android:name="android.permission.READ_LOGS" />
+
+    <application
+        android:name="com.wrriormedia.app.app.WrriormediaApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/ThemeActivity">
+        <meta-data
+            android:name="db_version"
+            android:value="1" />
+        <meta-data
+            android:name="db_name"
+            android:value="wrriormedia.db" />
+        <meta-data
+            android:name="image_dir"
+            android:value="wrriormedia/com.wrriormedia.app/image" />
+        <meta-data
+            android:name="http_cache_dir"
+            android:value="wrriormedia/com.wrriormedia.app/cache" />
+        <meta-data
+            android:name="email_log_enable"
+            android:value="true" />
+        <meta-data
+            android:name="error_log_enable"
+            android:value="true" />
+        <meta-data
+            android:name="debug_log_enable"
+            android:value="true" />
+        <meta-data
+            android:name="api_root_url"
+            android:value="http://api.warriormedia.cn" />
+        <meta-data
+            android:name="is_developing"
+            android:value="true" />
+        <meta-data
+            android:name="appSign"
+            android:value="wrriormedia" />
+
+        <activity
+            android:name=".ui.activity.LoadingActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 注册广播 -->
+        <receiver android:name="com.wrriormedia.app.listener.NetWorkChangeBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Framework</string>
+    <string name="add_tag">添加标签</string>
+    <!-- popupwindow -->
+    <string name="http_flag">http://</string>
+    <!-- autorefreshlistview -->
+    <string name="pull_to_refresh_pull_label">下拉可以刷新</string>
+    <string name="pull_down_to_refresh_pull_label">上拉可以刷新</string>
+    <string name="pull_to_refresh_release_label">释放开始刷新</string>
+    <string name="pull_to_refresh_refreshing_label">正在刷新&#8230;</string>
+    <string name="pull_to_refresh_header_subtext_label">上次更新:</string>
+    <string name="more_check_version_no_sdcard">SD卡未准备好，请确认后再进行下载安装</string>
+    <string name="no_more_data">没有更多了</string>
+    <string name="footer_hint_load_normal">""</string>
+    <!-- 检查版本更新 -->
+    <string name="more_check_newversion_btn_update_later">不更新</string>
+    <string name="more_check_newversion_exit">关闭应用</string>
+    <string name="no_more_update">现在已经是最新版本</string>
+    <!-- 出错提示 -->
+    <string name="msg_operate_fail_try_again">网络繁忙，请重试</string>
+    <string name="network_is_not_available">当前网络不给力\n建议检查网络状态</string>
+
+    <!-- 退出提示 -->
+    <string name="exit_prompt">程序 Hold 不住啦，重启一下..</string>
+
+    <!-- Just use standard Pull Down String when pulling up. These can be set for languages which require it -->
+    <string name="pull_to_refresh_from_bottom_release_label">@string/pull_to_refresh_release_label</string>
+    <string name="pull_to_refresh_from_bottom_refreshing_label">正在刷新…</string>
+
+    <item name="tag_image_url" type="id"></item>
+    <item name="tag_image_position" type="id"></item>
+
+    <string-array name="day_of_week">
+        <item name="Monday">周一</item>
+        <item name="Tuesday">周二</item>
+        <item name="Wednesday">周三</item>
+        <item name="Thursday">周四</item>
+        <item name="Friday">周五</item>
+        <item name="Saturday">周六</item>
+        <item name="Sunday">周日</item>
+    </string-array>
+
+    <string name="more_check_version_being_installed">下载安装包成功，正在安装&#8230;</string>
+    <string name="more_check_version_download_install_app_error">下载安装程序出错</string>
+    <string name="more_check_version_download_file_error">下载文件出错</string>
+    <string name="more_apps_is_downloading">还有下载未完成，请稍候再试</string>
+
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="listview_footer_background">#fff4f4f4</color>
+    <color name="transparent">#00000000</color>
+    <!-- 左滑控件资源 -->
+    <color name="menu_item_bg">#EDEBEA</color>
+    <!-- 灰色 -->
+    <color name="gray">#808080</color>
+    <!-- 暗灰色 -->
+    <color name="dimgrey">#696969</color>
+    <!-- 花白色 -->
+    <color name="floralwhite">#FFFAF0</color>
+    <color name="background">#F7F4F0</color>
+    <color name="title_color">#333333</color>
+
+</resources>
