@@ -32,7 +32,7 @@ public class DeviceRequest {
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_SIM, PackageUtil.getLine1Number()));
         try {
-            JsonResult jsonResult = HttpClientUtil.get(url, null, postParams);
+            JsonResult jsonResult = HttpClientUtil.post(url, null, postParams);
             if (jsonResult != null) {
                 if (jsonResult.isOK()) {
                     StatusModel model = jsonResult.getData(StatusModel.class);
