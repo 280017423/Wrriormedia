@@ -33,4 +33,13 @@ public class StatusModel extends BaseModel {
     public void setSerial(String serial) {
         this.serial = serial;
     }
+
+    @Override
+    public String toString() {
+        return "StatusModel{" +
+                "address='" + address + '\'' +
+                ", ready='" + ready + '\'' +
+                ", serial='" + serial + '\'' +
+                '}';
+    }
 }

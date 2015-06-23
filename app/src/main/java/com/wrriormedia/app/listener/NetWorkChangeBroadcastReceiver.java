@@ -41,8 +41,6 @@ public class NetWorkChangeBroadcastReceiver extends BroadcastReceiver {
                 }
             }
         }
-        // 没有执行return,则说明当前无网络连接
-        Toast.makeText(context, "网络关闭", Toast.LENGTH_LONG).show();
     }
 
     class VerifyTask extends AsyncTask<Void, Void, ActionResult> {
@@ -54,7 +52,7 @@ public class NetWorkChangeBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         protected ActionResult doInBackground(Void... params) {
-            return DeviceRequest.verifyDevice();
+            return DeviceRequest.ready();
         }
 
         @Override

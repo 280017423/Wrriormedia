@@ -8,10 +8,14 @@ public class ServerAPIConstant {
 
     // Action字段
     public static final String ACTION_READY = "/ready";
+    public static final String ACTION_CMD = "/cmd";
 
     // KEY字段
     public static final String ACTION_KEY_ID = "id";
     public static final String ACTION_KEY_SIM = "sim";
+    public static final String ACTION_KEY_VERSION = "version";
+    public static final String ACTION_KEY_MODIFY = "modify";
+    public static final String ACTION_KEY_NET = "net";
 
     /**
      * 获取后端的 api URL地址

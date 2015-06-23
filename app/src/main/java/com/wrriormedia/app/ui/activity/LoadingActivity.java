@@ -49,6 +49,7 @@ public class LoadingActivity extends HtcBaseActivity {
                 mTvAddress.setText(getString(R.string.address_info, model.getAddress()));
             } else if ("1".equals(ready)) {
                 startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+                finish();
             }
         } else {
             showErrorMsg(result);
