@@ -3,6 +3,7 @@ package com.wrriormedia.app.business.requst;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.manager.SystemManager;
 import com.wrriormedia.app.common.ServerAPIConstant;
+import com.wrriormedia.app.model.CmdModel;
 import com.wrriormedia.app.model.StatusModel;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
@@ -63,16 +64,14 @@ public class DeviceRequest {
         List<NameValuePair> postParams = new ArrayList<>();
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_VERSION, PackageUtil.getVersionName()));
-        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_MODIFY, SystemManager.getModifyTime()));
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_MODIFY, SystemManager.getModifyTime()+""));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_NET, NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g"));
         try {
             JsonResult jsonResult = HttpClientUtil.post(url, null, postParams);
             if (jsonResult != null) {
                 if (jsonResult.isOK()) {
-                    StatusModel model = jsonResult.getData(StatusModel.class);
-                    if (null != model && "1".equals(model.getReady())) {
-                        SharedPreferenceUtil.saveObject(WrriormediaApplication.getInstance().getBaseContext(), StatusModel.class.getName(), model);
-                    }
+                    CmdModel model = jsonResult.getData(CmdModel.class);
+                    SystemManager.setModifyTime();// 更新本地的上次请求时间
                     result.ResultObject = model;
                 } else {
                     result.ResultObject = jsonResult.Msg;

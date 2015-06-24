@@ -5,19 +5,18 @@ import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.common.ServerAPIConstant;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
-import com.wrriormedia.library.util.StringUtil;
 
 public class SystemManager {
 
-    public static String getModifyTime() {
-        String modifyTime = SharedPreferenceUtil.getStringValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_MODIFY);
-        if (StringUtil.isNullOrEmpty(modifyTime)) {
-            return ""+(System.currentTimeMillis() / 1000);
+    public static int getModifyTime() {
+        int modifyTime = SharedPreferenceUtil.getIntegerValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_MODIFY);
+        if (-1 == modifyTime) {
+            return (int)System.currentTimeMillis() / 1000;
         }
         return modifyTime;
     }
 
-    public static String setModifyTime(String modifyTime) {
-        SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_MODIFY, modifyTime);
+    public static void setModifyTime() {
+        SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_MODIFY, (int)System.currentTimeMillis() / 1000);
     }
 }

@@ -61,9 +61,6 @@ public class NetWorkChangeBroadcastReceiver extends BroadcastReceiver {
                 return;
             }
             EventBus.getDefault().post(result);
-            if (!ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
-                //TODO 记录日志
-            }
         }
     }
 
