@@ -9,6 +9,7 @@ public class ServerAPIConstant {
     // Action字段
     public static final String ACTION_READY = "/ready";
     public static final String ACTION_CMD = "/cmd";
+    public static final String ACTION_AD = "/ad";
 
     // KEY字段
     public static final String ACTION_KEY_ID = "id";

@@ -18,6 +18,11 @@ public class CmdModel extends BaseModel {
     private int brightness; // 屏幕亮度 值为0-10（0：屏幕关闭，1：最小值；10：最大值）；
 
     public int getBrightness() {
+        if (brightness < 3) {
+            brightness = 3;
+        } else if (brightness > 10) {
+            brightness = 10;
+        }
         return brightness;
     }
 

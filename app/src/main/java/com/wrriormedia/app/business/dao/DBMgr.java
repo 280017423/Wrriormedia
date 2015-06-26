@@ -109,7 +109,7 @@ public class DBMgr {
         dataManager.open();
         try {
             results = dataManager
-                    .getList(type, true, null, null, null, null, key + " desc", ConstantSet.PAGE_SIZE + "");
+                    .getList(type, true, null, null, null, null, key + " asc", ConstantSet.PAGE_SIZE + "");
         } catch (DataAccessException e) {
             e.printStackTrace();
         }

@@ -40,14 +40,14 @@ public class DeviceRequest {
             if (jsonResult != null) {
                 if (jsonResult.isOK()) {
                     StatusModel model = jsonResult.getData(StatusModel.class);
-                    if (null != model && "1".equals(model.getReady())) {
+                    if (null != model) {
                         SharedPreferenceUtil.saveObject(WrriormediaApplication.getInstance().getBaseContext(), StatusModel.class.getName(), model);
                     }
                     result.ResultObject = model;
                 } else {
                     result.ResultObject = jsonResult.Msg;
                 }
-                result.ResultCode = jsonResult.State;
+                result.ResultCode = jsonResult.Code;
             } else {
                 result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             }
@@ -64,19 +64,46 @@ public class DeviceRequest {
         List<NameValuePair> postParams = new ArrayList<>();
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_VERSION, PackageUtil.getVersionName()));
-        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_MODIFY, SystemManager.getModifyTime()+""));
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_MODIFY, SystemManager.getModifyTime(url) + ""));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_NET, NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g"));
         try {
-            JsonResult jsonResult = HttpClientUtil.post(url, null, postParams);
+            JsonResult jsonResult = HttpClientUtil.get(url, null, postParams);
             if (jsonResult != null) {
                 if (jsonResult.isOK()) {
                     CmdModel model = jsonResult.getData(CmdModel.class);
-                    SystemManager.setModifyTime();// 更新本地的上次请求时间
+                    SystemManager.setModifyTime(url);// 更新本地的上次请求时间
                     result.ResultObject = model;
                 } else {
                     result.ResultObject = jsonResult.Msg;
                 }
-                result.ResultCode = jsonResult.State;
+                result.ResultCode = jsonResult.Code;
+            } else {
+                result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
+            }
+        } catch (Exception e) {
+            result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
+            EvtLog.w(TAG, e);
+        }
+        return result;
+    }
+
+    public static ActionResult ad() {
+        ActionResult result = new ActionResult();
+        String url = ServerAPIConstant.getAPIUrl(ServerAPIConstant.ACTION_AD);
+        List<NameValuePair> postParams = new ArrayList<>();
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_MODIFY, SystemManager.getModifyTime(url) + ""));
+        try {
+            JsonResult jsonResult = HttpClientUtil.get(url, null, postParams);
+            if (jsonResult != null) {
+                if (jsonResult.isOK()) {
+//                    StatusModel model = jsonResult.getData(StatusModel.class);
+                    SystemManager.setModifyTime(url);// 更新本地的上次请求时间
+//                    result.ResultObject = model;
+                } else {
+                    result.ResultObject = jsonResult.Msg;
+                }
+                result.ResultCode = jsonResult.Code;
             } else {
                 result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             }
