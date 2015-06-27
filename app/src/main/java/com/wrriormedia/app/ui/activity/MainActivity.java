@@ -10,6 +10,7 @@ import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.common.ServerAPIConstant;
 import com.wrriormedia.app.model.CmdModel;
 import com.wrriormedia.app.model.VersionModel;
+import com.wrriormedia.app.model.WifiModel;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
@@ -90,6 +91,11 @@ public class MainActivity extends HtcBaseActivity {
                 default:
                     break;
             }
+            WifiModel wifiModel = model.getWifi();
+            if (null != wifiModel) {
+                // TODO 设置wifi
+            }
+
             SystemUtil.changeBrightnessSlide(MainActivity.this, model.getBrightness() / 10f);// 改变屏幕亮度
             SystemUtil.setStreamVolume(MainActivity.this, model.getVolume());// 改变声音大小
             checkVersion(model.getVersion());
@@ -123,6 +129,7 @@ public class MainActivity extends HtcBaseActivity {
             if (null == result) {
                 return;
             }
+            // TODO 重点是要解析这个接口
         }
     }
 

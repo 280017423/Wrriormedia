@@ -34,6 +34,7 @@ public class DeviceRequest {
         List<NameValuePair> postParams = new ArrayList<>();
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_SIM, "123456"));
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_EQ_VERSION, "WM001"));
 //        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_SIM, PackageUtil.getLine1Number()));
         try {
             JsonResult jsonResult = HttpClientUtil.post(url, null, postParams);

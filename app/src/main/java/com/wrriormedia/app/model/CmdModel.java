@@ -10,6 +10,7 @@ public class CmdModel extends BaseModel {
     private int sys_time; // 服务端系统时间，客户端需要对比本地时间，相差超过10秒，需要校准本地时间
     private int sys_status;//设备状态控制信号（0：正常播放广告；1：暂停播放，展示默认图；2：系统关闭屏幕，停止播放），当这个信号为0时才继续判断下面的字段，如果不为0，则立即进入指定的状态，停止播放广告
     private int next_time;
+    private WifiModel wifi;
     private VersionModel version;
     private int start_time; //开始播放的时间
     private int end_time; //结束播放时间，在这两个时间段内正常播放广告，时间外关闭屏幕；
@@ -100,5 +101,13 @@ public class CmdModel extends BaseModel {
 
     public void setVolume(int volume) {
         this.volume = volume;
+    }
+
+    public WifiModel getWifi() {
+        return wifi;
+    }
+
+    public void setWifi(WifiModel wifi) {
+        this.wifi = wifi;
     }
 }
