@@ -1,8 +1,10 @@
 package com.wrriormedia.app.business.requst;
 
 import com.wrriormedia.app.app.WrriormediaApplication;
+import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.business.manager.SystemManager;
 import com.wrriormedia.app.common.ServerAPIConstant;
+import com.wrriormedia.app.model.AdModel;
 import com.wrriormedia.app.model.CmdModel;
 import com.wrriormedia.app.model.StatusModel;
 import com.wrriormedia.app.util.ActionResult;
@@ -98,9 +100,13 @@ public class DeviceRequest {
             JsonResult jsonResult = HttpClientUtil.get(url, null, postParams);
             if (jsonResult != null) {
                 if (jsonResult.isOK()) {
-//                    StatusModel model = jsonResult.getData(StatusModel.class);
                     SystemManager.setModifyTime(url);// 更新本地的上次请求时间
-//                    result.ResultObject = model;
+                    AdModel model = jsonResult.getData(AdModel.class);
+                    if (null != model ){
+                        DBMgr.deleteTableFromDb(AdModel.class);
+                        DBMgr.saveModel(model);
+                    }
+                    result.ResultObject = model;
                 } else {
                     result.ResultObject = jsonResult.Msg;
                 }

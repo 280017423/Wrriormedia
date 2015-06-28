@@ -29,12 +29,17 @@ public class DBMgr {
         if (null == model) {
             return;
         }
-        DataManager dataManager = DBUtil.getDataManager();
-        try {
-            dataManager.save(model);
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DataManager dataManager = DBUtil.getDataManager();
+                try {
+                    dataManager.save(model);
+                } catch (DataAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public static <T extends BaseModel> void saveModel(final T model, String primaryKey, String primaryValue) {

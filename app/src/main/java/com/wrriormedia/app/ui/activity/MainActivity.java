@@ -8,6 +8,7 @@ import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.common.ServerAPIConstant;
+import com.wrriormedia.app.model.AdModel;
 import com.wrriormedia.app.model.CmdModel;
 import com.wrriormedia.app.model.VersionModel;
 import com.wrriormedia.app.model.WifiModel;
@@ -67,11 +68,12 @@ public class MainActivity extends HtcBaseActivity {
         if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
             CmdModel model = (CmdModel) result.ResultObject;
             //TODO 需要更新系统时间 3.相差超过10秒，需要校准本地时间；
+            //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
+            SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_NEXT_TIME, model.getNext_time());
+            //TODO 定时闹钟，下次请求
             if (0 == model.getUpdate()) {
-                EvtLog.d("aaa", "不需要更新");
-                //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
-                SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_NEXT_TIME, model.getNext_time());
-                //TODO 定时闹钟，下次请求
+                EvtLog.d("aaa", "不需要更新指令");
+                new AdTask().execute();
                 return;
             }
             int sysStatus = model.getSys_status();
@@ -127,6 +129,14 @@ public class MainActivity extends HtcBaseActivity {
         protected void onPostExecute(ActionResult result) {
             dismissLoadingUpView(mLoadingUpView);
             if (null == result) {
+                return;
+            }
+            AdModel adModel = (AdModel) result.ResultObject;
+            //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
+            SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_AD_NEXT_TIME, adModel.getNext_time());
+            //TODO 定时闹钟，下次请求
+            if (0 == adModel.getUpdate()) {
+                EvtLog.d("aaa", "不需要更新广告");
                 return;
             }
             // TODO 重点是要解析这个接口

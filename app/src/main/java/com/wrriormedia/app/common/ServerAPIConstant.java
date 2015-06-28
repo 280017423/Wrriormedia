@@ -19,6 +19,7 @@ public class ServerAPIConstant {
     public static final String ACTION_KEY_MODIFY = "modify";
     public static final String ACTION_KEY_NET = "net";
     public static final String ACTION_KEY_NEXT_TIME = "next_time";
+    public static final String ACTION_KEY_AD_NEXT_TIME = "ad_next_time";
 
     /**
      * 获取后端的 api URL地址
