@@ -55,14 +55,14 @@ public class ErrorDialogConfig {
         this.tagForLoggingExceptions = tagForLoggingExceptions;
     }
 
-    public void setEventBus(EventBus eventBus) {
-        this.eventBus = eventBus;
-    }
-
     /**
      * eventBus!=null ? eventBus: EventBus.getDefault()
      */
     EventBus getEventBus() {
         return eventBus != null ? eventBus : EventBus.getDefault();
+    }
+
+    public void setEventBus(EventBus eventBus) {
+        this.eventBus = eventBus;
     }
 }

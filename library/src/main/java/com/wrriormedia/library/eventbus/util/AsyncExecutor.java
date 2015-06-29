@@ -32,6 +32,64 @@ import java.util.concurrent.Executors;
  */
 public class AsyncExecutor {
 
+    private final Executor threadPool;
+    private final Constructor<?> failureEventConstructor;
+    private final EventBus eventBus;
+    private final Object scope;
+
+    private AsyncExecutor(Executor threadPool, EventBus eventBus, Class<?> failureEventType, Object scope) {
+        this.threadPool = threadPool;
+        this.eventBus = eventBus;
+        this.scope = scope;
+        try {
+            failureEventConstructor = failureEventType.getConstructor(Throwable.class);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(
+                    "Failure event class must have a constructor with one parameter of type Throwable", e);
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static AsyncExecutor create() {
+        return new Builder().build();
+    }
+
+    /**
+     * Posts an failure event if the given {@link RunnableEx} throws an Exception.
+     */
+    public void execute(final RunnableEx runnable) {
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (Exception e) {
+                    Object event;
+                    try {
+                        event = failureEventConstructor.newInstance(e);
+                    } catch (Exception e1) {
+                        Log.e(EventBus.TAG, "Original exception:", e);
+                        throw new RuntimeException("Could not create failure event", e1);
+                    }
+                    if (event instanceof com.wrriormedia.library.eventbus.util.HasExecutionScope) {
+                        ((com.wrriormedia.library.eventbus.util.HasExecutionScope) event).setExecutionScope(scope);
+                    }
+                    eventBus.post(event);
+                }
+            }
+        });
+    }
+
+    /**
+     * Like {@link Runnable}, but the run method may throw an exception.
+     */
+    public interface RunnableEx {
+        void run() throws Exception;
+    }
+
     public static class Builder {
         private Executor threadPool;
         private Class<?> failureEventType;
@@ -75,64 +133,6 @@ public class AsyncExecutor {
             }
             return new AsyncExecutor(threadPool, eventBus, failureEventType, executionContext);
         }
-    }
-
-    /**
-     * Like {@link Runnable}, but the run method may throw an exception.
-     */
-    public interface RunnableEx {
-        void run() throws Exception;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static AsyncExecutor create() {
-        return new Builder().build();
-    }
-
-    private final Executor threadPool;
-    private final Constructor<?> failureEventConstructor;
-    private final EventBus eventBus;
-    private final Object scope;
-
-    private AsyncExecutor(Executor threadPool, EventBus eventBus, Class<?> failureEventType, Object scope) {
-        this.threadPool = threadPool;
-        this.eventBus = eventBus;
-        this.scope = scope;
-        try {
-            failureEventConstructor = failureEventType.getConstructor(Throwable.class);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(
-                    "Failure event class must have a constructor with one parameter of type Throwable", e);
-        }
-    }
-
-    /**
-     * Posts an failure event if the given {@link RunnableEx} throws an Exception.
-     */
-    public void execute(final RunnableEx runnable) {
-        threadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    runnable.run();
-                } catch (Exception e) {
-                    Object event;
-                    try {
-                        event = failureEventConstructor.newInstance(e);
-                    } catch (Exception e1) {
-                        Log.e(EventBus.TAG, "Original exception:", e);
-                        throw new RuntimeException("Could not create failure event", e1);
-                    }
-                    if (event instanceof com.wrriormedia.library.eventbus.util.HasExecutionScope) {
-                        ((com.wrriormedia.library.eventbus.util.HasExecutionScope) event).setExecutionScope(scope);
-                    }
-                    eventBus.post(event);
-                }
-            }
-        });
     }
 
 }

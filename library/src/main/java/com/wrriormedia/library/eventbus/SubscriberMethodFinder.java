@@ -51,6 +51,12 @@ class SubscriberMethodFinder {
         }
     }
 
+    static void clearCaches() {
+        synchronized (methodCache) {
+            methodCache.clear();
+        }
+    }
+
     List<SubscriberMethod> findSubscriberMethods(Class<?> subscriberClass) {
         String key = subscriberClass.getName();
         List<SubscriberMethod> subscriberMethods;
@@ -123,12 +129,6 @@ class SubscriberMethodFinder {
                 methodCache.put(key, subscriberMethods);
             }
             return subscriberMethods;
-        }
-    }
-
-    static void clearCaches() {
-        synchronized (methodCache) {
-            methodCache.clear();
         }
     }
 

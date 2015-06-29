@@ -33,14 +33,14 @@ import com.wrriormedia.library.R;
  */
 public class RoundCornerImageView extends ImageView {
 
-    private int mRoundWidth = 15;
-    private int mRoundHeight = 15;
-    private Paint mPaint;
-    private Paint mPaint2;
     boolean mLeftTopRound;
     boolean mRightTopRound;
     boolean mLeftBottomRound;
     boolean mRightBottomRound;
+    private int mRoundWidth = 15;
+    private int mRoundHeight = 15;
+    private Paint mPaint;
+    private Paint mPaint2;
 
     public RoundCornerImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);

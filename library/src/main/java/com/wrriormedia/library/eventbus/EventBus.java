@@ -39,16 +39,13 @@ import java.util.concurrent.ExecutorService;
  */
 public class EventBus {
 
+    private static final com.wrriormedia.library.eventbus.EventBusBuilder DEFAULT_BUILDER = new com.wrriormedia.library.eventbus.EventBusBuilder();
+    private static final Map<Class<?>, List<Class<?>>> eventTypesCache = new HashMap<Class<?>, List<Class<?>>>();
     /**
      * Log tag, apps may override it.
      */
     public static String TAG = "Event";
-
     static volatile EventBus defaultInstance;
-
-    private static final com.wrriormedia.library.eventbus.EventBusBuilder DEFAULT_BUILDER = new com.wrriormedia.library.eventbus.EventBusBuilder();
-    private static final Map<Class<?>, List<Class<?>>> eventTypesCache = new HashMap<Class<?>, List<Class<?>>>();
-
     private final Map<Class<?>, CopyOnWriteArrayList<Subscription>> subscriptionsByEventType;
     private final Map<Object, List<Class<?>>> typesBySubscriber;
     private final Map<Class<?>, Object> stickyEvents;
@@ -73,6 +70,31 @@ public class EventBus {
     private final boolean sendSubscriberExceptionEvent;
     private final boolean sendNoSubscriberEvent;
     private final boolean eventInheritance;
+
+    /**
+     * Creates a new EventBus instance; each instance is a separate scope in which events are delivered. To use a
+     * central bus, consider {@link #getDefault()}.
+     */
+    public EventBus() {
+        this(DEFAULT_BUILDER);
+    }
+
+    EventBus(EventBusBuilder builder) {
+        subscriptionsByEventType = new HashMap<Class<?>, CopyOnWriteArrayList<Subscription>>();
+        typesBySubscriber = new HashMap<Object, List<Class<?>>>();
+        stickyEvents = new ConcurrentHashMap<Class<?>, Object>();
+        mainThreadPoster = new HandlerPoster(this, Looper.getMainLooper(), 10);
+        backgroundPoster = new BackgroundPoster(this);
+        asyncPoster = new AsyncPoster(this);
+        subscriberMethodFinder = new SubscriberMethodFinder(builder.skipMethodVerificationForClasses);
+        logSubscriberExceptions = builder.logSubscriberExceptions;
+        logNoSubscriberMessages = builder.logNoSubscriberMessages;
+        sendSubscriberExceptionEvent = builder.sendSubscriberExceptionEvent;
+        sendNoSubscriberEvent = builder.sendNoSubscriberEvent;
+        throwSubscriberException = builder.throwSubscriberException;
+        eventInheritance = builder.eventInheritance;
+        executorService = builder.executorService;
+    }
 
     /**
      * Convenience singleton for apps using a process-wide EventBus instance.
@@ -101,30 +123,16 @@ public class EventBus {
     }
 
     /**
-     * Creates a new EventBus instance; each instance is a separate scope in which events are delivered. To use a
-     * central bus, consider {@link #getDefault()}.
+     * Recurses through super interfaces.
      */
-    public EventBus() {
-        this(DEFAULT_BUILDER);
+    static void addInterfaces(List<Class<?>> eventTypes, Class<?>[] interfaces) {
+        for (Class<?> interfaceClass : interfaces) {
+            if (!eventTypes.contains(interfaceClass)) {
+                eventTypes.add(interfaceClass);
+                addInterfaces(eventTypes, interfaceClass.getInterfaces());
+            }
+        }
     }
-
-    EventBus(EventBusBuilder builder) {
-        subscriptionsByEventType = new HashMap<Class<?>, CopyOnWriteArrayList<Subscription>>();
-        typesBySubscriber = new HashMap<Object, List<Class<?>>>();
-        stickyEvents = new ConcurrentHashMap<Class<?>, Object>();
-        mainThreadPoster = new HandlerPoster(this, Looper.getMainLooper(), 10);
-        backgroundPoster = new BackgroundPoster(this);
-        asyncPoster = new AsyncPoster(this);
-        subscriberMethodFinder = new SubscriberMethodFinder(builder.skipMethodVerificationForClasses);
-        logSubscriberExceptions = builder.logSubscriberExceptions;
-        logNoSubscriberMessages = builder.logNoSubscriberMessages;
-        sendSubscriberExceptionEvent = builder.sendSubscriberExceptionEvent;
-        sendNoSubscriberEvent = builder.sendNoSubscriberEvent;
-        throwSubscriberException = builder.throwSubscriberException;
-        eventInheritance = builder.eventInheritance;
-        executorService = builder.executorService;
-    }
-
 
     /**
      * Registers the given subscriber to receive events. Subscribers must call {@link #unregister(Object)} once they
@@ -500,18 +508,6 @@ public class EventBus {
     }
 
     /**
-     * Recurses through super interfaces.
-     */
-    static void addInterfaces(List<Class<?>> eventTypes, Class<?>[] interfaces) {
-        for (Class<?> interfaceClass : interfaces) {
-            if (!eventTypes.contains(interfaceClass)) {
-                eventTypes.add(interfaceClass);
-                addInterfaces(eventTypes, interfaceClass.getInterfaces());
-            }
-        }
-    }
-
-    /**
      * Invokes the subscriber if the subscriptions is still active. Skipping subscriptions prevents race conditions
      * between {@link #unregister(Object)} and event delivery. Otherwise the event might be delivered after the
      * subscriber unregistered. This is particularly important for main thread delivery and registrations bound to the
@@ -562,6 +558,15 @@ public class EventBus {
         }
     }
 
+    ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    // Just an idea: we could provide a callback to post() to be notified, an alternative would be events, of course...
+    /* public */interface PostCallback {
+        void onPostCompleted(List<SubscriberExceptionEvent> exceptionEvents);
+    }
+
     /**
      * For ThreadLocal, much faster to set (and get multiple values).
      */
@@ -572,15 +577,6 @@ public class EventBus {
         Subscription subscription;
         Object event;
         boolean canceled;
-    }
-
-    ExecutorService getExecutorService() {
-        return executorService;
-    }
-
-    // Just an idea: we could provide a callback to post() to be notified, an alternative would be events, of course...
-    /* public */interface PostCallback {
-        void onPostCompleted(List<SubscriberExceptionEvent> exceptionEvents);
     }
 
 }

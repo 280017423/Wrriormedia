@@ -43,16 +43,17 @@ public class FileUtil {
      * @return 文件
      * @throws MessageException 异常信息
      */
-    public static File getDownloadDir() throws com.wrriormedia.library.util.MessageException {
+    public static File getDownloadDir() throws MessageException {
         File downloadFile = null;
-        if (android.os.Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            downloadFile = new File(Environment.getExternalStorageDirectory(), DOWNLOAD_PATH);
+        if (isSDCardReady()) {
+            downloadFile = new File(Environment.getExternalStorageDirectory(), AppUtil.getMetaDataByKey(HtcApplicationBase.getInstance().getBaseContext(), "download_dir"));
+            if (!downloadFile.exists()) {
+                downloadFile.mkdirs();
+            }
         }
-
         if (downloadFile == null) {
-            throw new com.wrriormedia.library.util.MessageException(com.wrriormedia.library.util.PackageUtil.getString(R.string.more_check_version_no_sdcard));
+            throw new MessageException(PackageUtil.getString(R.string.no_sdcard));
         }
-
         return downloadFile;
     }
 

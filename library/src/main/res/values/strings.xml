@@ -11,7 +11,7 @@
     <string name="pull_to_refresh_release_label">释放开始刷新</string>
     <string name="pull_to_refresh_refreshing_label">正在刷新&#8230;</string>
     <string name="pull_to_refresh_header_subtext_label">上次更新:</string>
-    <string name="more_check_version_no_sdcard">SD卡未准备好，请确认后再进行下载安装</string>
+    <string name="no_sdcard">SD卡未准备好，请确认后再进行下载安装</string>
     <string name="no_more_data">没有更多了</string>
     <string name="footer_hint_load_normal">""</string>
     <!-- 检查版本更新 -->
@@ -28,9 +28,6 @@
     <!-- Just use standard Pull Down String when pulling up. These can be set for languages which require it -->
     <string name="pull_to_refresh_from_bottom_release_label">@string/pull_to_refresh_release_label</string>
     <string name="pull_to_refresh_from_bottom_refreshing_label">正在刷新…</string>
-
-    <item name="tag_image_url" type="id"></item>
-    <item name="tag_image_position" type="id"></item>
 
     <string-array name="day_of_week">
         <item name="Monday">周一</item>

@@ -87,7 +87,27 @@ public class DBMgr {
      * @param <T>  BaseModel类型子类
      * @return List<T> BaseModel类型集合
      */
-    public static <T extends BaseModel> List<T> getBaseModel(Class<T> type) {
+    public static <T extends BaseModel> T getBaseModel(Class<T> type, String whereClause) {
+        T results = null;
+        DataManager dataManager = DBUtil.getDataManager();
+        dataManager.open();
+        try {
+            results = dataManager.get(type, whereClause, null);
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+        }
+        dataManager.close();
+        return results;
+    }
+
+    /**
+     * 获取BaseModel本地记录，升序
+     *
+     * @param type model类型
+     * @param <T>  BaseModel类型子类
+     * @return List<T> BaseModel类型集合
+     */
+    public static <T extends BaseModel> List<T> getBaseModels(Class<T> type) {
         List<T> results = null;
         DataManager dataManager = DBUtil.getDataManager();
         dataManager.open();

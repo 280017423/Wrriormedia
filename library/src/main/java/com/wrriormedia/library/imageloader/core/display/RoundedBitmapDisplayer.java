@@ -12,43 +12,43 @@ import android.widget.ImageView;
 
 /**
  * Displays bitmap with rounded corners
- * 
+ *
  * @author Sergey Tarasevich
  */
 public class RoundedBitmapDisplayer implements BitmapDisplayer {
 
-	private int color;
-	private int roundPixels;
+    private int color;
+    private int roundPixels;
 
-	public RoundedBitmapDisplayer(int color, int roundPixels) {
-		this.color = color;
-		this.roundPixels = roundPixels;
-	}
+    public RoundedBitmapDisplayer(int color, int roundPixels) {
+        this.color = color;
+        this.roundPixels = roundPixels;
+    }
 
-	@Override
-	public Bitmap display(Bitmap bitmap, ImageView imageView) {
-		Bitmap roundBitmap = getRoundedCornerBitmap(bitmap);
-		imageView.setImageBitmap(roundBitmap);
-		return roundBitmap;
-	}
+    @Override
+    public Bitmap display(Bitmap bitmap, ImageView imageView) {
+        Bitmap roundBitmap = getRoundedCornerBitmap(bitmap);
+        imageView.setImageBitmap(roundBitmap);
+        return roundBitmap;
+    }
 
-	private Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
-		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-				bitmap.getHeight(), Config.ARGB_8888);
-		Canvas canvas = new Canvas(output);
+    private Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
 
-		final Paint paint = new Paint();
-		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-		final RectF rectF = new RectF(rect);
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
 
-		paint.setAntiAlias(true);
-		canvas.drawARGB(0, 0, 0, 0);
-		paint.setColor(color);
-		canvas.drawRoundRect(rectF, roundPixels, roundPixels, paint);
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, roundPixels, roundPixels, paint);
 
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-		canvas.drawBitmap(bitmap, rect, rect, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
 
-		return output;
-	}
+        return output;
+    }
 }

@@ -7,11 +7,11 @@ import java.lang.annotation.Target;
 
 /**
  * Transient 标识该字段不能被持久化（保存数据库）
- * 
+ *
  * @author huang.b 2013-9-23 下午2:36:17
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD
+@Target({ElementType.FIELD
 })
 public @interface Transient {
 

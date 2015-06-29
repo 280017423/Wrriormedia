@@ -406,13 +406,6 @@ public class TagGroup extends ViewGroup {
     }
 
     /**
-     * @see #setTags(String...)
-     */
-    public void setTags(List<String> tagList) {
-        setTags(tagList.toArray(new String[tagList.size()]));
-    }
-
-    /**
      * Set the tags. It will remove all previous tags first.
      *
      * @param tags the tag list to set.
@@ -426,6 +419,13 @@ public class TagGroup extends ViewGroup {
         if (isAppendMode) {
             appendInputTag();
         }
+    }
+
+    /**
+     * @see #setTags(String...)
+     */
+    public void setTags(List<String> tagList) {
+        setTags(tagList.toArray(new String[tagList.size()]));
     }
 
     /**

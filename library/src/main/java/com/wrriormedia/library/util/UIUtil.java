@@ -90,7 +90,7 @@ public class UIUtil {
     /**
      * 设置view的宽度
      *
-     * @param view   指定的view
+     * @param view  指定的view
      * @param width 指定的宽度，以像素为单位
      */
     public static void setViewWidth(View view, int width) {

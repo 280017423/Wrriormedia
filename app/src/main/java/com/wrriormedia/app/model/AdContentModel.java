@@ -13,15 +13,6 @@ public class AdContentModel extends BaseModel {
 
     private List<MediaModel> media;
     private TextModel text;
-    private List<DownloadModel> download;
-
-    public List<DownloadModel> getDownload() {
-        return download;
-    }
-
-    public void setDownload(List<DownloadModel> download) {
-        this.download = download;
-    }
 
     public List<MediaModel> getMedia() {
         return media;

@@ -29,148 +29,17 @@ import com.wrriormedia.library.eventbus.EventBus;
  */
 public class ErrorDialogManager {
 
-    public static class SupportManagerFragment extends Fragment {
-        protected boolean finishAfterDialog;
-        protected Bundle argumentsForErrorDialog;
-        private EventBus eventBus;
-        private boolean skipRegisterOnNextResume;
-        private Object executionScope;
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            eventBus = ErrorDialogManager.factory.config.getEventBus();
-            eventBus.register(this);
-            skipRegisterOnNextResume = true;
-        }
-
-        @Override
-        public void onResume() {
-            super.onResume();
-            if (skipRegisterOnNextResume) {
-                // registered in onCreate, skip registration in this run
-                skipRegisterOnNextResume = false;
-            } else {
-                eventBus = ErrorDialogManager.factory.config.getEventBus();
-                eventBus.register(this);
-            }
-        }
-
-        @Override
-        public void onPause() {
-            eventBus.unregister(this);
-            super.onPause();
-        }
-
-        public void onEventMainThread(com.wrriormedia.library.eventbus.util.ThrowableFailureEvent event) {
-            if (!isInExecutionScope(executionScope, event)) {
-                return;
-            }
-            checkLogException(event);
-            // Execute pending commits before finding to avoid multiple error fragments being shown
-            FragmentManager fm = getFragmentManager();
-            fm.executePendingTransactions();
-
-            DialogFragment existingFragment = (DialogFragment) fm.findFragmentByTag(TAG_ERROR_DIALOG);
-            if (existingFragment != null) {
-                // Just show the latest error
-                existingFragment.dismiss();
-            }
-
-            android.support.v4.app.DialogFragment errorFragment = (android.support.v4.app.DialogFragment) factory
-                    .prepareErrorFragment(event, finishAfterDialog, argumentsForErrorDialog);
-            if (errorFragment != null) {
-                errorFragment.show(fm, TAG_ERROR_DIALOG);
-            }
-        }
-
-        public static void attachTo(Activity activity, Object executionScope, boolean finishAfterDialog,
-                                    Bundle argumentsForErrorDialog) {
-            FragmentManager fm = ((FragmentActivity) activity).getSupportFragmentManager();
-            SupportManagerFragment fragment = (SupportManagerFragment) fm.findFragmentByTag(TAG_ERROR_DIALOG_MANAGER);
-            if (fragment == null) {
-                fragment = new SupportManagerFragment();
-                fm.beginTransaction().add(fragment, TAG_ERROR_DIALOG_MANAGER).commit();
-                fm.executePendingTransactions();
-            }
-            fragment.finishAfterDialog = finishAfterDialog;
-            fragment.argumentsForErrorDialog = argumentsForErrorDialog;
-            fragment.executionScope = executionScope;
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class HoneycombManagerFragment extends android.app.Fragment {
-        protected boolean finishAfterDialog;
-        protected Bundle argumentsForErrorDialog;
-        private EventBus eventBus;
-        private Object executionScope;
-
-        @Override
-        public void onResume() {
-            super.onResume();
-            eventBus = ErrorDialogManager.factory.config.getEventBus();
-            eventBus.register(this);
-        }
-
-        @Override
-        public void onPause() {
-            eventBus.unregister(this);
-            super.onPause();
-        }
-
-        public void onEventMainThread(com.wrriormedia.library.eventbus.util.ThrowableFailureEvent event) {
-            if (!isInExecutionScope(executionScope, event)) {
-                return;
-            }
-            checkLogException(event);
-
-            // Execute pending commits before finding to avoid multiple error fragments being shown
-            android.app.FragmentManager fm = getFragmentManager();
-            fm.executePendingTransactions();
-
-            android.app.DialogFragment existingFragment = (android.app.DialogFragment) fm
-                    .findFragmentByTag(TAG_ERROR_DIALOG);
-            if (existingFragment != null) {
-                // Just show the latest error
-                existingFragment.dismiss();
-            }
-
-            android.app.DialogFragment errorFragment = (android.app.DialogFragment) factory.prepareErrorFragment(event,
-                    finishAfterDialog, argumentsForErrorDialog);
-            if (errorFragment != null) {
-                errorFragment.show(fm, TAG_ERROR_DIALOG);
-            }
-        }
-
-        public static void attachTo(Activity activity, Object executionScope, boolean finishAfterDialog, Bundle argumentsForErrorDialog) {
-            android.app.FragmentManager fm = activity.getFragmentManager();
-            HoneycombManagerFragment fragment = (HoneycombManagerFragment) fm
-                    .findFragmentByTag(TAG_ERROR_DIALOG_MANAGER);
-            if (fragment == null) {
-                fragment = new HoneycombManagerFragment();
-                fm.beginTransaction().add(fragment, TAG_ERROR_DIALOG_MANAGER).commit();
-                fm.executePendingTransactions();
-            }
-            fragment.finishAfterDialog = finishAfterDialog;
-            fragment.argumentsForErrorDialog = argumentsForErrorDialog;
-            fragment.executionScope = executionScope;
-        }
-    }
-
-    /**
-     * Must be set by the application.
-     */
-    public static ErrorDialogFragmentFactory<?> factory;
-
-    protected static final String TAG_ERROR_DIALOG = "de.greenrobot.eventbus.error_dialog";
-    protected static final String TAG_ERROR_DIALOG_MANAGER = "de.greenrobot.eventbus.error_dialog_manager";
-
     public static final String KEY_TITLE = "de.greenrobot.eventbus.errordialog.title";
     public static final String KEY_MESSAGE = "de.greenrobot.eventbus.errordialog.message";
     public static final String KEY_FINISH_AFTER_DIALOG = "de.greenrobot.eventbus.errordialog.finish_after_dialog";
     public static final String KEY_ICON_ID = "de.greenrobot.eventbus.errordialog.icon_id";
     public static final String KEY_EVENT_TYPE_ON_CLOSE = "de.greenrobot.eventbus.errordialog.event_type_on_close";
+    protected static final String TAG_ERROR_DIALOG = "de.greenrobot.eventbus.error_dialog";
+    protected static final String TAG_ERROR_DIALOG_MANAGER = "de.greenrobot.eventbus.error_dialog_manager";
+    /**
+     * Must be set by the application.
+     */
+    public static ErrorDialogFragmentFactory<?> factory;
 
     /**
      * Scope is limited to the activity's class.
@@ -249,6 +118,135 @@ public class ErrorDialogManager {
             }
         }
         return true;
+    }
+
+    public static class SupportManagerFragment extends Fragment {
+        protected boolean finishAfterDialog;
+        protected Bundle argumentsForErrorDialog;
+        private EventBus eventBus;
+        private boolean skipRegisterOnNextResume;
+        private Object executionScope;
+
+        public static void attachTo(Activity activity, Object executionScope, boolean finishAfterDialog,
+                                    Bundle argumentsForErrorDialog) {
+            FragmentManager fm = ((FragmentActivity) activity).getSupportFragmentManager();
+            SupportManagerFragment fragment = (SupportManagerFragment) fm.findFragmentByTag(TAG_ERROR_DIALOG_MANAGER);
+            if (fragment == null) {
+                fragment = new SupportManagerFragment();
+                fm.beginTransaction().add(fragment, TAG_ERROR_DIALOG_MANAGER).commit();
+                fm.executePendingTransactions();
+            }
+            fragment.finishAfterDialog = finishAfterDialog;
+            fragment.argumentsForErrorDialog = argumentsForErrorDialog;
+            fragment.executionScope = executionScope;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            eventBus = ErrorDialogManager.factory.config.getEventBus();
+            eventBus.register(this);
+            skipRegisterOnNextResume = true;
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            if (skipRegisterOnNextResume) {
+                // registered in onCreate, skip registration in this run
+                skipRegisterOnNextResume = false;
+            } else {
+                eventBus = ErrorDialogManager.factory.config.getEventBus();
+                eventBus.register(this);
+            }
+        }
+
+        @Override
+        public void onPause() {
+            eventBus.unregister(this);
+            super.onPause();
+        }
+
+        public void onEventMainThread(com.wrriormedia.library.eventbus.util.ThrowableFailureEvent event) {
+            if (!isInExecutionScope(executionScope, event)) {
+                return;
+            }
+            checkLogException(event);
+            // Execute pending commits before finding to avoid multiple error fragments being shown
+            FragmentManager fm = getFragmentManager();
+            fm.executePendingTransactions();
+
+            DialogFragment existingFragment = (DialogFragment) fm.findFragmentByTag(TAG_ERROR_DIALOG);
+            if (existingFragment != null) {
+                // Just show the latest error
+                existingFragment.dismiss();
+            }
+
+            android.support.v4.app.DialogFragment errorFragment = (android.support.v4.app.DialogFragment) factory
+                    .prepareErrorFragment(event, finishAfterDialog, argumentsForErrorDialog);
+            if (errorFragment != null) {
+                errorFragment.show(fm, TAG_ERROR_DIALOG);
+            }
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class HoneycombManagerFragment extends android.app.Fragment {
+        protected boolean finishAfterDialog;
+        protected Bundle argumentsForErrorDialog;
+        private EventBus eventBus;
+        private Object executionScope;
+
+        public static void attachTo(Activity activity, Object executionScope, boolean finishAfterDialog, Bundle argumentsForErrorDialog) {
+            android.app.FragmentManager fm = activity.getFragmentManager();
+            HoneycombManagerFragment fragment = (HoneycombManagerFragment) fm
+                    .findFragmentByTag(TAG_ERROR_DIALOG_MANAGER);
+            if (fragment == null) {
+                fragment = new HoneycombManagerFragment();
+                fm.beginTransaction().add(fragment, TAG_ERROR_DIALOG_MANAGER).commit();
+                fm.executePendingTransactions();
+            }
+            fragment.finishAfterDialog = finishAfterDialog;
+            fragment.argumentsForErrorDialog = argumentsForErrorDialog;
+            fragment.executionScope = executionScope;
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            eventBus = ErrorDialogManager.factory.config.getEventBus();
+            eventBus.register(this);
+        }
+
+        @Override
+        public void onPause() {
+            eventBus.unregister(this);
+            super.onPause();
+        }
+
+        public void onEventMainThread(com.wrriormedia.library.eventbus.util.ThrowableFailureEvent event) {
+            if (!isInExecutionScope(executionScope, event)) {
+                return;
+            }
+            checkLogException(event);
+
+            // Execute pending commits before finding to avoid multiple error fragments being shown
+            android.app.FragmentManager fm = getFragmentManager();
+            fm.executePendingTransactions();
+
+            android.app.DialogFragment existingFragment = (android.app.DialogFragment) fm
+                    .findFragmentByTag(TAG_ERROR_DIALOG);
+            if (existingFragment != null) {
+                // Just show the latest error
+                existingFragment.dismiss();
+            }
+
+            android.app.DialogFragment errorFragment = (android.app.DialogFragment) factory.prepareErrorFragment(event,
+                    finishAfterDialog, argumentsForErrorDialog);
+            if (errorFragment != null) {
+                errorFragment.show(fm, TAG_ERROR_DIALOG);
+            }
+        }
     }
 
 }

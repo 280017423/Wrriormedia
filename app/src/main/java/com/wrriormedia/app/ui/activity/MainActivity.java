@@ -1,5 +1,6 @@
 package com.wrriormedia.app.ui.activity;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -8,10 +9,11 @@ import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.common.ServerAPIConstant;
-import com.wrriormedia.app.model.AdModel;
+import com.wrriormedia.app.model.AdContentModel;
 import com.wrriormedia.app.model.CmdModel;
 import com.wrriormedia.app.model.VersionModel;
 import com.wrriormedia.app.model.WifiModel;
+import com.wrriormedia.app.service.DownloadService;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
@@ -39,29 +41,6 @@ public class MainActivity extends HtcBaseActivity {
 
     private void getCmd() {
         new CmdTask().execute();
-    }
-
-    class CmdTask extends AsyncTask<Void, Void, ActionResult> {
-
-        @Override
-        protected void onPreExecute() {
-            showLoadingUpView(mLoadingUpView);
-            super.onPreExecute();
-        }
-
-        @Override
-        protected ActionResult doInBackground(Void... params) {
-            return DeviceRequest.cmd();
-        }
-
-        @Override
-        protected void onPostExecute(ActionResult result) {
-            dismissLoadingUpView(mLoadingUpView);
-            if (null == result) {
-                return;
-            }
-            EventBus.getDefault().post(result);
-        }
     }
 
     public void onEventMainThread(ActionResult result) {
@@ -97,11 +76,20 @@ public class MainActivity extends HtcBaseActivity {
             if (null != wifiModel) {
                 // TODO 设置wifi
             }
-
+            int needDownload = model.getDownload();
+            if (1 == needDownload) {
+                EvtLog.d("aaa", "有新的下载");
+                new DownloadTask().execute();
+            }
+            int needAd = model.getAd();
+            if (1 == needAd) {
+                EvtLog.d("aaa", "有新的广告");
+                new AdTask().execute();
+            }
             SystemUtil.changeBrightnessSlide(MainActivity.this, model.getBrightness() / 10f);// 改变屏幕亮度
             SystemUtil.setStreamVolume(MainActivity.this, model.getVolume());// 改变声音大小
             checkVersion(model.getVersion());
-            new AdTask().execute();
+
         } else {
             //TODO 记录日志
             showErrorMsg(result);
@@ -110,6 +98,35 @@ public class MainActivity extends HtcBaseActivity {
 
     private void checkVersion(VersionModel model) {
         // TODO 更新版本逻辑
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
+
+    class CmdTask extends AsyncTask<Void, Void, ActionResult> {
+
+        @Override
+        protected void onPreExecute() {
+            showLoadingUpView(mLoadingUpView);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected ActionResult doInBackground(Void... params) {
+            return DeviceRequest.cmd();
+        }
+
+        @Override
+        protected void onPostExecute(ActionResult result) {
+            dismissLoadingUpView(mLoadingUpView);
+            if (null == result) {
+                return;
+            }
+            EventBus.getDefault().post(result);
+        }
     }
 
     class AdTask extends AsyncTask<Void, Void, ActionResult> {
@@ -131,21 +148,29 @@ public class MainActivity extends HtcBaseActivity {
             if (null == result) {
                 return;
             }
-            AdModel adModel = (AdModel) result.ResultObject;
-            //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
-            SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_AD_NEXT_TIME, adModel.getNext_time());
-            //TODO 定时闹钟，下次请求
-            if (0 == adModel.getUpdate()) {
-                EvtLog.d("aaa", "不需要更新广告");
-                return;
-            }
+            AdContentModel adModel = (AdContentModel) result.ResultObject;
+
             // TODO 重点是要解析这个接口
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
+    class DownloadTask extends AsyncTask<Void, Void, ActionResult> {
+
+        @Override
+        protected void onPreExecute() {
+            showLoadingUpView(mLoadingUpView);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected ActionResult doInBackground(Void... params) {
+            return DeviceRequest.getAdDownload();
+        }
+
+        @Override
+        protected void onPostExecute(ActionResult result) {
+            dismissLoadingUpView(mLoadingUpView);
+            startService(new Intent(MainActivity.this, DownloadService.class));// 开启下载服务
+        }
     }
 }

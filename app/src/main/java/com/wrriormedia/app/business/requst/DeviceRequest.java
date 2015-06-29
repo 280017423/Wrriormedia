@@ -1,11 +1,13 @@
 package com.wrriormedia.app.business.requst;
 
+import com.pdw.gson.reflect.TypeToken;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.business.manager.SystemManager;
 import com.wrriormedia.app.common.ServerAPIConstant;
-import com.wrriormedia.app.model.AdModel;
+import com.wrriormedia.app.model.AdContentModel;
 import com.wrriormedia.app.model.CmdModel;
+import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.app.model.StatusModel;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
@@ -90,6 +92,48 @@ public class DeviceRequest {
         return result;
     }
 
+    public static ActionResult getAdDownload() {
+        ActionResult result = new ActionResult();
+        String url = ServerAPIConstant.getAPIUrl(ServerAPIConstant.ACTION_AD_DOWNLOAD);
+        List<NameValuePair> postParams = new ArrayList<>();
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
+        try {
+            JsonResult jsonResult = HttpClientUtil.get(url, null, postParams);
+            if (jsonResult != null) {
+                if (jsonResult.isOK()) {
+                    List<DownloadModel> downloadModels = jsonResult.getData(new TypeToken<List<DownloadModel>>() {
+                    }.getType());
+                    SystemManager.setModifyTime(url);// 更新本地的上次请求时间
+                    // 这里是 增量返回
+                    if (null != downloadModels || !downloadModels.isEmpty()) {
+                        for (DownloadModel model : downloadModels) {
+                            DownloadModel localModel = DBMgr.getBaseModel(DownloadModel.class, DownloadModel.WHERE_CASE_SUB + " = " + model.getAid());
+                            if (null == localModel) {
+                                EvtLog.d("aaa", "服务器新增的" + model.getAid());
+                                DBMgr.saveModel(model);
+                            } else {
+                                EvtLog.d("aaa", "这个是服务器修改本地数据库的" + model.getAid());
+                                // TODO 先删除本地已经下载的数据
+                                model.setIsDownloadFinish(1); // TODO 正式环境要去掉
+                                DBMgr.saveModel(model, DownloadModel.WHERE_CASE, "" + model.getAid());
+                            }
+                        }
+                    }
+                    result.ResultObject = downloadModels;
+                } else {
+                    result.ResultObject = jsonResult.Msg;
+                }
+                result.ResultCode = jsonResult.Code;
+            } else {
+                result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
+            }
+        } catch (Exception e) {
+            result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
+            EvtLog.w(TAG, e);
+        }
+        return result;
+    }
+
     public static ActionResult ad() {
         ActionResult result = new ActionResult();
         String url = ServerAPIConstant.getAPIUrl(ServerAPIConstant.ACTION_AD);
@@ -101,12 +145,13 @@ public class DeviceRequest {
             if (jsonResult != null) {
                 if (jsonResult.isOK()) {
                     SystemManager.setModifyTime(url);// 更新本地的上次请求时间
-                    AdModel model = jsonResult.getData(AdModel.class);
-                    if (null != model ){
-                        DBMgr.deleteTableFromDb(AdModel.class);
-                        DBMgr.saveModel(model);
-                    }
+                    AdContentModel model = jsonResult.getData(AdContentModel.class);
+//                    if (null != model ){
+//                        DBMgr.deleteTableFromDb(AdContentModel.class);
+//                        DBMgr.saveModel(model);
+//                    }
                     result.ResultObject = model;
+                    EvtLog.d("aaa", model.toString());
                 } else {
                     result.ResultObject = jsonResult.Msg;
                 }

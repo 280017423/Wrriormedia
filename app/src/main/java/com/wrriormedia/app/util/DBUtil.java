@@ -3,6 +3,7 @@ package com.wrriormedia.app.util;
 import android.content.Context;
 
 import com.wrriormedia.app.business.dao.DBMgr;
+import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.library.app.HtcApplicationBase;
 import com.wrriormedia.library.orm.DataManager;
 import com.wrriormedia.library.orm.DatabaseBuilder;
@@ -22,6 +23,7 @@ public class DBUtil {
     static {
         if (DATABASE_BUILDER == null) {
             DATABASE_BUILDER = new DatabaseBuilder(PackageUtil.getConfigString("db_name"));
+            DATABASE_BUILDER.addClass(DownloadModel.class);
         }
     }
 

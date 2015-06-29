@@ -18,143 +18,132 @@ import java.util.UUID;
 
 /**
  * 记录动作信息类
- * 
+ *
+ * @param <T> 动作回调
  * @author tan.xx
- * @param <T>
- *            动作回调
  */
-@SuppressWarnings({ "rawtypes" })
+@SuppressWarnings({"rawtypes"})
 public class ActionModel<T extends IBaseActionListener> {
-	// 唯一标识
-	private String mIdentify;
-	// 接口回调
-	private T mListener;
-	// 跳转目的
-	private Intent mIntent;
-	// 当前Activity
-	private Activity mActivity;
-	// 登录类型
-	private LOGIN_TYPE mLoginType;
-	// 是否在UI线程中回调
-	private boolean mIsOnUiThreadCallBack;
-	// 是否是自动登陆后
-	private boolean mIsAfterAutoLogin;
+    // 唯一标识
+    private String mIdentify;
+    // 接口回调
+    private T mListener;
+    // 跳转目的
+    private Intent mIntent;
+    // 当前Activity
+    private Activity mActivity;
+    // 登录类型
+    private LOGIN_TYPE mLoginType;
+    // 是否在UI线程中回调
+    private boolean mIsOnUiThreadCallBack;
+    // 是否是自动登陆后
+    private boolean mIsAfterAutoLogin;
 
-	/**
-	 * 构造方法
-	 * 
-	 * @param context
-	 *            上下文
-	 * @param listener
-	 *            回调
-	 * @param intent
-	 *            目的界面
-	 * @param isOnUiThreadCallBack
-	 *            是否在UI线程回调
-	 */
-	public ActionModel(Activity context, T listener, Intent intent, boolean isOnUiThreadCallBack) {
-		this.mActivity = context;
-		this.mListener = listener;
-		this.mIntent = intent;
-		this.mIdentify = UUID.randomUUID().toString() + System.currentTimeMillis();
-		this.mIsOnUiThreadCallBack = isOnUiThreadCallBack;
-	}
+    /**
+     * 构造方法
+     *
+     * @param context              上下文
+     * @param listener             回调
+     * @param intent               目的界面
+     * @param isOnUiThreadCallBack 是否在UI线程回调
+     */
+    public ActionModel(Activity context, T listener, Intent intent, boolean isOnUiThreadCallBack) {
+        this.mActivity = context;
+        this.mListener = listener;
+        this.mIntent = intent;
+        this.mIdentify = UUID.randomUUID().toString() + System.currentTimeMillis();
+        this.mIsOnUiThreadCallBack = isOnUiThreadCallBack;
+    }
 
-	/**
-	 * @return the identify
-	 */
-	public String getIdentify() {
-		return mIdentify;
-	}
+    /**
+     * @return the identify
+     */
+    public String getIdentify() {
+        return mIdentify;
+    }
 
-	/**
-	 * @param identify
-	 *            the identify to set
-	 */
-	public void setIdentify(String identify) {
-		mIdentify = identify;
-	}
+    /**
+     * @param identify the identify to set
+     */
+    public void setIdentify(String identify) {
+        mIdentify = identify;
+    }
 
-	/**
-	 * @return the mListener
-	 */
-	public T getListener() {
-		return mListener;
-	}
+    /**
+     * @return the mListener
+     */
+    public T getListener() {
+        return mListener;
+    }
 
-	/**
-	 * @param listener
-	 *            the mListener to set
-	 */
-	public void setListener(T listener) {
-		this.mListener = listener;
-	}
+    /**
+     * @param listener the mListener to set
+     */
+    public void setListener(T listener) {
+        this.mListener = listener;
+    }
 
-	/**
-	 * @return the intent
-	 */
-	public Intent getIntent() {
-		return mIntent;
-	}
+    /**
+     * @return the intent
+     */
+    public Intent getIntent() {
+        return mIntent;
+    }
 
-	/**
-	 * @param intent
-	 *            the intent to set
-	 */
-	public void setIntent(Intent intent) {
-		mIntent = intent;
-	}
+    /**
+     * @param intent the intent to set
+     */
+    public void setIntent(Intent intent) {
+        mIntent = intent;
+    }
 
-	/**
-	 * @return the currentContext
-	 */
-	public Activity getActivity() {
-		return mActivity;
-	}
+    /**
+     * @return the currentContext
+     */
+    public Activity getActivity() {
+        return mActivity;
+    }
 
-	/**
-	 * @param activity
-	 *            the mActivity to set
-	 */
-	public void setActivity(Activity activity) {
-		mActivity = activity;
-	}
+    /**
+     * @param activity the mActivity to set
+     */
+    public void setActivity(Activity activity) {
+        mActivity = activity;
+    }
 
-	/**
-	 * @return the mLoginType
-	 */
-	public LOGIN_TYPE getLoginType() {
-		return mLoginType;
-	}
+    /**
+     * @return the mLoginType
+     */
+    public LOGIN_TYPE getLoginType() {
+        return mLoginType;
+    }
 
-	/**
-	 * @param loginType
-	 *            the mLoginType to set
-	 */
-	public void setLoginType(LOGIN_TYPE loginType) {
-		this.mLoginType = loginType;
-	}
+    /**
+     * @param loginType the mLoginType to set
+     */
+    public void setLoginType(LOGIN_TYPE loginType) {
+        this.mLoginType = loginType;
+    }
 
-	/**
-	 * @return the mIsOnUiThreadCallBack
-	 */
-	public boolean isOnUiThreadCallBack() {
-		return mIsOnUiThreadCallBack;
-	}
+    /**
+     * @return the mIsOnUiThreadCallBack
+     */
+    public boolean isOnUiThreadCallBack() {
+        return mIsOnUiThreadCallBack;
+    }
 
-	/**
-	 * @param isOnUiThreadCallBack
-	 *            the mIsOnUiThreadCallBack to set
-	 */
-	public void setIsOnUiThreadCallBack(boolean isOnUiThreadCallBack) {
-		this.mIsOnUiThreadCallBack = isOnUiThreadCallBack;
-	}
+    /**
+     * @param isOnUiThreadCallBack the mIsOnUiThreadCallBack to set
+     */
+    public void setIsOnUiThreadCallBack(boolean isOnUiThreadCallBack) {
+        this.mIsOnUiThreadCallBack = isOnUiThreadCallBack;
+    }
 
-	public boolean isAfterAutoLogin() {
-		return mIsAfterAutoLogin;
-	}
+    public boolean isAfterAutoLogin() {
+        return mIsAfterAutoLogin;
+    }
 
-	public void setIsAfterAutoLogin(boolean isAfterAutoLogin) {
-		this.mIsAfterAutoLogin = isAfterAutoLogin;
-	}
+    public void setIsAfterAutoLogin(boolean isAfterAutoLogin) {
+        this.mIsAfterAutoLogin = isAfterAutoLogin;
+    }
 }

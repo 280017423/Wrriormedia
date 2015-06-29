@@ -36,4 +36,15 @@ public class DownLoadVideoModel extends BaseModel {
     public void setSecond(String second) {
         this.second = second;
     }
+
+    public String getFileName() {
+        if (null == first) {
+            if (null == second){
+                return "";
+            }else{
+                return second.substring(second.lastIndexOf("."));
+            }
+        }
+        return first.substring(first.lastIndexOf("."));
+    }
 }

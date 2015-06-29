@@ -32,7 +32,7 @@ public class NetWorkChangeBroadcastReceiver extends BroadcastReceiver {
                     StatusModel model = (StatusModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), StatusModel.class.getName(), StatusModel.class);
                     if (null == model || StringUtil.isNullOrEmpty(model.getSerial())) {
                         new VerifyTask().execute();
-                    }else {
+                    } else {
                         ActionResult result = new ActionResult();
                         result.ResultCode = ActionResult.RESULT_CODE_SUCCESS;
                         EventBus.getDefault().post(result);

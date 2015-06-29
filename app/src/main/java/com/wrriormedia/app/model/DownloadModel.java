@@ -9,9 +9,13 @@ import com.wrriormedia.library.orm.BaseModel;
  */
 public class DownloadModel extends BaseModel {
 
+    public static final String WHERE_CASE = "AID = ?";
+    public static final String WHERE_CASE_SUB = "AID";
+
     private int aid;
     private DownLoadVideoModel video;
     private DownLoadImageModel image;
+    private int isDownloadFinish;
 
     public int getAid() {
         return aid;
@@ -35,5 +39,13 @@ public class DownloadModel extends BaseModel {
 
     public void setVideo(DownLoadVideoModel video) {
         this.video = video;
+    }
+
+    public int getIsDownloadFinish() {
+        return isDownloadFinish;
+    }
+
+    public void setIsDownloadFinish(int isDownloadFinish) {
+        this.isDownloadFinish = isDownloadFinish;
     }
 }

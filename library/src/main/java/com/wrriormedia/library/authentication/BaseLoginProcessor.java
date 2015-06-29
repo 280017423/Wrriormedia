@@ -1,4 +1,3 @@
-
 package com.wrriormedia.library.authentication;
 
 import android.app.Activity;

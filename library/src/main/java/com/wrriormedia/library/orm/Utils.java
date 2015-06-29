@@ -2,8 +2,8 @@ package com.wrriormedia.library.orm;
 
 import android.database.Cursor;
 
-import com.wrriormedia.library.util.EvtLog;
 import com.pdw.gson.Gson;
+import com.wrriormedia.library.util.EvtLog;
 
 import java.lang.reflect.Field;
 import java.sql.Timestamp;

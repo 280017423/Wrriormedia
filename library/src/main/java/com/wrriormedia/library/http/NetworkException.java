@@ -13,14 +13,6 @@ public class NetworkException extends Exception {
     private static String MESSAGE = com.wrriormedia.library.util.PackageUtil.getString(R.string.network_is_not_available);
     private int exceptionCode;
 
-    public int getExceptionCode() {
-        return exceptionCode;
-    }
-
-    public void setExceptionCode(int mExceptionCode) {
-        this.exceptionCode = mExceptionCode;
-    }
-
     /**
      * 构造函数
      */
@@ -35,5 +27,13 @@ public class NetworkException extends Exception {
      */
     public NetworkException(String message) {
         super(message);
+    }
+
+    public int getExceptionCode() {
+        return exceptionCode;
+    }
+
+    public void setExceptionCode(int mExceptionCode) {
+        this.exceptionCode = mExceptionCode;
     }
 }

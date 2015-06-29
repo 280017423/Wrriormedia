@@ -17,7 +17,7 @@ import com.wrriormedia.library.imageloader.core.display.BitmapDisplayer;
  * <li>image scale type</li>
  * <li>transformation matrix</li>
  * </ul>
- * 
+ * <p/>
  * You can create instance:
  * <ul>
  * <li>with {@link Builder}:<br />
@@ -27,165 +27,169 @@ import com.wrriormedia.library.imageloader.core.display.BitmapDisplayer;
  * <br />
  * </li>
  * <li>or by static method: {@link #createSimple()}</li> <br />
- * 
+ *
  * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
  */
 public final class DisplayImageOptions {
 
-	private final Integer stubImage;
-	private final Integer imageForEmptyUri;
-	private final boolean resetViewBeforeLoading;
-	private final boolean cacheInMemory;
-	private final boolean cacheOnDisc;
-	private final ImageScaleType imageScaleType;
-	private final BitmapDisplayer displayer;
+    private final Integer stubImage;
+    private final Integer imageForEmptyUri;
+    private final boolean resetViewBeforeLoading;
+    private final boolean cacheInMemory;
+    private final boolean cacheOnDisc;
+    private final ImageScaleType imageScaleType;
+    private final BitmapDisplayer displayer;
 
-	private DisplayImageOptions(Builder builder) {
-		stubImage = builder.stubImage;
-		imageForEmptyUri = builder.imageForEmptyUri;
-		resetViewBeforeLoading = builder.resetViewBeforeLoading;
-		cacheInMemory = builder.cacheInMemory;
-		cacheOnDisc = builder.cacheOnDisc;
-		imageScaleType = builder.imageScaleType;
-		displayer = builder.displayer;
-	}
+    private DisplayImageOptions(Builder builder) {
+        stubImage = builder.stubImage;
+        imageForEmptyUri = builder.imageForEmptyUri;
+        resetViewBeforeLoading = builder.resetViewBeforeLoading;
+        cacheInMemory = builder.cacheInMemory;
+        cacheOnDisc = builder.cacheOnDisc;
+        imageScaleType = builder.imageScaleType;
+        displayer = builder.displayer;
+    }
 
-	boolean isShowStubImage() {
-		return stubImage != null;
-	}
+    /**
+     * Creates options appropriate for single displaying:
+     * <ul>
+     * <li>Stub image will <b>not</b> be displayed in
+     * {@link android.widget.ImageView ImageView} during image loading</li>
+     * <li>Loaded image will <b>not</b> be cached in memory</li>
+     * <li>Loaded image will <b>not</b> be cached on disc (application cache
+     * directory or on SD card)</li>
+     * <li>{@link ImageScaleType#POWER_OF_2 FAST} decoding type will be used</li>
+     * </ul>
+     * <p/>
+     * These option are appropriate for simple single-use image (from drawables
+     * or from internet) displaying.
+     */
+    public static DisplayImageOptions createSimple() {
+        return new Builder().build();
+    }
 
-	boolean isShowImageForEmptyUri() {
-		return imageForEmptyUri != null;
-	}
+    boolean isShowStubImage() {
+        return stubImage != null;
+    }
 
-	Integer getStubImage() {
-		return stubImage;
-	}
+    boolean isShowImageForEmptyUri() {
+        return imageForEmptyUri != null;
+    }
 
-	Integer getImageForEmptyUri() {
-		return imageForEmptyUri;
-	}
+    Integer getStubImage() {
+        return stubImage;
+    }
 
-	boolean isResetViewBeforeLoading() {
-		return resetViewBeforeLoading;
-	}
+    Integer getImageForEmptyUri() {
+        return imageForEmptyUri;
+    }
 
-	boolean isCacheInMemory() {
-		return cacheInMemory;
-	}
+    boolean isResetViewBeforeLoading() {
+        return resetViewBeforeLoading;
+    }
 
-	boolean isCacheOnDisc() {
-		return cacheOnDisc;
-	}
+    boolean isCacheInMemory() {
+        return cacheInMemory;
+    }
 
-	ImageScaleType getImageScaleType() {
-		return imageScaleType;
-	}
+    boolean isCacheOnDisc() {
+        return cacheOnDisc;
+    }
 
-	BitmapDisplayer getDisplayer() {
-		return displayer;
-	}
+    ImageScaleType getImageScaleType() {
+        return imageScaleType;
+    }
 
-	/**
-	 * Builder for {@link DisplayImageOptions}
-	 * 
-	 * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
-	 */
-	public static class Builder {
-		private Integer stubImage = null;
-		private Integer imageForEmptyUri = null;
-		private boolean resetViewBeforeLoading = false;
-		private boolean cacheInMemory = false;
-		private boolean cacheOnDisc = false;
-		private ImageScaleType imageScaleType = ImageScaleType.POWER_OF_2;
-		private BitmapDisplayer displayer = com.wrriormedia.library.imageloader.core.DefaultConfigurationFactory.createBitmapDisplayer();
+    BitmapDisplayer getDisplayer() {
+        return displayer;
+    }
 
-		/**
-		 * Stub image will be displayed in {@link android.widget.ImageView
-		 * ImageView} during image loading
-		 * 
-		 * @param stubImageRes
-		 *            Stub image resource
-		 */
-		public Builder showStubImage(int stubImageRes) {
-			stubImage = stubImageRes;
-			return this;
-		}
+    /**
+     * Builder for {@link DisplayImageOptions}
+     *
+     * @author Sergey Tarasevich (nostra13[at]gmail[dot]com)
+     */
+    public static class Builder {
+        private Integer stubImage = null;
+        private Integer imageForEmptyUri = null;
+        private boolean resetViewBeforeLoading = false;
+        private boolean cacheInMemory = false;
+        private boolean cacheOnDisc = false;
+        private ImageScaleType imageScaleType = ImageScaleType.POWER_OF_2;
+        private BitmapDisplayer displayer = com.wrriormedia.library.imageloader.core.DefaultConfigurationFactory.createBitmapDisplayer();
 
-		/**
-		 * Image will be displayed in {@link android.widget.ImageView ImageView}
-		 * if empty URI (null or empty string) will be passed to
-		 * <b>ImageLoader.displayImage(...)</b> method.
-		 * 
-		 * @param imageRes
-		 *            Image resource
-		 */
-		public Builder showImageForEmptyUri(int imageRes) {
-			imageForEmptyUri = imageRes;
-			return this;
-		}
+        /**
+         * Stub image will be displayed in {@link android.widget.ImageView
+         * ImageView} during image loading
+         *
+         * @param stubImageRes Stub image resource
+         */
+        public Builder showStubImage(int stubImageRes) {
+            stubImage = stubImageRes;
+            return this;
+        }
 
-		/**
-		 * {@link android.widget.ImageView ImageView} will be reset (set
-		 * <b>null</b>) before image loading start
-		 */
-		public Builder resetViewBeforeLoading() {
-			resetViewBeforeLoading = true;
-			return this;
-		}
+        /**
+         * Image will be displayed in {@link android.widget.ImageView ImageView}
+         * if empty URI (null or empty string) will be passed to
+         * <b>ImageLoader.displayImage(...)</b> method.
+         *
+         * @param imageRes Image resource
+         */
+        public Builder showImageForEmptyUri(int imageRes) {
+            imageForEmptyUri = imageRes;
+            return this;
+        }
 
-		/** Loaded image will be cached in memory */
-		public Builder cacheInMemory() {
-			cacheInMemory = true;
-			return this;
-		}
+        /**
+         * {@link android.widget.ImageView ImageView} will be reset (set
+         * <b>null</b>) before image loading start
+         */
+        public Builder resetViewBeforeLoading() {
+            resetViewBeforeLoading = true;
+            return this;
+        }
 
-		/** Loaded image will be cached on disc */
-		public Builder cacheOnDisc() {
-			cacheOnDisc = true;
-			return this;
-		}
+        /**
+         * Loaded image will be cached in memory
+         */
+        public Builder cacheInMemory() {
+            cacheInMemory = true;
+            return this;
+        }
 
-		/**
-		 * Sets {@link ImageScaleType decoding type} for image loading task.
-		 * Default value - {@link ImageScaleType#POWER_OF_2}
-		 */
-		public Builder imageScaleType(ImageScaleType imageScaleType) {
-			this.imageScaleType = imageScaleType;
-			return this;
-		}
+        /**
+         * Loaded image will be cached on disc
+         */
+        public Builder cacheOnDisc() {
+            cacheOnDisc = true;
+            return this;
+        }
 
-		/**
-		 * Sets custom {@link BitmapDisplayer displayer} for image loading task.
-		 * Default value -
-		 * {@link DefaultConfigurationFactory#createBitmapDisplayer()}
-		 */
-		public Builder displayer(BitmapDisplayer displayer) {
-			this.displayer = displayer;
-			return this;
-		}
+        /**
+         * Sets {@link ImageScaleType decoding type} for image loading task.
+         * Default value - {@link ImageScaleType#POWER_OF_2}
+         */
+        public Builder imageScaleType(ImageScaleType imageScaleType) {
+            this.imageScaleType = imageScaleType;
+            return this;
+        }
 
-		/** Builds configured {@link DisplayImageOptions} object */
-		public DisplayImageOptions build() {
-			return new DisplayImageOptions(this);
-		}
-	}
+        /**
+         * Sets custom {@link BitmapDisplayer displayer} for image loading task.
+         * Default value -
+         * {@link DefaultConfigurationFactory#createBitmapDisplayer()}
+         */
+        public Builder displayer(BitmapDisplayer displayer) {
+            this.displayer = displayer;
+            return this;
+        }
 
-	/**
-	 * Creates options appropriate for single displaying:
-	 * <ul>
-	 * <li>Stub image will <b>not</b> be displayed in
-	 * {@link android.widget.ImageView ImageView} during image loading</li>
-	 * <li>Loaded image will <b>not</b> be cached in memory</li>
-	 * <li>Loaded image will <b>not</b> be cached on disc (application cache
-	 * directory or on SD card)</li>
-	 * <li>{@link ImageScaleType#POWER_OF_2 FAST} decoding type will be used</li>
-	 * </ul>
-	 * 
-	 * These option are appropriate for simple single-use image (from drawables
-	 * or from internet) displaying.
-	 */
-	public static DisplayImageOptions createSimple() {
-		return new Builder().build();
-	}
+        /**
+         * Builds configured {@link DisplayImageOptions} object
+         */
+        public DisplayImageOptions build() {
+            return new DisplayImageOptions(this);
+        }
+    }
 }
