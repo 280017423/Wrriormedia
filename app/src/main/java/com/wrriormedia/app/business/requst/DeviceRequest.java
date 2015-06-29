@@ -105,7 +105,7 @@ public class DeviceRequest {
                     }.getType());
                     SystemManager.setModifyTime(url);// 更新本地的上次请求时间
                     // 这里是 增量返回
-                    if (null != downloadModels || !downloadModels.isEmpty()) {
+                    if (null != downloadModels && !downloadModels.isEmpty()) {
                         for (DownloadModel model : downloadModels) {
                             DownloadModel localModel = DBMgr.getBaseModel(DownloadModel.class, DownloadModel.WHERE_CASE_SUB + " = " + model.getAid());
                             if (null == localModel) {

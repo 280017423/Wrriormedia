@@ -639,12 +639,22 @@ public abstract class DataManager {
         firstOpen();
         List<Field> columns = model.getColumnFieldsWithoutID();
         ContentValues values = new ContentValues(columns.size());
+        String typeString;
         for (Field column : columns) {
             try {
+                typeString = column.getType().getName();
                 column.setAccessible(true);
+                // 字段不为空时才插入值
                 Object fieldValue = column.get(model);
-                if (null != fieldValue) {
+                if (fieldValue != null
+                        && (!(typeString.equals("java.util.ArrayList") || typeString.equals("java.util.List")) && column
+                        .getType().getSuperclass() != BaseModel.class)) {
                     values.put(com.wrriormedia.library.orm.Utils.toSQLName(column.getName()), String.valueOf(fieldValue));
+                } else if (fieldValue != null
+                        && (com.wrriormedia.library.orm.Utils.isInstanceofBaseModel(column.getType()) || typeString.equals("java.util.ArrayList") || typeString
+                        .equals("java.util.List"))) {
+                    // 如果该字段继承自BaseModel；也可以保存到数据库中，转化为Json字符串保存
+                    values.put(com.wrriormedia.library.orm.Utils.toSQLName(column.getName()), new Gson().toJson(fieldValue));
                 } else {
                     // 如果没有只，用空覆盖
                     values.put(com.wrriormedia.library.orm.Utils.toSQLName(column.getName()), "");

@@ -150,8 +150,8 @@ public class Utils {
         }
 
         for (Field field : entity.getColumnFields()) {
-            String typeString = null;
-            String colName = null;
+            String typeString;
+            String colName;
             field.setAccessible(true);
             try {
                 typeString = field.getType().getName();
@@ -186,8 +186,7 @@ public class Utils {
                         || (typeString.equals("java.util.ArrayList") || typeString.equals("java.util.List"))) {
                     // 如果字段继承自BaseModel，，需要进行Json字符串解析；
                     String fieldValue = cursor.getString(cursor.getColumnIndex(colName));
-                    EvtLog.d(TAG, "inflate:" + field.getClass());
-                    field.set(entity, new Gson().fromJson(fieldValue, field.getGenericType()));
+                    field.set(entity, new Gson().fromJson(fieldValue, field.getType()));
                 } else {
                     throw new DataAccessException("Class cannot be read from Sqlite3 database.");
                 }
