@@ -22,8 +22,10 @@ import com.wrriormedia.app.service.DownloadService;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
+import com.wrriormedia.app.util.WifiAdmin;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.EvtLog;
+import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
 
 import java.text.SimpleDateFormat;
@@ -37,6 +39,7 @@ public class MainActivity extends HtcBaseActivity {
     private AlarmManager mAlarmManager;
     private PendingIntent mPI;
     private CmdNextReceiver mCmdNextReceiver;
+    private WifiAdmin mWifiAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +79,7 @@ public class MainActivity extends HtcBaseActivity {
             //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_NEXT_TIME, model.getNext_time());
             //TODO 定时闹钟，下次请求
-            mAlarmManager.set(mAlarmManager.ELAPSED_REALTIME_WAKEUP, model.getNext_time() - System.currentTimeMillis(), mPI);
+            mAlarmManager.set(mAlarmManager.RTC_WAKEUP, model.getNext_time(), mPI);
             if (0 == model.getUpdate()) {
                 EvtLog.d("aaa", "不需要更新指令");
                 new AdTask().execute();
@@ -99,10 +102,7 @@ public class MainActivity extends HtcBaseActivity {
                 default:
                     break;
             }
-            WifiModel wifiModel = model.getWifi();
-            if (null != wifiModel) {
-                // TODO 设置wifi
-            }
+            connectWifi(model.getWifi());
             int needDownload = model.getDownload();
             if (1 == needDownload) {
                 EvtLog.d("aaa", "有新的下载");
@@ -120,6 +120,18 @@ public class MainActivity extends HtcBaseActivity {
         } else {
             //TODO 记录日志
             showErrorMsg(result);
+        }
+    }
+
+    private void connectWifi(WifiModel wifiModel) {
+        if (null != wifiModel) {
+            if (mWifiAdmin == null) {
+                mWifiAdmin = new WifiAdmin(this);
+            }
+            if (!StringUtil.isNullOrEmpty(wifiModel.getSsid())) {
+                mWifiAdmin.openWifi();
+                mWifiAdmin.addNetwork(mWifiAdmin.CreateWifiInfo(wifiModel.getSsid(), wifiModel.getPassword(), wifiModel.getType()));
+            }
         }
     }
 
