@@ -27,6 +27,7 @@ import com.wrriormedia.app.service.DownloadService;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
+import com.wrriormedia.app.util.WifiAdmin;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.imageloader.core.DisplayImageOptions;
 import com.wrriormedia.library.imageloader.core.display.SimpleBitmapDisplayer;
@@ -37,6 +38,8 @@ import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.widget.VideoView;
@@ -50,8 +53,10 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     private VideoView mVideoView;
     private int mPlayIndex;
     private ImageView mIvAd;
+    private WifiAdmin mWifiAdmin;
 
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -187,14 +192,12 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             CmdModel model = (CmdModel) result.ResultObject;
             //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_NEXT_TIME, model.getNext_time());
-            mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, model.getNext_time() - System.currentTimeMillis(), mPI);
+            //TODO 定时闹钟，下次请求
+            mAlarmManager.set(mAlarmManager.RTC_WAKEUP, model.getNext_time(), mPI);
             if (0 == model.getUpdate()) {
                 return; // 没有设置更新
             }
-            WifiModel wifiModel = model.getWifi();
-            if (null != wifiModel) {
-                // TODO 设置wifi
-            }
+            connectWifi(model.getWifi());
             int needDownload = model.getDownload();
             if (1 == needDownload) {
                 EvtLog.d("aaa", "有新的下载");
@@ -214,6 +217,18 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         }
     }
 
+    private void connectWifi(WifiModel wifiModel) {
+        if (null != wifiModel) {
+            if (mWifiAdmin == null) {
+                mWifiAdmin = new WifiAdmin(this);
+            }
+            if (!StringUtil.isNullOrEmpty(wifiModel.getSsid())) {
+                mWifiAdmin.openWifi();
+                mWifiAdmin.addNetwork(mWifiAdmin.CreateWifiInfo(wifiModel.getSsid(), wifiModel.getPassword(), wifiModel.getType()));
+            }
+        }
+    }
+    
     private void checkVersion(VersionModel model) {
         // TODO 更新版本逻辑
     }
