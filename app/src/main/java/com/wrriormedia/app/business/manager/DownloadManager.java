@@ -23,6 +23,8 @@ public class DownloadManager {
                     }
                     if (1 != model.getIsDownloadFinish()) {
                         DownLoadUtil.download(model);
+                        //TODO 一次下载一个，下载完成或者失败就重新检查
+                        break;
                     } else {
                         EvtLog.d("aaa", model.getAid() + "已经下载过");
                     }

@@ -9,6 +9,9 @@ public class ConstantSet {
     public static final int PAGE_SIZE = 20;
 
     // EventBus action
+    public static final String KEY_EVENT_ACTION_PLAY_VIDEO = "KEY_EVENT_ACTION_PLAY_VIDEO";
+    public static final String KEY_EVENT_ACTION_PLAY_IMAGE = "KEY_EVENT_ACTION_PLAY_IMAGE";
+    public static final String KEY_EVENT_ACTION_PLAY_NEXT = "KEY_EVENT_ACTION_PLAY_NEXT";
 
     //下载app
     public static final String KEY_EVENT_ACTION_DOWNLOAD_STATUS_START = "KEY_EVENT_ACTION_DOWNLOAD_STATUS_START";

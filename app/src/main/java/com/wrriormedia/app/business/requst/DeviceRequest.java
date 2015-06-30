@@ -4,6 +4,7 @@ import com.pdw.gson.reflect.TypeToken;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.business.manager.SystemManager;
+import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.common.ServerAPIConstant;
 import com.wrriormedia.app.model.AdContentModel;
 import com.wrriormedia.app.model.CmdModel;
@@ -11,6 +12,7 @@ import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.app.model.StatusModel;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
+import com.wrriormedia.app.util.TimeUtil;
 import com.wrriormedia.library.app.JsonResult;
 import com.wrriormedia.library.http.HttpClientUtil;
 import com.wrriormedia.library.util.EvtLog;
@@ -77,6 +79,9 @@ public class DeviceRequest {
                 if (jsonResult.isOK()) {
                     CmdModel model = jsonResult.getData(CmdModel.class);
                     SystemManager.setModifyTime(url);// 更新本地的上次请求时间
+                    TimeUtil.setSystemTime(model.getSys_time());//更新系统时间
+                    // 保存到本地
+                    SharedPreferenceUtil.saveObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, model);
                     result.ResultObject = model;
                 } else {
                     result.ResultObject = jsonResult.Msg;
@@ -146,12 +151,11 @@ public class DeviceRequest {
                 if (jsonResult.isOK()) {
                     SystemManager.setModifyTime(url);// 更新本地的上次请求时间
                     AdContentModel model = jsonResult.getData(AdContentModel.class);
-//                    if (null != model ){
-//                        DBMgr.deleteTableFromDb(AdContentModel.class);
-//                        DBMgr.saveModel(model);
-//                    }
+                    if (null != model) {
+                        DBMgr.deleteTableFromDb(AdContentModel.class);
+                        DBMgr.saveModel(model);
+                    }
                     result.ResultObject = model;
-                    EvtLog.d("aaa", model.toString());
                 } else {
                     result.ResultObject = jsonResult.Msg;
                 }

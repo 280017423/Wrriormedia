@@ -15,9 +15,13 @@ import com.wrriormedia.app.business.manager.DownloadManager;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.library.eventbus.EventBus;
+import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.StringUtil;
+import com.wrriormedia.library.util.TimerUtil;
 
 public class DownloadService extends Service {
+
+    private static final String TAG = "DownloadService";
 
     private static final int PROGRESS_MAX = 100;
     private Notification mNotification;
@@ -77,9 +81,11 @@ public class DownloadService extends Service {
         }
         if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH)) {
             mNotificationManager.cancel(model.getEventId());
+            timeDownload();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_START)) {
             mNotificationManager.notify(model.getEventId(), mNotification);
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
+            timeDownload();
             mNotificationManager.cancel(model.getEventId());
             if (null != model.getEventBusObject()) {
                 Toast.makeText(this, (String) model.getEventBusObject(), Toast.LENGTH_LONG).show();
@@ -89,12 +95,26 @@ public class DownloadService extends Service {
             if (progress > PROGRESS_MAX) {
                 progress = PROGRESS_MAX;
             }
-            mRemoteViews.setProgressBar(R.id.progress_horizontal, PROGRESS_MAX, (int)progress, false);
+            mRemoteViews.setProgressBar(R.id.progress_horizontal, PROGRESS_MAX, (int) progress, false);
             mRemoteViews.setImageViewResource(R.id.notification_image, R.mipmap.ic_launcher);
             mRemoteViews.setTextViewText(R.id.tip, "下载进度:" + progress + "%");
             mNotification.contentView = mRemoteViews;
             mNotificationManager.notify(model.getEventId(), mNotification);
         }
+    }
+
+    private void timeDownload() {
+        // 10秒倒计时开始下载
+        TimerUtil.startTimer(TAG, 10, 1 * 1000, new TimerUtil.TimerActionListener() {
+            @Override
+            public void doAction() {
+                if (TimerUtil.getTimerTime(TAG) <= 0) {
+                    EvtLog.d("aaa", "10秒倒计时开始下载");
+                    DownloadManager.downTask();
+                    TimerUtil.stopTimer(TAG);
+                }
+            }
+        });
     }
 
     @Override

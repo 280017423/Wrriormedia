@@ -17,6 +17,8 @@ import com.wrriormedia.library.util.NetUtil;
 import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
 
+import io.vov.vitamio.LibsChecker;
+
 /**
  * app启动界面
  */
@@ -37,6 +39,10 @@ public class LoadingActivity extends HtcBaseActivity {
     }
 
     private void initVariable() {
+        // TODO 初始化Vitanio库
+        if (!LibsChecker.checkVitamioLibs(this)) {
+            return;
+        }
         EventBus.getDefault().register(this);
         mLoadingUpView = new LoadingUpView(this, false);
     }

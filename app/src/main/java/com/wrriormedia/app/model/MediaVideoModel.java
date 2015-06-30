@@ -27,4 +27,12 @@ public class MediaVideoModel extends BaseModel {
     public void setPos(int pos) {
         this.pos = pos;
     }
+
+    @Override
+    public String toString() {
+        return "MediaVideoModel{" +
+                "md5='" + md5 + '\'' +
+                ", pos=" + pos +
+                '}';
+    }
 }

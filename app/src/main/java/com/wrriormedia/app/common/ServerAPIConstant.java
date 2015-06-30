@@ -10,7 +10,7 @@ public class ServerAPIConstant {
     public static final String ACTION_READY = "/ready";
     public static final String ACTION_CMD = "/cmd";
     public static final String ACTION_AD = "/ad";
-    public static final String ACTION_AD_DOWNLOAD = "/ad/download";
+    public static final String ACTION_AD_DOWNLOAD = "/download/get";
 
     // KEY字段
     public static final String ACTION_KEY_ID = "id";

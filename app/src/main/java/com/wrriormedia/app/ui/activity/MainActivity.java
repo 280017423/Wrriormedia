@@ -8,14 +8,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.widget.ImageView;
 
 import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
+import com.wrriormedia.app.business.manager.AdManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.common.ServerAPIConstant;
-import com.wrriormedia.app.model.AdContentModel;
 import com.wrriormedia.app.model.CmdModel;
+import com.wrriormedia.app.model.EventBusModel;
+import com.wrriormedia.app.model.MediaImageModel;
+import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.app.model.VersionModel;
 import com.wrriormedia.app.model.WifiModel;
 import com.wrriormedia.app.service.DownloadService;
@@ -23,34 +28,116 @@ import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
 import com.wrriormedia.library.eventbus.EventBus;
+import com.wrriormedia.library.imageloader.core.DisplayImageOptions;
+import com.wrriormedia.library.imageloader.core.display.SimpleBitmapDisplayer;
 import com.wrriormedia.library.util.EvtLog;
+import com.wrriormedia.library.util.FileUtil;
+import com.wrriormedia.library.util.MessageException;
+import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.io.File;
 
+import io.vov.vitamio.MediaPlayer;
+import io.vov.vitamio.widget.VideoView;
 
-public class MainActivity extends HtcBaseActivity {
+public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompletionListener, MediaPlayer.OnInfoListener, MediaPlayer.OnErrorListener {
     private static final String ACTION_CMD_NEXT_TIME = "com.wrriormedia.action.cmd_next_time";
     private LoadingUpView mLoadingUpView;
     private AlarmManager mAlarmManager;
     private PendingIntent mPI;
     private CmdNextReceiver mCmdNextReceiver;
+    private VideoView mVideoView;
+    private int mPlayIndex;
+    private ImageView mIvAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initVariable();
+        initViews();
         registerCmdNextReceiver();
         initAlarm();
-        getCmd();
+        new CmdTask().execute();
     }
 
     private void initVariable() {
         EventBus.getDefault().register(this);
         mLoadingUpView = new LoadingUpView(this, false);
+    }
+
+    private void initViews() {
+        mVideoView = (VideoView) findViewById(R.id.surface_view);
+        mVideoView.setOnCompletionListener(this);
+        mVideoView.setOnInfoListener(this);
+        AdManager.getPlayAd(mPlayIndex);
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+        EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+    }
+
+    @Override
+    public boolean onInfo(MediaPlayer mediaPlayer, int arg1, int i1) {
+        switch (arg1) {
+            case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+                if (isPlaying()) {
+                    stopPlayer();
+                }
+                showLoadingUpView(mLoadingUpView);
+                break;
+            case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+                startPlayer();
+                dismissLoadingUpView(mLoadingUpView);
+                break;
+            case MediaPlayer.MEDIA_INFO_DOWNLOAD_RATE_CHANGED:
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+        EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+        return true;
+    }
+
+    private void stopPlayer() {
+        if (mVideoView != null)
+            mVideoView.pause();
+    }
+
+    private void startPlayer() {
+        if (mVideoView != null)
+            mVideoView.start();
+    }
+
+    private boolean isPlaying() {
+        return mVideoView != null && mVideoView.isPlaying();
+    }
+
+    private void play(MediaVideoModel model) {
+        EvtLog.d("aaa", "即将播放视屏" + model.toString());
+        File downloadDir = null;
+        try {
+            downloadDir = FileUtil.getDownloadDir();
+        } catch (MessageException e) {
+            e.printStackTrace();
+        }
+        String fileName = model.getMd5();
+        if (StringUtil.isNullOrEmpty(fileName)) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+            return;
+        }
+        File downloadFile = new File(downloadDir, fileName);
+        if (!downloadFile.exists()) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+            return;
+        }
+        mVideoView.setVideoPath(downloadFile.getAbsolutePath());
+        mVideoView.requestFocus();
     }
 
     private void registerCmdNextReceiver() {
@@ -64,40 +151,45 @@ public class MainActivity extends HtcBaseActivity {
         mPI = PendingIntent.getBroadcast(this, 0, intent, 0);
     }
 
-    private void getCmd() {
-        new CmdTask().execute();
+    public void onEventMainThread(EventBusModel model) {
+        if (null == model || StringUtil.isNullOrEmpty(model.getEventBusAction())) {
+            return;
+        }
+        if (ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO.equals(model.getEventBusAction())) {
+            EvtLog.d("aaa", "播放视频");
+            play((MediaVideoModel) model.getEventBusObject());
+        } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE.equals(model.getEventBusAction())) {
+            MediaImageModel mediaImageModel = (MediaImageModel) model.getEventBusObject();
+            String url = "http://warriormedia-warriormedia.stor.sinaapp.com/85d25e99d4d8bd3237aa47efea228f62.jpg";
+            mImageLoader.displayImage(url, mIvAd, new DisplayImageOptions.Builder()
+                    .cacheInMemory().cacheOnDisc().displayer(new SimpleBitmapDisplayer())
+                    .build());
+            new CountDownTimer(mediaImageModel.getTime() * 1000, mediaImageModel.getTime() * 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                }
+
+                @Override
+                public void onFinish() {
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+                }
+            }.start();
+            EvtLog.d("aaa", "显示图像");
+        } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT.equals(model.getEventBusAction())) {
+            EvtLog.d("aaa", "播放下一个");
+            mPlayIndex++;
+            AdManager.getPlayAd(mPlayIndex);
+        }
     }
 
     public void onEventMainThread(ActionResult result) {
         if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
             CmdModel model = (CmdModel) result.ResultObject;
-            //TODO 需要更新系统时间 3.相差超过10秒，需要校准本地时间；
-            setSystemTime(model.getSys_time());
             //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_NEXT_TIME, model.getNext_time());
-            //TODO 定时闹钟，下次请求
-            mAlarmManager.set(mAlarmManager.ELAPSED_REALTIME_WAKEUP, model.getNext_time() - System.currentTimeMillis(), mPI);
+            mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, model.getNext_time() - System.currentTimeMillis(), mPI);
             if (0 == model.getUpdate()) {
-                EvtLog.d("aaa", "不需要更新指令");
-                new AdTask().execute();
-                return;
-            }
-            int sysStatus = model.getSys_status();
-            switch (sysStatus) {
-                case 0:
-                    // TODO 正常播放广告
-                    EvtLog.d("aaa", "正常播放广告");
-                    break;
-                case 1:
-                    //TODO 暂停播放，展示默认图
-                    EvtLog.d("aaa", "暂停播放，展示默认图");
-                    break;
-                case 2:
-                    //TODO 系统关闭屏幕，停止播放
-                    EvtLog.d("aaa", "系统关闭屏幕，停止播放");
-                    break;
-                default:
-                    break;
+                return; // 没有设置更新
             }
             WifiModel wifiModel = model.getWifi();
             if (null != wifiModel) {
@@ -116,28 +208,9 @@ public class MainActivity extends HtcBaseActivity {
             SystemUtil.changeBrightnessSlide(MainActivity.this, model.getBrightness() / 10f);// 改变屏幕亮度
             SystemUtil.setStreamVolume(MainActivity.this, model.getVolume());// 改变声音大小
             checkVersion(model.getVersion());
-
         } else {
             //TODO 记录日志
             showErrorMsg(result);
-        }
-    }
-
-    private void setSystemTime(long time) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-        String dateTime = sdf.format(new Date(time));
-        String[] timeList = dateTime.split("-");
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.YEAR, Integer.parseInt(timeList[0]));
-        c.set(Calendar.MONTH, Integer.parseInt(timeList[1]));
-        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(timeList[2]));
-        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeList[3]));
-        c.set(Calendar.MINUTE, Integer.parseInt(timeList[4]));
-        c.set(Calendar.SECOND, Integer.parseInt(timeList[5]));
-        long when = c.getTimeInMillis();
-        if (when / 1000 < Integer.MAX_VALUE) {
-            // 等作为系统应用正式测试时再打开
-           // ((AlarmManager) getSystemService(Context.ALARM_SERVICE)).setTime(when);
         }
     }
 
@@ -149,6 +222,8 @@ public class MainActivity extends HtcBaseActivity {
     protected void onDestroy() {
         unregisterReceiver(mCmdNextReceiver);
         EventBus.getDefault().unregister(this);
+        if (mVideoView != null)
+            mVideoView.stopPlayback();
         super.onDestroy();
     }
 
@@ -168,9 +243,6 @@ public class MainActivity extends HtcBaseActivity {
         @Override
         protected void onPostExecute(ActionResult result) {
             dismissLoadingUpView(mLoadingUpView);
-            if (null == result) {
-                return;
-            }
             EventBus.getDefault().post(result);
         }
     }
@@ -191,12 +263,7 @@ public class MainActivity extends HtcBaseActivity {
         @Override
         protected void onPostExecute(ActionResult result) {
             dismissLoadingUpView(mLoadingUpView);
-            if (null == result) {
-                return;
-            }
-            AdContentModel adModel = (AdContentModel) result.ResultObject;
-
-            // TODO 重点是要解析这个接口
+            // TODO 执行广告播放
         }
     }
 
@@ -224,7 +291,8 @@ public class MainActivity extends HtcBaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ACTION_CMD_NEXT_TIME)) {
-                getCmd();
+                EvtLog.d("aaa", "下次时间到");
+//               new CmdTask().execute();
             }
         }
     }

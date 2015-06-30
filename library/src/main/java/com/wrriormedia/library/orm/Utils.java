@@ -186,7 +186,7 @@ public class Utils {
                         || (typeString.equals("java.util.ArrayList") || typeString.equals("java.util.List"))) {
                     // 如果字段继承自BaseModel，，需要进行Json字符串解析；
                     String fieldValue = cursor.getString(cursor.getColumnIndex(colName));
-                    field.set(entity, new Gson().fromJson(fieldValue, field.getType()));
+                    field.set(entity, new Gson().fromJson(fieldValue, field.getGenericType()));
                 } else {
                     throw new DataAccessException("Class cannot be read from Sqlite3 database.");
                 }

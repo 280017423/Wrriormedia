@@ -45,8 +45,8 @@ public class DownLoadUtil {
             return;
         }
         File downloadFile = new File(downloadDir, fileName);
-
-        mHttpUtils.download(url, downloadFile.getAbsolutePath(), true, true, new RequestCallBack<File>() {
+        EvtLog.d("aaa", "下载路径：" + downloadFile.getAbsolutePath());
+        mHttpUtils.download(url, downloadFile.getAbsolutePath(), false, false, new RequestCallBack<File>() {
 
             @Override
             public void onStart() {

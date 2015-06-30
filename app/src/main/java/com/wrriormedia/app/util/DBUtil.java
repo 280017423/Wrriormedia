@@ -3,8 +3,7 @@ package com.wrriormedia.app.util;
 import android.content.Context;
 
 import com.wrriormedia.app.business.dao.DBMgr;
-import com.wrriormedia.app.model.DownLoadImageModel;
-import com.wrriormedia.app.model.DownLoadVideoModel;
+import com.wrriormedia.app.model.AdContentModel;
 import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.library.app.HtcApplicationBase;
 import com.wrriormedia.library.orm.DataManager;
@@ -26,8 +25,7 @@ public class DBUtil {
         if (DATABASE_BUILDER == null) {
             DATABASE_BUILDER = new DatabaseBuilder(PackageUtil.getConfigString("db_name"));
             DATABASE_BUILDER.addClass(DownloadModel.class);
-            DATABASE_BUILDER.addClass(DownLoadVideoModel.class);
-            DATABASE_BUILDER.addClass(DownLoadImageModel.class);
+            DATABASE_BUILDER.addClass(AdContentModel.class);
         }
     }
 

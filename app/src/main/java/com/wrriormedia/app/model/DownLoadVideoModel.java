@@ -38,13 +38,6 @@ public class DownLoadVideoModel extends BaseModel {
     }
 
     public String getFileName() {
-        if (null == first) {
-            if (null == second){
-                return "";
-            }else{
-                return second.substring(second.lastIndexOf("."));
-            }
-        }
-        return first.substring(first.lastIndexOf("."));
+        return null == md5 ? "" : md5;
     }
 }
