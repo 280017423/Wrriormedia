@@ -38,8 +38,6 @@ import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.widget.VideoView;
@@ -228,7 +226,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             }
         }
     }
-    
+
     private void checkVersion(VersionModel model) {
         // TODO 更新版本逻辑
     }

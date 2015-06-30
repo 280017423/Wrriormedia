@@ -32,18 +32,16 @@ public class AdManager {
         }
         int size = mediaModels.size();
         for (int i = 0; i < size; i++) {
-            MediaModel mediaModel = mediaModels.get(i % size);
-            if (index == mediaModel.getIndex()) {
-                MediaVideoModel mediaVideoModel = mediaModel.getVideo();
-                MediaImageModel mediaImageModel = mediaModel.getImage();
-                if (null != mediaVideoModel) {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO, mediaVideoModel));
-                    return;
-                }
-                if (null != mediaImageModel) {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaImageModel));
-                    return;
-                }
+            MediaModel mediaModel = mediaModels.get(index % size);
+            MediaVideoModel mediaVideoModel = mediaModel.getVideo();
+            MediaImageModel mediaImageModel = mediaModel.getImage();
+            if (null != mediaVideoModel) {
+                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO, mediaVideoModel));
+                return;
+            }
+            if (null != mediaImageModel) {
+                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaImageModel));
+                return;
             }
         }
         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
