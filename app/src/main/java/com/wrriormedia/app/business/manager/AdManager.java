@@ -18,16 +18,34 @@ import java.util.List;
 
 public class AdManager {
 
+    /**
+     * 是否有东西播放
+     *
+     * @return boolean 是否有播放的广告
+     */
+    public static boolean canPlayAd() {
+
+        AdContentModel model = DBMgr.getBaseModel(AdContentModel.class, "");
+        if (null == model) {
+            return false;
+        }
+        List<MediaModel> mediaModels = model.getMedia();
+        return null != mediaModels && !mediaModels.isEmpty();
+    }
+
+    /**
+     * 获取要播放的广告
+     *
+     * @param index 播放索引
+     */
     public static void getPlayAd(int index) {
         EvtLog.d("aaa", "获取要播放的视屏");
         AdContentModel model = DBMgr.getBaseModel(AdContentModel.class, "");
         if (null == model) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
             return;
         }
         List<MediaModel> mediaModels = model.getMedia();
         if (null == mediaModels || mediaModels.isEmpty()) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
             return;
         }
         int size = mediaModels.size();

@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.manager.AdManager;
+import com.wrriormedia.app.business.manager.SystemManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.common.ServerAPIConstant;
@@ -22,22 +23,17 @@ import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.MediaImageModel;
 import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.app.model.VersionModel;
-import com.wrriormedia.app.model.WifiModel;
 import com.wrriormedia.app.service.DownloadService;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
-import com.wrriormedia.app.util.WifiAdmin;
+import com.wrriormedia.app.util.VideoUtil;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.imageloader.core.DisplayImageOptions;
 import com.wrriormedia.library.imageloader.core.display.SimpleBitmapDisplayer;
 import com.wrriormedia.library.util.EvtLog;
-import com.wrriormedia.library.util.FileUtil;
-import com.wrriormedia.library.util.MessageException;
 import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
-
-import java.io.File;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.widget.VideoView;
@@ -51,7 +47,6 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     private VideoView mVideoView;
     private int mPlayIndex;
     private ImageView mIvAd;
-    private WifiAdmin mWifiAdmin;
 
     @Override
 
@@ -72,9 +67,9 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
 
     private void initViews() {
         mVideoView = (VideoView) findViewById(R.id.surface_view);
+        mIvAd = (ImageView) findViewById(R.id.iv_ad);
         mVideoView.setOnCompletionListener(this);
         mVideoView.setOnInfoListener(this);
-        AdManager.getPlayAd(mPlayIndex);
     }
 
     @Override
@@ -86,13 +81,13 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     public boolean onInfo(MediaPlayer mediaPlayer, int arg1, int i1) {
         switch (arg1) {
             case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-                if (isPlaying()) {
-                    stopPlayer();
+                if (VideoUtil.isPlaying(mVideoView)) {
+                    VideoUtil.stopPlayer(mVideoView);
                 }
                 showLoadingUpView(mLoadingUpView);
                 break;
             case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-                startPlayer();
+                VideoUtil.startPlayer(mVideoView);
                 dismissLoadingUpView(mLoadingUpView);
                 break;
             case MediaPlayer.MEDIA_INFO_DOWNLOAD_RATE_CHANGED:
@@ -105,42 +100,6 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
         return true;
-    }
-
-    private void stopPlayer() {
-        if (mVideoView != null)
-            mVideoView.pause();
-    }
-
-    private void startPlayer() {
-        if (mVideoView != null)
-            mVideoView.start();
-    }
-
-    private boolean isPlaying() {
-        return mVideoView != null && mVideoView.isPlaying();
-    }
-
-    private void play(MediaVideoModel model) {
-        EvtLog.d("aaa", "即将播放视屏" + model.toString());
-        File downloadDir = null;
-        try {
-            downloadDir = FileUtil.getDownloadDir();
-        } catch (MessageException e) {
-            e.printStackTrace();
-        }
-        String fileName = model.getMd5();
-        if (StringUtil.isNullOrEmpty(fileName)) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-            return;
-        }
-        File downloadFile = new File(downloadDir, fileName);
-        if (!downloadFile.exists()) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-            return;
-        }
-        mVideoView.setVideoPath(downloadFile.getAbsolutePath());
-        mVideoView.requestFocus();
     }
 
     private void registerCmdNextReceiver() {
@@ -160,7 +119,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         }
         if (ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO.equals(model.getEventBusAction())) {
             EvtLog.d("aaa", "播放视频");
-            play((MediaVideoModel) model.getEventBusObject());
+            VideoUtil.play((MediaVideoModel) model.getEventBusObject(), mVideoView);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE.equals(model.getEventBusAction())) {
             MediaImageModel mediaImageModel = (MediaImageModel) model.getEventBusObject();
             String url = "http://warriormedia-warriormedia.stor.sinaapp.com/85d25e99d4d8bd3237aa47efea228f62.jpg";
@@ -191,11 +150,11 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_NEXT_TIME, model.getNext_time());
             //TODO 定时闹钟，下次请求
-            mAlarmManager.set(mAlarmManager.RTC_WAKEUP, model.getNext_time(), mPI);
+            mAlarmManager.set(AlarmManager.RTC_WAKEUP, model.getNext_time(), mPI);
             if (0 == model.getUpdate()) {
                 return; // 没有设置更新
             }
-            connectWifi(model.getWifi());
+            SystemManager.connectWifi(this, model.getWifi());
             int needDownload = model.getDownload();
             if (1 == needDownload) {
                 EvtLog.d("aaa", "有新的下载");
@@ -215,18 +174,6 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         }
     }
 
-    private void connectWifi(WifiModel wifiModel) {
-        if (null != wifiModel) {
-            if (mWifiAdmin == null) {
-                mWifiAdmin = new WifiAdmin(this);
-            }
-            if (!StringUtil.isNullOrEmpty(wifiModel.getSsid())) {
-                mWifiAdmin.openWifi();
-                mWifiAdmin.addNetwork(mWifiAdmin.CreateWifiInfo(wifiModel.getSsid(), wifiModel.getPassword(), wifiModel.getType()));
-            }
-        }
-    }
-
     private void checkVersion(VersionModel model) {
         // TODO 更新版本逻辑
     }
@@ -235,8 +182,9 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     protected void onDestroy() {
         unregisterReceiver(mCmdNextReceiver);
         EventBus.getDefault().unregister(this);
-        if (mVideoView != null)
+        if (mVideoView != null) {
             mVideoView.stopPlayback();
+        }
         super.onDestroy();
     }
 
@@ -276,7 +224,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         @Override
         protected void onPostExecute(ActionResult result) {
             dismissLoadingUpView(mLoadingUpView);
-            // TODO 执行广告播放
+            AdManager.getPlayAd(mPlayIndex);
         }
     }
 
