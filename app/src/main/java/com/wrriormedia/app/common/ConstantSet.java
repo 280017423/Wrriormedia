@@ -12,6 +12,7 @@ public class ConstantSet {
     public static final String KEY_EVENT_ACTION_PLAY_VIDEO = "KEY_EVENT_ACTION_PLAY_VIDEO";
     public static final String KEY_EVENT_ACTION_PLAY_IMAGE = "KEY_EVENT_ACTION_PLAY_IMAGE";
     public static final String KEY_EVENT_ACTION_PLAY_NEXT = "KEY_EVENT_ACTION_PLAY_NEXT";
+    public static final String KEY_EVENT_ACTION_PLAY_NO_AD = "KEY_EVENT_ACTION_PLAY_NO_AD";
 
     //下载app
     public static final String KEY_EVENT_ACTION_DOWNLOAD_STATUS_START = "KEY_EVENT_ACTION_DOWNLOAD_STATUS_START";

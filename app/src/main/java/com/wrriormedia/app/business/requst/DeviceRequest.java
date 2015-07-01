@@ -39,9 +39,8 @@ public class DeviceRequest {
         String url = ServerAPIConstant.getAPIUrl(ServerAPIConstant.ACTION_READY);
         List<NameValuePair> postParams = new ArrayList<>();
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
-        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_SIM, "123456"));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_EQ_VERSION, "WM001"));
-//        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_SIM, PackageUtil.getLine1Number()));
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_SIM, PackageUtil.getLine1Number()));
         try {
             JsonResult jsonResult = HttpClientUtil.post(url, null, postParams);
             if (jsonResult != null) {
@@ -109,7 +108,6 @@ public class DeviceRequest {
                     List<DownloadModel> downloadModels = jsonResult.getData(new TypeToken<List<DownloadModel>>() {
                     }.getType());
                     SystemManager.setModifyTime(url);// 更新本地的上次请求时间
-                    // 这里是 增量返回
                     if (null != downloadModels && !downloadModels.isEmpty()) {
                         for (DownloadModel model : downloadModels) {
                             DownloadModel localModel = DBMgr.getBaseModel(DownloadModel.class, DownloadModel.WHERE_CASE_SUB + " = " + model.getAid());

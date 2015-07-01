@@ -43,10 +43,12 @@ public class AdManager {
         EvtLog.d("aaa", "获取要播放的视屏");
         AdContentModel model = DBMgr.getBaseModel(AdContentModel.class, "");
         if (null == model) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
             return;
         }
         List<MediaModel> mediaModels = model.getMedia();
         if (null == mediaModels || mediaModels.isEmpty()) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
             return;
         }
         MediaModel mediaModel = mediaModels.get(index % mediaModels.size());

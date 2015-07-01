@@ -149,6 +149,9 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             mPlayIndex++;
             hideAllImg();
             AdManager.getPlayAd(mPlayIndex);
+        }else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD.equals(model.getEventBusAction())) {
+            EvtLog.d("aaa", "当前没有广告数据");
+            toast("当前没有广告数据");
         }
     }
 
@@ -202,7 +205,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
 
         @Override
         protected void onPreExecute() {
-            showLoadingUpView(mLoadingUpView);
+            showLoadingUpView(mLoadingUpView, "正在获取指令信息...");
             super.onPreExecute();
         }
 
@@ -222,7 +225,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
 
         @Override
         protected void onPreExecute() {
-            showLoadingUpView(mLoadingUpView);
+            showLoadingUpView(mLoadingUpView, "正在获取广告信息...");
             super.onPreExecute();
         }
 
@@ -242,7 +245,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
 
         @Override
         protected void onPreExecute() {
-            showLoadingUpView(mLoadingUpView);
+            showLoadingUpView(mLoadingUpView, "正在获取下载信息...");
             super.onPreExecute();
         }
 

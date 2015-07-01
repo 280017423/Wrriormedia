@@ -49,7 +49,7 @@ public class DownLoadUtil {
             downloadFile.delete();
         }
         EvtLog.d("aaa", "下载路径：" + downloadFile.getAbsolutePath());
-        mHttpUtils.download(url, downloadFile.getAbsolutePath(), false, false, new RequestCallBack<File>() {
+        mHttpUtils.download(url, downloadFile.getAbsolutePath(), true, false, new RequestCallBack<File>() {
 
             @Override
             public void onStart() {
