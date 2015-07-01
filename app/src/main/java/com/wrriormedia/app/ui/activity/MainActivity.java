@@ -33,6 +33,7 @@ import com.wrriormedia.library.imageloader.core.DisplayImageOptions;
 import com.wrriormedia.library.imageloader.core.display.SimpleBitmapDisplayer;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.StringUtil;
+import com.wrriormedia.library.util.UIUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
 
 import io.vov.vitamio.MediaPlayer;
@@ -46,7 +47,16 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     private CmdNextReceiver mCmdNextReceiver;
     private VideoView mVideoView;
     private int mPlayIndex;
-    private ImageView mIvAd;
+    private ImageView mIvAdPos0;
+    private ImageView mIvAdPos1;
+    private ImageView mIvAdPos2;
+    private ImageView mIvAdPos3;
+    private ImageView mIvAdPos4;
+    private ImageView mIvAdPos5;
+    private ImageView mIvAdPos6;
+    private ImageView mIvAdPos7;
+    private ImageView mIvAdPos8;
+    private ImageView mIvAdPos9;
 
     @Override
 
@@ -67,7 +77,16 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
 
     private void initViews() {
         mVideoView = (VideoView) findViewById(R.id.surface_view);
-        mIvAd = (ImageView) findViewById(R.id.iv_ad);
+        mIvAdPos0 = (ImageView) findViewById(R.id.iv_ad_pos_0);
+        mIvAdPos1 = (ImageView) findViewById(R.id.iv_ad_pos_1);
+        mIvAdPos2 = (ImageView) findViewById(R.id.iv_ad_pos_2);
+        mIvAdPos3 = (ImageView) findViewById(R.id.iv_ad_pos_3);
+        mIvAdPos4 = (ImageView) findViewById(R.id.iv_ad_pos_4);
+        mIvAdPos5 = (ImageView) findViewById(R.id.iv_ad_pos_5);
+        mIvAdPos6 = (ImageView) findViewById(R.id.iv_ad_pos_6);
+        mIvAdPos7 = (ImageView) findViewById(R.id.iv_ad_pos_7);
+        mIvAdPos8 = (ImageView) findViewById(R.id.iv_ad_pos_8);
+        mIvAdPos9 = (ImageView) findViewById(R.id.iv_ad_pos_9);
         mVideoView.setOnCompletionListener(this);
         mVideoView.setOnInfoListener(this);
     }
@@ -119,27 +138,16 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         }
         if (ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO.equals(model.getEventBusAction())) {
             EvtLog.d("aaa", "播放视频");
+            UIUtil.setViewVisible(mVideoView);
             VideoUtil.play((MediaVideoModel) model.getEventBusObject(), mVideoView);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE.equals(model.getEventBusAction())) {
-            MediaImageModel mediaImageModel = (MediaImageModel) model.getEventBusObject();
-            String url = "http://warriormedia-warriormedia.stor.sinaapp.com/85d25e99d4d8bd3237aa47efea228f62.jpg";
-            mImageLoader.displayImage(url, mIvAd, new DisplayImageOptions.Builder()
-                    .cacheInMemory().cacheOnDisc().displayer(new SimpleBitmapDisplayer())
-                    .build());
-            new CountDownTimer(mediaImageModel.getTime() * 1000, mediaImageModel.getTime() * 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                }
-
-                @Override
-                public void onFinish() {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-                }
-            }.start();
+            showPosImg((MediaImageModel) model.getEventBusObject());
             EvtLog.d("aaa", "显示图像");
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT.equals(model.getEventBusAction())) {
             EvtLog.d("aaa", "播放下一个");
+            UIUtil.setViewGone(mVideoView);
             mPlayIndex++;
+            hideAllImg();
             AdManager.getPlayAd(mPlayIndex);
         }
     }
@@ -164,6 +172,8 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             if (1 == needAd) {
                 EvtLog.d("aaa", "有新的广告");
                 new AdTask().execute();
+            } else {
+                AdManager.getPlayAd(mPlayIndex);
             }
             SystemUtil.changeBrightnessSlide(MainActivity.this, model.getBrightness() / 10f);// 改变屏幕亮度
             SystemUtil.setStreamVolume(MainActivity.this, model.getVolume());// 改变声音大小
@@ -258,4 +268,73 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         }
     }
 
+    private void hideAllImg() {
+        UIUtil.setViewInVisible(mIvAdPos0);
+        UIUtil.setViewInVisible(mIvAdPos1);
+        UIUtil.setViewInVisible(mIvAdPos2);
+        UIUtil.setViewInVisible(mIvAdPos3);
+        UIUtil.setViewInVisible(mIvAdPos4);
+        UIUtil.setViewInVisible(mIvAdPos5);
+        UIUtil.setViewInVisible(mIvAdPos6);
+        UIUtil.setViewInVisible(mIvAdPos7);
+        UIUtil.setViewInVisible(mIvAdPos8);
+        UIUtil.setViewInVisible(mIvAdPos9);
+    }
+
+    private void showPosImg(final MediaImageModel mediaImageModel) {
+        ImageView displayView = null;
+        int position = mediaImageModel.getPos();
+        EvtLog.d("aaa", "显示第" + position + "张");
+        switch (position) {
+            case 0:
+                displayView = mIvAdPos0;
+                break;
+            case 1:
+                displayView = mIvAdPos1;
+                break;
+            case 2:
+                displayView = mIvAdPos2;
+                break;
+            case 3:
+                displayView = mIvAdPos3;
+                break;
+            case 4:
+                displayView = mIvAdPos4;
+                break;
+            case 5:
+                displayView = mIvAdPos5;
+                break;
+            case 6:
+                displayView = mIvAdPos6;
+                break;
+            case 7:
+                displayView = mIvAdPos7;
+                break;
+            case 8:
+                displayView = mIvAdPos8;
+                break;
+            case 9:
+                displayView = mIvAdPos9;
+                break;
+            default:
+                break;
+        }
+        UIUtil.setViewVisible(displayView);
+        mImageLoader.displayImage(mediaImageModel.getFirst(), displayView, new DisplayImageOptions.Builder()
+                .cacheInMemory().cacheOnDisc().displayer(new SimpleBitmapDisplayer())
+                .build());
+        int time = mediaImageModel.getTime();
+        if (0 != time) {
+            new CountDownTimer(time * 1000, time * 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                }
+
+                @Override
+                public void onFinish() {
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+                }
+            }.start();
+        }
+    }
 }

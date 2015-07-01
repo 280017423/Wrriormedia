@@ -144,7 +144,8 @@ public class DeviceRequest {
         String url = ServerAPIConstant.getAPIUrl(ServerAPIConstant.ACTION_AD);
         List<NameValuePair> postParams = new ArrayList<>();
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
-        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_MODIFY, SystemManager.getModifyTime(url) + ""));
+        // 不用传了
+        //postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_MODIFY, SystemManager.getModifyTime(url) + ""));
         try {
             JsonResult jsonResult = HttpClientUtil.get(url, null, postParams);
             if (jsonResult != null) {

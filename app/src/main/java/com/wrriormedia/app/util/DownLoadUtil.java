@@ -45,6 +45,9 @@ public class DownLoadUtil {
             return;
         }
         File downloadFile = new File(downloadDir, fileName);
+        if (downloadFile.exists()) { // 如果存在，先删除
+            downloadFile.delete();
+        }
         EvtLog.d("aaa", "下载路径：" + downloadFile.getAbsolutePath());
         mHttpUtils.download(url, downloadFile.getAbsolutePath(), false, false, new RequestCallBack<File>() {
 

@@ -8,7 +8,8 @@ import com.wrriormedia.library.orm.BaseModel;
  * @author zou.sq
  */
 public class MediaVideoModel extends BaseModel {
-
+    private String first;
+    private String second;
     private int pos;
     private String md5;
 
@@ -26,6 +27,22 @@ public class MediaVideoModel extends BaseModel {
 
     public void setPos(int pos) {
         this.pos = pos;
+    }
+
+    public String getFirst() {
+        return first;
+    }
+
+    public void setFirst(String first) {
+        this.first = first;
+    }
+
+    public String getSecond() {
+        return second;
+    }
+
+    public void setSecond(String second) {
+        this.second = second;
     }
 
     @Override

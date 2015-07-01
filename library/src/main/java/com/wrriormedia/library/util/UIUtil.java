@@ -285,6 +285,15 @@ public class UIUtil {
     /**
      * 设置View显示,判断了是否已显示
      */
+    public static void setViewInVisible(View view) {
+        if (view != null && view.getVisibility() != View.INVISIBLE) {
+            view.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    /**
+     * 设置View显示,判断了是否已显示
+     */
     public static void setViewVisible(View view) {
         if (view != null && view.getVisibility() != View.VISIBLE) {
             view.setVisibility(View.VISIBLE);

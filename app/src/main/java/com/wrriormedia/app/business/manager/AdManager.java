@@ -13,6 +13,7 @@ import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.EvtLog;
+import com.wrriormedia.library.util.StringUtil;
 
 import java.util.List;
 
@@ -48,21 +49,19 @@ public class AdManager {
         if (null == mediaModels || mediaModels.isEmpty()) {
             return;
         }
-        int size = mediaModels.size();
-        for (int i = 0; i < size; i++) {
-            MediaModel mediaModel = mediaModels.get(index % size);
-            MediaVideoModel mediaVideoModel = mediaModel.getVideo();
-            MediaImageModel mediaImageModel = mediaModel.getImage();
-            if (null != mediaVideoModel) {
+        MediaModel mediaModel = mediaModels.get(index % mediaModels.size());
+        MediaVideoModel mediaVideoModel = mediaModel.getVideo();
+        MediaImageModel mediaImageModel = mediaModel.getImage();
+        if ((null == mediaVideoModel || StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) && (null == mediaImageModel || StringUtil.isNullOrEmpty(mediaImageModel.getMd5()))) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+        } else {
+            if (null != mediaVideoModel && !StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) {
                 EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO, mediaVideoModel));
-                return;
             }
-            if (null != mediaImageModel) {
+            if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5())) {
                 EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaImageModel));
-                return;
             }
         }
-        EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
     }
 
     /**
