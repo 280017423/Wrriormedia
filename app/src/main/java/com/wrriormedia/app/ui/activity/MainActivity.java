@@ -154,6 +154,9 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     public void onEventMainThread(ActionResult result) {
         if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
             CmdModel model = (CmdModel) result.ResultObject;
+            if (null == model) {
+                return;
+            }
             //TODO 定时闹钟，下次请求
             mAlarmManager.set(AlarmManager.RTC_WAKEUP, model.getNext_time(), mPI);
             if (StringUtil.isNullOrEmpty(model.getUpdate_fields())) {
