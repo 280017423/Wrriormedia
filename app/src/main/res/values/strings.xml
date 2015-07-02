@@ -5,6 +5,6 @@
     <string name="serial_info">Serial:<xliff:g>%1$s</xliff:g></string>
     <string name="address_info">Address:<xliff:g>%1$s</xliff:g></string>
     <string name="download_app_info">正在下载应用</string>
-    <string name="download_failed">下载失败</string>
+    <string name="download_failed">在线升级失败</string>
     <string name="download_success">下载成功</string>
 </resources>

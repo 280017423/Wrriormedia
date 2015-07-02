@@ -56,7 +56,6 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     private ImageView mIvAdPos9;
 
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -157,17 +156,15 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             CmdModel model = (CmdModel) result.ResultObject;
             //TODO 定时闹钟，下次请求
             mAlarmManager.set(AlarmManager.RTC_WAKEUP, model.getNext_time(), mPI);
-            if (0 == model.getUpdate()) {
+            if (StringUtil.isNullOrEmpty(model.getUpdate_fields())) {
                 return; // 没有设置更新
             }
             SystemManager.connectWifi(this, model.getWifi());
-            int needDownload = model.getDownload();
-            if (1 == needDownload) {
+            if (model.isNeedUpdate("download")) {
                 EvtLog.d("aaa", "有新的下载就获取下载信息");
                 new DownloadTask().execute();
             }
-            int needAd = model.getAd();
-            if (1 == needAd) {
+            if (model.isNeedUpdate("ad")) {
                 EvtLog.d("aaa", "有新的广告就获取广告信息");
                 new AdTask().execute();
             } else {

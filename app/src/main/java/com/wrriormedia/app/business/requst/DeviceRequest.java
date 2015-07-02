@@ -18,7 +18,6 @@ import com.wrriormedia.library.http.HttpClientUtil;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.NetUtil;
 import com.wrriormedia.library.util.PackageUtil;
-import com.wrriormedia.library.util.StringUtil;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -41,11 +40,7 @@ public class DeviceRequest {
         List<NameValuePair> postParams = new ArrayList<>();
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_EQ_VERSION, "WM001"));
-        String phoneNum = PackageUtil.getLine1Number();
-        if (StringUtil.isNullOrEmpty(phoneNum)) {
-            phoneNum = "13000000000";
-        }
-        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_SIM, phoneNum));
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_OPERATOR, PackageUtil.getNetworkOperatorName()));
         try {
             JsonResult jsonResult = HttpClientUtil.post(url, null, postParams);
             if (jsonResult != null) {

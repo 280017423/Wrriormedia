@@ -15,6 +15,7 @@ import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.VersionModel;
 import com.wrriormedia.app.service.AppUpdateService;
 import com.wrriormedia.library.eventbus.EventBus;
+import com.wrriormedia.library.util.FileUtil;
 import com.wrriormedia.library.util.StringUtil;
 
 import java.io.File;
@@ -77,7 +78,7 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
             mTxtState.setText(getString(R.string.download_success));
             File file = (File) model.getEventBusObject();
             toast("需要静默安装");
-//            FileUtil.installApkFile(this, file); // TODO 需要静默安装
+            FileUtil.slientInstall(file); // TODO 需要静默安装
             finish();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
             toast(getString(R.string.download_failed));

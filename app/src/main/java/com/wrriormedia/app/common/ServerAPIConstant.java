@@ -15,6 +15,7 @@ public class ServerAPIConstant {
     // KEY字段
     public static final String ACTION_KEY_ID = "id";
     public static final String ACTION_KEY_SIM = "sim";
+    public static final String ACTION_KEY_OPERATOR = "operator";
     public static final String ACTION_KEY_EQ_VERSION = "eq_version";
     public static final String ACTION_KEY_VERSION = "version";
     public static final String ACTION_KEY_MODIFY = "modify";

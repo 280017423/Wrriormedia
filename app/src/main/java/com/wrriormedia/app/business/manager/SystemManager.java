@@ -21,7 +21,7 @@ public class SystemManager {
     }
 
     public static void setModifyTime(String modifyTimeKey) {
-        SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, modifyTimeKey, (int) System.currentTimeMillis() / 1000);
+        SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, modifyTimeKey, (int) (System.currentTimeMillis() / 1000));
     }
 
     public static void connectWifi(Context context, WifiModel wifiModel) {

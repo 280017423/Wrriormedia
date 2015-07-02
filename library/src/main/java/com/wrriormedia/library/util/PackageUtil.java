@@ -131,6 +131,13 @@ public class PackageUtil {
         return tvDevice;
     }
 
+    public static String getNetworkOperatorName() {
+        String tvDevice;
+        TelephonyManager tm = (TelephonyManager) HtcApplicationBase.getInstance().getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+        tvDevice = tm.getNetworkOperatorName();
+        return tvDevice;
+    }
+
     /**
      * @return 获得手机型号
      */
