@@ -69,13 +69,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.activity.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="landscape" />
-
+        <activity
+            android:name=".ui.activity.UpdateStateActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:theme="@style/Dialog"
+            android:screenOrientation="landscape" />
         <activity
             android:name="io.vov.vitamio.activity.InitActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden"
@@ -85,6 +89,7 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <service android:name="com.wrriormedia.app.service.DownloadService" />
+        <service android:name="com.wrriormedia.app.service.AppUpdateService" />
 
         <!-- 注册广播 -->
         <receiver android:name="com.wrriormedia.app.listener.NetWorkChangeBroadcastReceiver">

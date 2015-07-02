@@ -4,17 +4,20 @@
     <!-- 背景  gradient是渐变,corners定义的是圆角 -->
     <item android:id="@android:id/background">
         <shape>
+            <stroke
+                android:width="0.5dp"
+                android:color="@color/title_bg_color" />
             <corners android:radius="10dp" />
-
-            <solid android:color="#ffffff" />
+            <solid android:color="@color/white" />
         </shape>
     </item>
-    <!-- 第二条进度条颜色 -->
     <item android:id="@android:id/secondaryProgress">
         <clip>
             <shape>
                 <corners android:radius="10dip" />
-
+                <stroke
+                    android:width="0.5dp"
+                    android:color="@color/title_bg_color" />
                 <gradient
                     android:angle="90.0"
                     android:centerColor="#ac6079"
@@ -24,13 +27,14 @@
             </shape>
         </clip>
     </item>
-    <!-- 进度条 -->
     <item android:id="@android:id/progress">
         <clip>
             <shape>
                 <corners android:radius="10dip" />
-
-                <solid android:color="#FF8080" />
+                <stroke
+                    android:width="0.5dp"
+                    android:color="@color/title_bg_color" />
+                <solid android:color="@color/title_bg_color" />
             </shape>
         </clip>
     </item>

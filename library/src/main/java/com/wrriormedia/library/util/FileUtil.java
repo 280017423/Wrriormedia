@@ -1,10 +1,14 @@
 package com.wrriormedia.library.util;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 
 import com.wrriormedia.library.R;
 import com.wrriormedia.library.app.HtcApplicationBase;
+import com.wrriormedia.library.listener.DownloadListener;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -30,7 +34,6 @@ public class FileUtil {
     public static final int BUFSIZE = 256;
     public static final int COUNT = 320;
     private static final String TAG = "FileUtils";
-    private static final String DOWNLOAD_PATH = "wrriormedia/downloads/download";
     private static final long SIZE_KB = 1024;
     private static final long SIZE_MB = 1048576;
     private static final long SIZE_GB = 1073741824;
@@ -217,42 +220,45 @@ public class FileUtil {
         return fileSizeString;
     }
 
-    /**
-     * 将文件写入SD卡
-     *
-     * @param path     路径
-     * @param fileName 文件名称
-     * @param input    输入流
-     * @return 文件
-     */
-    public static File writeToSDCard(String path, String fileName, InputStream input) {
-        File file = null;
+    public static void write2SDFromInput(File downloadFile, InputStream inputStream, long size, DownloadListener listener) {
         OutputStream output = null;
+        long onePercentage = size / 100;
+        int progress = 0;
         try {
-            createSDDir(path);
-            file = createSDFile(path + fileName);
-            output = new FileOutputStream(file);
-
-            byte[] buffer = new byte[BUFSIZE];
-            int readedLength = -1;
-            while ((readedLength = input.read(buffer)) != -1) {
-                output.write(buffer, 0, readedLength);
+            output = new FileOutputStream(downloadFile);
+            byte[] buffer = new byte[4 * 1024];
+            int length;
+            long readCount = 0;
+            while ((length = inputStream.read(buffer)) != -1) {
+                Thread.sleep(100);
+                output.write(buffer, 0, length);
+                readCount += length;
+                long maxProgress = readCount / onePercentage;
+                if (maxProgress > progress && maxProgress % 5 == 0) {
+                    progress = (int) maxProgress;
+                    if (null != listener) {
+                        listener.onDownloading(progress);
+                    }
+                }
             }
             output.flush();
-
+            if (null != listener) {
+                listener.onDownloadFinish(downloadFile);
+            }
         } catch (Exception e) {
-            com.wrriormedia.library.util.EvtLog.e(TAG, e);
+            if (null != listener) {
+                listener.onDownloadFail();
+            }
+            e.printStackTrace();
         } finally {
             try {
                 if (null != output) {
                     output.close();
                 }
             } catch (IOException e) {
-                com.wrriormedia.library.util.EvtLog.e(TAG, e);
+                e.printStackTrace();
             }
         }
-
-        return file;
     }
 
     /**
@@ -465,6 +471,14 @@ public class FileUtil {
          * @param isUpgradeMust 是否必须升级
          */
         void onError(boolean isUpgradeMust);
+    }
+
+    public static void installApkFile(Context context, File file) {
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+        context.startActivity(intent);
     }
 
 }

@@ -40,7 +40,7 @@ public class LoadingActivity extends HtcBaseActivity {
 
     private void initVariable() {
         if (!LibsChecker.checkVitamioLibs(this)) {
-            // TODO 初始化Vitanio库
+            // TODO 初始化Vitamio库
             return;
         }
         EventBus.getDefault().register(this);

@@ -12,12 +12,10 @@ import android.os.CountDownTimer;
 import android.widget.ImageView;
 
 import com.wrriormedia.app.R;
-import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.manager.AdManager;
 import com.wrriormedia.app.business.manager.SystemManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
-import com.wrriormedia.app.common.ServerAPIConstant;
 import com.wrriormedia.app.model.CmdModel;
 import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.MediaImageModel;
@@ -25,7 +23,6 @@ import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.app.model.VersionModel;
 import com.wrriormedia.app.service.DownloadService;
 import com.wrriormedia.app.util.ActionResult;
-import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
 import com.wrriormedia.app.util.VideoUtil;
 import com.wrriormedia.library.eventbus.EventBus;
@@ -149,7 +146,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             mPlayIndex++;
             hideAllImg();
             AdManager.getPlayAd(mPlayIndex);
-        }else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD.equals(model.getEventBusAction())) {
+        } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD.equals(model.getEventBusAction())) {
             EvtLog.d("aaa", "当前没有广告数据");
             toast("当前没有广告数据");
         }
@@ -158,8 +155,6 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     public void onEventMainThread(ActionResult result) {
         if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
             CmdModel model = (CmdModel) result.ResultObject;
-            //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
-            SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_NEXT_TIME, model.getNext_time());
             //TODO 定时闹钟，下次请求
             mAlarmManager.set(AlarmManager.RTC_WAKEUP, model.getNext_time(), mPI);
             if (0 == model.getUpdate()) {
@@ -168,27 +163,34 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             SystemManager.connectWifi(this, model.getWifi());
             int needDownload = model.getDownload();
             if (1 == needDownload) {
-                EvtLog.d("aaa", "有新的下载");
+                EvtLog.d("aaa", "有新的下载就获取下载信息");
                 new DownloadTask().execute();
             }
             int needAd = model.getAd();
             if (1 == needAd) {
-                EvtLog.d("aaa", "有新的广告");
+                EvtLog.d("aaa", "有新的广告就获取广告信息");
                 new AdTask().execute();
             } else {
+                EvtLog.d("aaa", "没有新的广告就开始播放广告信息");
                 AdManager.getPlayAd(mPlayIndex);
             }
             SystemUtil.changeBrightnessSlide(MainActivity.this, model.getBrightness() / 10f);// 改变屏幕亮度
             SystemUtil.setStreamVolume(MainActivity.this, model.getVolume());// 改变声音大小
-            checkVersion(model.getVersion());
+            VersionModel versionModel = model.getVersion();
+            if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getUrl())) {
+                checkVersion(model.getVersion());
+            }
         } else {
             //TODO 记录日志
             showErrorMsg(result);
         }
     }
 
-    private void checkVersion(VersionModel model) {
-        // TODO 更新版本逻辑
+    private void checkVersion(VersionModel versionModel) {
+//        versionModel.setUrl("http://pkg.fir.im/4c112fc010e811e58134ae37436e714b4d439517.apk?attname=app-release.apk&e=1435809708&token=KMHm2Srw8ucAeUwTrkfXSgx35GMiSYWo5N4QCy-B:T74CXhtT31160rWkCLyHR9Hicv4=");
+        Intent intent = new Intent(MainActivity.this, UpdateStateActivity.class);
+        intent.putExtra(VersionModel.class.getName(), versionModel);
+        startActivity(intent);
     }
 
     @Override
