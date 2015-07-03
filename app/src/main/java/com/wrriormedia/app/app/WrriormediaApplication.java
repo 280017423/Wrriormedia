@@ -7,6 +7,8 @@ import com.wrriormedia.library.imageloader.cache.disc.naming.Md5FileNameGenerato
 import com.wrriormedia.library.imageloader.core.ImageLoader;
 import com.wrriormedia.library.imageloader.core.ImageLoaderConfiguration;
 
+import cn.jpush.android.api.JPushInterface;
+
 /**
  * 全局应用程序
  */
@@ -17,6 +19,8 @@ public class WrriormediaApplication extends HtcApplicationBase {
     @Override
     public void onCreate() {
         super.onCreate();
+        JPushInterface.setDebugMode(true);
+        JPushInterface.init(this);
         initImageLoader();
         // 打开数据库
         new Thread(new Runnable() {

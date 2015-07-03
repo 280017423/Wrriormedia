@@ -77,6 +77,8 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         mIvAdPos9 = (ImageView) findViewById(R.id.iv_ad_pos_9);
 
         mVideoView.setOnCompletionListener(this);
+        mVideoView.setOnErrorListener(this);
+        mVideoView.setVideoQuality(MediaPlayer.VIDEOQUALITY_LOW);
     }
 
     @Override

@@ -92,6 +92,7 @@
     <orderEntry type="library" exported="" name="PDGson-2.2.2" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.6" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.2.1" level="project" />
+    <orderEntry type="library" exported="" name="jpush-sdk-release1.7.5" level="project" />
     <orderEntry type="library" exported="" name="vitamio" level="project" />
   </component>
 </module>
