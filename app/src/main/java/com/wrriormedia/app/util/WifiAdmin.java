@@ -102,8 +102,12 @@ public class WifiAdmin {
         return (mWifiInfo == null) ? "NULL" : mWifiInfo.toString();
     }
 
-    public boolean addNetwork(WifiConfiguration wcg) {
+    public boolean addNetwork(String ssid, String password, String type) {
+        WifiConfiguration wcg = createWifiInfo(ssid, password, type);
         int wcgID = mWifiManager.addNetwork(wcg);
+        if (wcgID < 0) {
+            return false;
+        }
         return mWifiManager.enableNetwork(wcgID, true);
     }
 
@@ -112,23 +116,23 @@ public class WifiAdmin {
         mWifiManager.disconnect();
     }
 
-    public WifiConfiguration CreateWifiInfo(String ssid, String password, String type) {
+    public WifiConfiguration createWifiInfo(String ssid, String password, String type) {
         WifiConfiguration config = new WifiConfiguration();
         config.allowedAuthAlgorithms.clear();
         config.allowedGroupCiphers.clear();
         config.allowedKeyManagement.clear();
         config.allowedPairwiseCiphers.clear();
         config.allowedProtocols.clear();
-        config.SSID = ssid;
+        config.SSID = "\"" + ssid + "\"";
         config.priority = 0;
 
-        WifiConfiguration tempConfig = this.isExsits(ssid);
+        WifiConfiguration tempConfig = this.isExsits(config.SSID);
         if (tempConfig != null) {
             mWifiManager.removeNetwork(tempConfig.networkId);
         }
 
-        if ("WPA2".equalsIgnoreCase(type) || "WPA2 PSK".equalsIgnoreCase(type) || "WPA".equalsIgnoreCase(type)) {
-            config.preSharedKey = password;
+        if (type.contains("wpa") || type.contains("WPA")) {
+            config.preSharedKey = "\"" + password + "\"";
             config.hiddenSSID = true;
             config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
             config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
@@ -138,9 +142,9 @@ public class WifiAdmin {
             config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
             config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
             config.status = WifiConfiguration.Status.ENABLED;
-        } else if ("WEP".equalsIgnoreCase(type)) {
+        } else if (type.contains("wep") || type.contains("WEP")) {
             config.hiddenSSID = true;
-            config.wepKeys[0] = password;
+            config.wepKeys[0] = "\"" + password + "\"";
             config.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.SHARED);
             config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
             config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
@@ -149,7 +153,7 @@ public class WifiAdmin {
             config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
             config.wepTxKeyIndex = 0;
         } else {
-            config.wepKeys[0] = "";
+            config.wepKeys[0] = "\"" + "" + "\"";
             config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
             config.wepTxKeyIndex = 0;
             config.status = WifiConfiguration.Status.ENABLED;
@@ -159,9 +163,11 @@ public class WifiAdmin {
 
     private WifiConfiguration isExsits(String ssid) {
         List<WifiConfiguration> existingConfigs = mWifiManager.getConfiguredNetworks();
-        for (WifiConfiguration existingConfig : existingConfigs) {
-            if (existingConfig.SSID.equals(ssid)) {
-                return existingConfig;
+        if (existingConfigs != null && existingConfigs.size() > 0) {
+            for (WifiConfiguration existingConfig : existingConfigs) {
+                if (existingConfig.SSID.equals(ssid)) {
+                    return existingConfig;
+                }
             }
         }
         return null;

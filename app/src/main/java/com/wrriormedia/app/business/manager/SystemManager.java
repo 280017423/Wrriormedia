@@ -32,7 +32,7 @@ public class SystemManager {
         }
         if (!StringUtil.isNullOrEmpty(wifiModel.getSsid())) {
             mWifiAdmin.openWifi();
-            return mWifiAdmin.addNetwork(mWifiAdmin.CreateWifiInfo(wifiModel.getSsid(), wifiModel.getPassword(), wifiModel.getType()));
+            return mWifiAdmin.addNetwork(wifiModel.getSsid(), wifiModel.getPassword(), wifiModel.getType());
         } else {
             mWifiAdmin.closeWifi();
             return true;
