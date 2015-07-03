@@ -1,9 +1,6 @@
 package com.wrriormedia.library.util;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Environment;
 
 import com.wrriormedia.library.R;
@@ -17,6 +14,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -480,12 +478,54 @@ public class FileUtil {
         void onError(boolean isUpgradeMust);
     }
 
-    public static void installApkFile(Context context, File file) {
-        Intent intent = new Intent();
+    public static String installApkFile(File file) {
+        /*Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(android.content.Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
-        context.startActivity(intent);
+        context.startActivity(intent);*/
+
+        String[] args = { "pm", "install", "-r", file.getAbsolutePath() };
+        String result = "";
+        ProcessBuilder processBuilder = new ProcessBuilder(args);
+        Process process = null;
+        InputStream errIs = null;
+        InputStream inIs = null;
+
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int read = -1;
+            process = processBuilder.start();
+            errIs = process.getErrorStream();
+            while ((read = errIs.read()) != -1) {
+                baos.write(read);
+            }
+            baos.write("/n".getBytes());
+            inIs = process.getInputStream();
+            while ((read = inIs.read()) != -1) {
+                baos.write(read);
+            }
+            byte[] data = baos.toByteArray();
+            result = new String(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = "";
+        } finally {
+            try {
+                if (errIs != null) {
+                    errIs.close();
+                }
+                if (inIs != null) {
+                    inIs.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (process != null) {
+                process.destroy();
+            }
+        }
+        return result;
     }
 
     /**

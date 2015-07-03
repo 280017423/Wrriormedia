@@ -7,4 +7,6 @@
     <string name="download_app_info">正在下载应用</string>
     <string name="download_failed">在线升级失败</string>
     <string name="download_success">下载成功</string>
+    <string name="install_apk_success">静默安装成功</string>
+    <string name="install_apk_fail">静默安装失败</string>
 </resources>
