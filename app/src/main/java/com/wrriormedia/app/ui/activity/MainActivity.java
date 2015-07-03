@@ -17,6 +17,7 @@ import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.MediaImageModel;
 import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.app.model.VersionModel;
+import com.wrriormedia.app.service.DelOldFilesService;
 import com.wrriormedia.app.service.DownloadService;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SystemUtil;
@@ -28,6 +29,9 @@ import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.util.UIUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
+
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.widget.VideoView;
@@ -55,6 +59,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         initVariable();
         initViews();
         new CmdTask().execute();
+        checkStorage();
     }
 
     private void initVariable() {
@@ -307,6 +312,15 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             mVideoView.stopPlayback();
         }
         super.onDestroy();
+    }
+
+    // 每周一检查卡的容量
+    private void checkStorage() {
+        final Calendar c = Calendar.getInstance();
+        c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+        if (2 == c.get(Calendar.DAY_OF_WEEK)) {
+            startService(new Intent(MainActivity.this, DelOldFilesService.class));
+        }
     }
 
 }
