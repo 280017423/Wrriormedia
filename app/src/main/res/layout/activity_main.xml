@@ -19,115 +19,83 @@
         android:contentDescription="@null"
         android:visibility="gone" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/iv_ad_pos_1"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@null"
+        android:visibility="gone" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@drawable/divider"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:showDividers="middle">
+    <ImageView
+        android:id="@+id/iv_ad_pos_2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@null"
+        android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/iv_ad_pos_1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:visibility="gone" />
+    <ImageView
+        android:id="@+id/iv_ad_pos_3"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@null"
+        android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/iv_ad_pos_2"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:visibility="gone" />
+    <ImageView
+        android:id="@+id/iv_ad_pos_4"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@null"
+        android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/iv_ad_pos_3"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:visibility="gone" />
+    <ImageView
+        android:id="@+id/iv_ad_pos_5"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:contentDescription="@null"
+        android:visibility="gone" />
 
+    <ImageView
+        android:id="@+id/iv_ad_pos_6"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@null"
+        android:visibility="gone" />
 
-        </LinearLayout>
+    <ImageView
+        android:id="@+id/iv_ad_pos_7"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:contentDescription="@null"
+        android:visibility="gone" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@drawable/divider"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:showDividers="middle">
+    <ImageView
+        android:id="@+id/iv_ad_pos_8"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@null"
+        android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/iv_ad_pos_4"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/iv_ad_pos_5"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/iv_ad_pos_6"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@drawable/divider"
-            android:orientation="horizontal"
-            android:padding="10dp"
-            android:showDividers="middle">
-
-            <ImageView
-                android:id="@+id/iv_ad_pos_7"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/iv_ad_pos_8"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/iv_ad_pos_9"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@null"
-                android:visibility="gone" />
-
-        </LinearLayout>
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/iv_ad_pos_9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@null"
+        android:visibility="gone" />
 </RelativeLayout>

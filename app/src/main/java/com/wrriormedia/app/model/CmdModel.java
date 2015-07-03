@@ -13,6 +13,8 @@ public class CmdModel extends BaseModel {
     private int next_time;
     private WifiModel wifi;
     private VersionModel version;
+    private int ad;
+    private int download; //开始播放的时间
     private int start_time; //开始播放的时间
     private int end_time; //结束播放时间，在这两个时间段内正常播放广告，时间外关闭屏幕；
     private int log_time; //向服务端发日志的时间
@@ -123,5 +125,21 @@ public class CmdModel extends BaseModel {
             }
         }
         return false;
+    }
+
+    public int getAd() {
+        return ad;
+    }
+
+    public void setAd(int ad) {
+        this.ad = ad;
+    }
+
+    public int getDownload() {
+        return download;
+    }
+
+    public void setDownload(int download) {
+        this.download = download;
     }
 }

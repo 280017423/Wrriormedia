@@ -24,14 +24,18 @@ public class SystemManager {
         SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, modifyTimeKey, (int) (System.currentTimeMillis() / 1000));
     }
 
-    public static void connectWifi(Context context, WifiModel wifiModel) {
-        if (null == wifiModel) {
-            return;
-        }
+    public static boolean connectWifi(Context context, WifiModel wifiModel) {
         WifiAdmin mWifiAdmin = new WifiAdmin(context);
+        if (null == wifiModel) {
+            mWifiAdmin.closeWifi();
+            return true;
+        }
         if (!StringUtil.isNullOrEmpty(wifiModel.getSsid())) {
             mWifiAdmin.openWifi();
-            mWifiAdmin.addNetwork(mWifiAdmin.CreateWifiInfo(wifiModel.getSsid(), wifiModel.getPassword(), wifiModel.getType()));
+            return mWifiAdmin.addNetwork(mWifiAdmin.CreateWifiInfo(wifiModel.getSsid(), wifiModel.getPassword(), wifiModel.getType()));
+        } else {
+            mWifiAdmin.closeWifi();
+            return true;
         }
     }
 }

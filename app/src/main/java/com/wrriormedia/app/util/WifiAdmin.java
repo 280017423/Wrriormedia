@@ -102,11 +102,9 @@ public class WifiAdmin {
         return (mWifiInfo == null) ? "NULL" : mWifiInfo.toString();
     }
 
-    public void addNetwork(WifiConfiguration wcg) {
+    public boolean addNetwork(WifiConfiguration wcg) {
         int wcgID = mWifiManager.addNetwork(wcg);
-        boolean b = mWifiManager.enableNetwork(wcgID, true);
-        System.out.println("a--" + wcgID);
-        System.out.println("b--" + b);
+        return mWifiManager.enableNetwork(wcgID, true);
     }
 
     public void disconnectWifi(int netId) {

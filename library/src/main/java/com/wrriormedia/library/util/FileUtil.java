@@ -223,6 +223,12 @@ public class FileUtil {
 
     public static void write2SDFromInput(File downloadFile, InputStream inputStream, long size, DownloadListener listener) {
         OutputStream output = null;
+        if (size <= 0) {
+            if (null != listener) {
+                listener.onDownloadFail();
+            }
+            return;
+        }
         long onePercentage = size / 100;
         int progress = 0;
         try {
@@ -488,7 +494,7 @@ public class FileUtil {
      * @param file 待安装的apk文件
      * @return 是否安装成功
      */
-    public static boolean slientInstall(File file) {
+    public static boolean silentInstall(File file) {
         boolean result = false;
         Process process;
         OutputStream out;
@@ -506,16 +512,10 @@ public class FileUtil {
             out.close();
             int value = process.waitFor();
             // 代表成功
-            if (value == 0) {
-                result = true;
-            } else if (value == 1) { // 失败
-                result = false;
-            } else { // 未知情况
-                result = false;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            return value == 0;
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return result;

@@ -78,7 +78,7 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
             mTxtState.setText(getString(R.string.download_success));
             File file = (File) model.getEventBusObject();
             toast("需要静默安装");
-            FileUtil.slientInstall(file); // TODO 需要静默安装
+            FileUtil.silentInstall(file); // TODO 需要静默安装成功之后才更新本地时间
             finish();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
             toast(getString(R.string.download_failed));

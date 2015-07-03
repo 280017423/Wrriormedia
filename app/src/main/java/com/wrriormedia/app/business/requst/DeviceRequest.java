@@ -18,6 +18,7 @@ import com.wrriormedia.library.http.HttpClientUtil;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.NetUtil;
 import com.wrriormedia.library.util.PackageUtil;
+import com.wrriormedia.library.util.StringUtil;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -40,7 +41,12 @@ public class DeviceRequest {
         List<NameValuePair> postParams = new ArrayList<>();
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_EQ_VERSION, "WM001"));
-        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_OPERATOR, PackageUtil.getNetworkOperatorName()));
+        String phoneNum = PackageUtil.getLine1Number();
+        if (StringUtil.isNullOrEmpty(phoneNum)) {
+            phoneNum = "0";
+        }
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_SIM, phoneNum));
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_OPERATOR, PackageUtil.getProvidersName()));
         try {
             JsonResult jsonResult = HttpClientUtil.post(url, null, postParams);
             if (jsonResult != null) {
@@ -77,7 +83,6 @@ public class DeviceRequest {
             if (jsonResult != null) {
                 if (jsonResult.isOK()) {
                     CmdModel model = jsonResult.getData(CmdModel.class);
-                    SystemManager.setModifyTime(url);// 更新本地的上次请求时间
                     TimeUtil.setSystemTime(model.getSys_time());//更新系统时间
                     //当无更新时，不必判断其他节点，记录下次请求时间：next_time，本地计时（到了这个时间再次发起请求），本次请求处理结束
                     SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ServerAPIConstant.ACTION_KEY_NEXT_TIME, model.getNext_time());

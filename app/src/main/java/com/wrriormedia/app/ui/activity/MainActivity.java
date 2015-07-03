@@ -1,11 +1,6 @@
 package com.wrriormedia.app.ui.activity;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,6 +11,7 @@ import com.wrriormedia.app.business.manager.AdManager;
 import com.wrriormedia.app.business.manager.SystemManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
+import com.wrriormedia.app.common.ServerAPIConstant;
 import com.wrriormedia.app.model.CmdModel;
 import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.MediaImageModel;
@@ -36,13 +32,8 @@ import com.wrriormedia.library.widget.LoadingUpView;
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.widget.VideoView;
 
-public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompletionListener, MediaPlayer.OnInfoListener, MediaPlayer.OnErrorListener {
-    private static final String ACTION_CMD_NEXT_TIME = "com.wrriormedia.action.cmd_next_time";
+public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
     private LoadingUpView mLoadingUpView;
-    private AlarmManager mAlarmManager;
-    private PendingIntent mPI;
-    private CmdNextReceiver mCmdNextReceiver;
-    private VideoView mVideoView;
     private int mPlayIndex;
     private ImageView mIvAdPos0;
     private ImageView mIvAdPos1;
@@ -55,14 +46,14 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     private ImageView mIvAdPos8;
     private ImageView mIvAdPos9;
 
+    private VideoView mVideoView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initVariable();
         initViews();
-        registerCmdNextReceiver();
-        initAlarm();
         new CmdTask().execute();
     }
 
@@ -73,6 +64,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
 
     private void initViews() {
         mVideoView = (VideoView) findViewById(R.id.surface_view);
+
         mIvAdPos0 = (ImageView) findViewById(R.id.iv_ad_pos_0);
         mIvAdPos1 = (ImageView) findViewById(R.id.iv_ad_pos_1);
         mIvAdPos2 = (ImageView) findViewById(R.id.iv_ad_pos_2);
@@ -83,8 +75,8 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         mIvAdPos7 = (ImageView) findViewById(R.id.iv_ad_pos_7);
         mIvAdPos8 = (ImageView) findViewById(R.id.iv_ad_pos_8);
         mIvAdPos9 = (ImageView) findViewById(R.id.iv_ad_pos_9);
+
         mVideoView.setOnCompletionListener(this);
-        mVideoView.setOnInfoListener(this);
     }
 
     @Override
@@ -93,39 +85,9 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     }
 
     @Override
-    public boolean onInfo(MediaPlayer mediaPlayer, int arg1, int i1) {
-        switch (arg1) {
-            case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-                if (VideoUtil.isPlaying(mVideoView)) {
-                    VideoUtil.stopPlayer(mVideoView);
-                }
-                showLoadingUpView(mLoadingUpView);
-                break;
-            case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-                VideoUtil.startPlayer(mVideoView);
-                dismissLoadingUpView(mLoadingUpView);
-                break;
-            case MediaPlayer.MEDIA_INFO_DOWNLOAD_RATE_CHANGED:
-                break;
-        }
-        return true;
-    }
-
-    @Override
     public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
         return true;
-    }
-
-    private void registerCmdNextReceiver() {
-        mCmdNextReceiver = new CmdNextReceiver();
-        registerReceiver(mCmdNextReceiver, new IntentFilter(ACTION_CMD_NEXT_TIME));
-    }
-
-    private void initAlarm() {
-        mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(ACTION_CMD_NEXT_TIME);
-        mPI = PendingIntent.getBroadcast(this, 0, intent, 0);
     }
 
     public void onEventMainThread(EventBusModel model) {
@@ -154,17 +116,38 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     public void onEventMainThread(ActionResult result) {
         if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
             CmdModel model = (CmdModel) result.ResultObject;
-            //TODO 定时闹钟，下次请求
-            mAlarmManager.set(AlarmManager.RTC_WAKEUP, model.getNext_time(), mPI);
             if (StringUtil.isNullOrEmpty(model.getUpdate_fields())) {
+                SystemManager.setModifyTime(ServerAPIConstant.ACTION_KEY_MODIFY);// 更新本地的上次请求时间
                 return; // 没有设置更新
             }
-            SystemManager.connectWifi(this, model.getWifi());
-            if (model.isNeedUpdate("download")) {
+            new CountDownTimer(model.getNext_time() * 1000, 1000) {
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+                }
+
+                @Override
+                public void onFinish() {
+                    toast("下次执行cmd指令");
+                    new CmdTask().execute();
+                }
+            }.start();
+            VersionModel versionModel = model.getVersion();
+            if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getUrl())) {
+                checkVersion(model.getVersion());
+                return;
+            }
+            boolean isSuccess = SystemManager.connectWifi(this, model.getWifi());
+            // TODO 设置wifi失败
+//            if (!isSuccess) {
+//                toast("wifi设置失败");
+//                return;
+//            }
+            if (model.isNeedUpdate("download") && 1 == model.getDownload()) {
                 EvtLog.d("aaa", "有新的下载就获取下载信息");
                 new DownloadTask().execute();
             }
-            if (model.isNeedUpdate("ad")) {
+            if (model.isNeedUpdate("ad") && 1 == model.getAd()) {
                 EvtLog.d("aaa", "有新的广告就获取广告信息");
                 new AdTask().execute();
             } else {
@@ -173,10 +156,7 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             }
             SystemUtil.changeBrightnessSlide(MainActivity.this, model.getBrightness() / 10f);// 改变屏幕亮度
             SystemUtil.setStreamVolume(MainActivity.this, model.getVolume());// 改变声音大小
-            VersionModel versionModel = model.getVersion();
-            if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getUrl())) {
-                checkVersion(model.getVersion());
-            }
+            SystemManager.setModifyTime(ServerAPIConstant.ACTION_KEY_MODIFY);// 更新model时间
         } else {
             //TODO 记录日志
             showErrorMsg(result);
@@ -184,21 +164,11 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
     }
 
     private void checkVersion(VersionModel versionModel) {
-//        versionModel.setUrl("http://pkg.fir.im/4c112fc010e811e58134ae37436e714b4d439517.apk?attname=app-release.apk&e=1435809708&token=KMHm2Srw8ucAeUwTrkfXSgx35GMiSYWo5N4QCy-B:T74CXhtT31160rWkCLyHR9Hicv4=");
         Intent intent = new Intent(MainActivity.this, UpdateStateActivity.class);
         intent.putExtra(VersionModel.class.getName(), versionModel);
         startActivity(intent);
     }
 
-    @Override
-    protected void onDestroy() {
-        unregisterReceiver(mCmdNextReceiver);
-        EventBus.getDefault().unregister(this);
-        if (mVideoView != null) {
-            mVideoView.stopPlayback();
-        }
-        super.onDestroy();
-    }
 
     class CmdTask extends AsyncTask<Void, Void, ActionResult> {
 
@@ -257,16 +227,6 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
         protected void onPostExecute(ActionResult result) {
             dismissLoadingUpView(mLoadingUpView);
             startService(new Intent(MainActivity.this, DownloadService.class));// 开启下载服务
-        }
-    }
-
-    class CmdNextReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ACTION_CMD_NEXT_TIME)) {
-                EvtLog.d("aaa", "下次时间到");
-//               new CmdTask().execute();
-            }
         }
     }
 
@@ -339,4 +299,14 @@ public class MainActivity extends HtcBaseActivity implements MediaPlayer.OnCompl
             }.start();
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        if (mVideoView != null) {
+            mVideoView.stopPlayback();
+        }
+        super.onDestroy();
+    }
+
 }
