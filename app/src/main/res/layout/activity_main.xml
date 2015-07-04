@@ -4,13 +4,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <io.vov.vitamio.widget.VideoView
-        android:id="@+id/surface_view"
+    <io.vov.vitamio.widget.CenterLayout
+        android:id="@+id/ll_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:visibility="gone" />
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <SurfaceView
+            android:id="@+id/surface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+    </io.vov.vitamio.widget.CenterLayout>
 
     <ImageView
         android:id="@+id/iv_ad_pos_0"
@@ -98,4 +104,33 @@
         android:layout_alignParentRight="true"
         android:contentDescription="@null"
         android:visibility="gone" />
+
+    <com.wrriormedia.app.ui.widget.AutoScrollTextView
+        android:id="@+id/tv_10"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#99000000"
+        android:contentDescription="@null"
+        android:gravity="center"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:visibility="gone" />
+
+    <com.wrriormedia.app.ui.widget.AutoScrollTextView
+        android:id="@+id/tv_11"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#99000000"
+        android:contentDescription="@null"
+        android:gravity="center"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:visibility="gone" />
+
 </RelativeLayout>

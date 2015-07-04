@@ -2,8 +2,6 @@ package com.wrriormedia.app.model;
 
 import com.wrriormedia.library.orm.BaseModel;
 
-import java.util.List;
-
 /**
  * 广告数据的model
  *
@@ -11,22 +9,30 @@ import java.util.List;
  */
 public class TextModel extends BaseModel {
 
-    private List<UpTextModel> up;
-    private List<DownTextModel> down;
+    private String msg;
+    private int pos; // 10，屏幕顶部轮播; 11，屏幕底部轮播
 
-    public List<DownTextModel> getDown() {
-        return down;
+    public int getPos() {
+        return pos;
     }
 
-    public void setDown(List<DownTextModel> down) {
-        this.down = down;
+    public void setPos(int pos) {
+        this.pos = pos;
     }
 
-    public List<UpTextModel> getUp() {
-        return up;
+    public String getMsg() {
+        return msg;
     }
 
-    public void setUp(List<UpTextModel> up) {
-        this.up = up;
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    @Override
+    public String toString() {
+        return "TextModel{" +
+                "msg='" + msg + '\'' +
+                ", pos=" + pos +
+                '}';
     }
 }

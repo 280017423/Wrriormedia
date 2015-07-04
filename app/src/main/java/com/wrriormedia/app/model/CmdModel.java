@@ -1,22 +1,14 @@
 package com.wrriormedia.app.model;
 
 import com.wrriormedia.library.orm.BaseModel;
-import com.wrriormedia.library.util.StringUtil;
 
 /**
  * 指令model
  */
 public class CmdModel extends BaseModel {
-    private String update_fields; // 空为无更新；1，有更新"download,ad"
-    private int sys_time; // 服务端系统时间，客户端需要对比本地时间，相差超过10秒，需要校准本地时间
     private int sys_status;//设备状态控制信号（0：正常播放广告；1：暂停播放，展示默认图；2：系统关闭屏幕，停止播放），当这个信号为0时才继续判断下面的字段，如果不为0，则立即进入指定的状态，停止播放广告
-    private int next_time;
-    private WifiModel wifi;
-    private VersionModel version;
-    private int ad;
-    private int download; //开始播放的时间
-    private int start_time; //开始播放的时间
-    private int end_time; //结束播放时间，在这两个时间段内正常播放广告，时间外关闭屏幕；
+    private String start_time; //开始播放的时间
+    private String end_time; //结束播放时间，在这两个时间段内正常播放广告，时间外关闭屏幕；
     private int log_time; //向服务端发日志的时间
     private int volume; // 声音大小 值为0-10（0：静音，1：最小值，10：最大值）
     private int brightness; // 屏幕亮度 值为0-10（0：屏幕关闭，1：最小值；10：最大值）；
@@ -34,11 +26,11 @@ public class CmdModel extends BaseModel {
         this.brightness = brightness;
     }
 
-    public int getEnd_time() {
+    public String getEnd_time() {
         return end_time;
     }
 
-    public void setEnd_time(int end_time) {
+    public void setEnd_time(String end_time) {
         this.end_time = end_time;
     }
 
@@ -50,19 +42,11 @@ public class CmdModel extends BaseModel {
         this.log_time = log_time;
     }
 
-    public int getNext_time() {
-        return next_time;
-    }
-
-    public void setNext_time(int next_time) {
-        this.next_time = next_time;
-    }
-
-    public int getStart_time() {
+    public String getStart_time() {
         return start_time;
     }
 
-    public void setStart_time(int start_time) {
+    public void setStart_time(String start_time) {
         this.start_time = start_time;
     }
 
@@ -74,22 +58,6 @@ public class CmdModel extends BaseModel {
         this.sys_status = sys_status;
     }
 
-    public int getSys_time() {
-        return sys_time;
-    }
-
-    public void setSys_time(int sys_time) {
-        this.sys_time = sys_time;
-    }
-
-    public VersionModel getVersion() {
-        return version;
-    }
-
-    public void setVersion(VersionModel version) {
-        this.version = version;
-    }
-
     public int getVolume() {
         return volume;
     }
@@ -98,48 +66,15 @@ public class CmdModel extends BaseModel {
         this.volume = volume;
     }
 
-    public WifiModel getWifi() {
-        return wifi;
-    }
-
-    public void setWifi(WifiModel wifi) {
-        this.wifi = wifi;
-    }
-
-    public String getUpdate_fields() {
-        return update_fields;
-    }
-
-    public void setUpdate_fields(String update_fields) {
-        this.update_fields = update_fields;
-    }
-
-    public boolean isNeedUpdate(String info) {
-        if (StringUtil.isNullOrEmpty(update_fields) || StringUtil.isNullOrEmpty(info)) {
-            return false;
-        }
-        String[] updateArray = update_fields.split(",");
-        for (String update : updateArray) {
-            if (info.equals(update)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public int getAd() {
-        return ad;
-    }
-
-    public void setAd(int ad) {
-        this.ad = ad;
-    }
-
-    public int getDownload() {
-        return download;
-    }
-
-    public void setDownload(int download) {
-        this.download = download;
+    @Override
+    public String toString() {
+        return "CmdModel{" +
+                "brightness=" + brightness +
+                ", sys_status=" + sys_status +
+                ", start_time='" + start_time + '\'' +
+                ", end_time='" + end_time + '\'' +
+                ", log_time=" + log_time +
+                ", volume=" + volume +
+                '}';
     }
 }

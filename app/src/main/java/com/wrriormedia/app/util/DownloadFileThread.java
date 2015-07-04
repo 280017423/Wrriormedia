@@ -5,7 +5,7 @@ import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.EventBusModel;
-import com.wrriormedia.app.model.VersionModel;
+import com.wrriormedia.app.model.PushVersionModel;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.listener.DownloadListener;
 import com.wrriormedia.library.util.FileUtil;
@@ -24,9 +24,9 @@ import java.net.URL;
  */
 public class DownloadFileThread extends Thread {
 
-    private VersionModel mUpdateModel;
+    private PushVersionModel mUpdateModel;
 
-    public DownloadFileThread(VersionModel mUpdateModel) {
+    public DownloadFileThread(PushVersionModel mUpdateModel) {
         this.mUpdateModel = mUpdateModel;
     }
 
@@ -39,7 +39,7 @@ public class DownloadFileThread extends Thread {
         }
         try {
             File downloadDir = FileUtil.getDownloadDir();
-            String apkFileName = WrriormediaApplication.getInstance().getBaseContext().getPackageName() + "_" + mUpdateModel.getNum()
+            String apkFileName = WrriormediaApplication.getInstance().getBaseContext().getPackageName() + "_" + mUpdateModel.getVersion()
                     + ".apk";
             File downloadFile = new File(downloadDir, apkFileName);
             downFile(mUpdateModel.getUrl(), downloadFile);

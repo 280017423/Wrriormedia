@@ -45,6 +45,10 @@ public class MediaVideoModel extends BaseModel {
         this.second = second;
     }
 
+    public String getFileName() {
+        return null == md5 ? "" : md5;
+    }
+    
     @Override
     public String toString() {
         return "MediaVideoModel{" +

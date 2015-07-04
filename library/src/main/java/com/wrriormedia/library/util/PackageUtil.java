@@ -143,8 +143,9 @@ public class PackageUtil {
         TelephonyManager telephonyManager = (TelephonyManager) HtcApplicationBase.getInstance().getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
         // 返回唯一的用户ID;
         String imsi = telephonyManager.getSubscriberId();
-        // IMSI号前面3位460是国家，紧接着后面2位00 02是中国移动，01是中国联通，03是中国电信。
-        System.out.println(imsi);
+        if (StringUtil.isNullOrEmpty(imsi)){
+            return ProvidersName;
+        }
         if (imsi.startsWith("46000") || imsi.startsWith("46002")) {
             ProvidersName = "中国移动";
         } else if (imsi.startsWith("46001")) {

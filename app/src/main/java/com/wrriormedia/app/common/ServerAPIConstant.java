@@ -8,20 +8,22 @@ public class ServerAPIConstant {
 
     // Action字段
     public static final String ACTION_READY = "/ready";
-    public static final String ACTION_CMD = "/cmd";
+    public static final String ACTION_CMD_GET = "/cmd/get";
+    public static final String ACTION_CMD_UPDATE = "/cmd/update";
     public static final String ACTION_AD = "/ad/get2";
-    public static final String ACTION_AD_DOWNLOAD = "/download/get";
+    public static final String ACTION_AD_GET = "/ad/get";
 
     // KEY字段
     public static final String ACTION_KEY_ID = "id";
+    public static final String ACTION_KEY_AID = "aid";
     public static final String ACTION_KEY_SIM = "sim";
     public static final String ACTION_KEY_OPERATOR = "operator";
     public static final String ACTION_KEY_EQ_VERSION = "eq_version";
     public static final String ACTION_KEY_VERSION = "version";
     public static final String ACTION_KEY_MODIFY = "modify";
     public static final String ACTION_KEY_NET = "net";
-    public static final String ACTION_KEY_NEXT_TIME = "next_time";
-    public static final String ACTION_KEY_AD_NEXT_TIME = "ad_next_time";
+    public static final String ACTION_KEY_KEY = "key";
+    public static final String ACTION_KEY_STATUS = "status";
 
     /**
      * 获取后端的 api URL地址

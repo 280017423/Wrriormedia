@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.wrriormedia.app.R;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.EventBusModel;
-import com.wrriormedia.app.model.VersionModel;
+import com.wrriormedia.app.model.PushVersionModel;
 import com.wrriormedia.app.service.AppUpdateService;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.FileUtil;
@@ -27,7 +27,7 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
     private TextView mTxtProgress;
     private TextView mTxtState;
     private ProgressBar mProgressBar;
-    private VersionModel mVersionModel;
+    private PushVersionModel mVersionModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
     }
 
     private void initVariables() {
-        mVersionModel = (VersionModel) getIntent().getSerializableExtra(VersionModel.class.getName());
+        mVersionModel = (PushVersionModel) getIntent().getSerializableExtra(PushVersionModel.class.getName());
         if (null == mVersionModel || StringUtil.isNullOrEmpty(mVersionModel.getUrl())) {
             finish();
         }
@@ -61,7 +61,7 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
 
     private void startDownloadService() {
         Intent intent = new Intent(this, AppUpdateService.class);
-        intent.putExtra(VersionModel.class.getName(), mVersionModel);
+        intent.putExtra(PushVersionModel.class.getName(), mVersionModel);
         startService(intent);
     }
 
@@ -77,14 +77,16 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
         if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH)) {
             mTxtState.setText(getString(R.string.download_success));
             File file = (File) model.getEventBusObject();
-            String result = FileUtil.installApkFile(file);
-            if (StringUtil.isNullOrEmpty(result)) {
+            boolean success = FileUtil.silentInstall(file);
+            if (!success) {
                 toast(getString(R.string.install_apk_fail));
             } else {
                 toast(getString(R.string.install_apk_success));
+                // TODO 执行回调接口
             }
             finish();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
+            toast((String) model.getEventBusObject());
             toast(getString(R.string.download_failed));
             finish();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_NORMAL)) {

@@ -116,6 +116,19 @@ public class DBMgr {
         return results;
     }
 
+    public static <T extends BaseModel> List<T> getBaseModels(Class<T> type, String where) {
+        List<T> results = null;
+        DataManager dataManager = DBUtil.getDataManager();
+        dataManager.open();
+        try {
+            results = dataManager.getList(type, where, null, "_id asc", null);
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+        }
+        dataManager.close();
+        return results;
+    }
+
     /**
      * 下拉刷新
      *
@@ -171,6 +184,18 @@ public class DBMgr {
                 DataManager dataManager = DBUtil.getDataManager();
                 dataManager.open();
                 dataManager.delete(type, null, null);
+                dataManager.close();
+            }
+        }).start();
+    }
+
+    public static <T extends BaseModel> void delete(final Class<T> type, final String where) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DataManager dataManager = DBUtil.getDataManager();
+                dataManager.open();
+                dataManager.delete(type, where, null);
                 dataManager.close();
             }
         }).start();

@@ -14,7 +14,6 @@ import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.NetUtil;
-import com.wrriormedia.library.util.PackageUtil;
 import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
 
@@ -41,7 +40,7 @@ public class LoadingActivity extends HtcBaseActivity {
 
     private void initVariable() {
         if (!LibsChecker.checkVitamioLibs(this)) {
-            // TODO 初始化Vitamio库
+            // 初始化Vitamio库
             return;
         }
         EventBus.getDefault().register(this);
@@ -55,34 +54,25 @@ public class LoadingActivity extends HtcBaseActivity {
     }
 
     private void getReadCmd() {
-        if (NetUtil.isNetworkAvailable()) {
-            // 如果网络可以，直接请求ready接口，如果还没有准备好就等待网络开启广播
-            StatusModel model = (StatusModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), StatusModel.class.getName(), StatusModel.class);
-            if (null == model || StringUtil.isNullOrEmpty(model.getSerial())) {
+        // 如果网络可以，直接请求ready接口，如果还没有准备好就等待网络开启广播
+        StatusModel model = (StatusModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), StatusModel.class.getName(), StatusModel.class);
+        if (null != model || !StringUtil.isNullOrEmpty(model.getSerial())) {
+            startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+            finish();
+        } else {
+            if (NetUtil.isNetworkAvailable()) {
                 new VerifyTask().execute();
             } else {
-                ActionResult result = new ActionResult();
-                result.ResultCode = ActionResult.RESULT_CODE_SUCCESS;
-                EventBus.getDefault().post(result);
+                showLoadingUpView(mLoadingUpView, "等待网络初始化...");
             }
-        } else {
-            showLoadingUpView(mLoadingUpView, "等待网络初始化...");
         }
     }
 
     public void onEventMainThread(ActionResult result) {
         dismissLoadingUpView(mLoadingUpView);
         if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
-            StatusModel model = (StatusModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), StatusModel.class.getName(), StatusModel.class);
-            String ready = model.getReady();
-            if ("0".equals(ready)) {
-                mTvImmeInfo.setText(getString(R.string.imie_info, PackageUtil.getTerminalSign()));
-                mTvSerial.setText(getString(R.string.serial_info, model.getSerial()));
-                mTvAddress.setText(getString(R.string.address_info, model.getAddress()));
-            } else if ("1".equals(ready)) {
-                startActivity(new Intent(LoadingActivity.this, MainActivity.class));
-                finish();
-            }
+            startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+            finish();
         } else {
             //TODO 记录日志
             showErrorMsg(result);

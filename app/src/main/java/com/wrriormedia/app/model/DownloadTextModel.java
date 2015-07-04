@@ -7,12 +7,10 @@ import com.wrriormedia.library.orm.BaseModel;
  *
  * @author zou.sq
  */
-public class DownloadModel extends BaseModel {
+public class DownloadTextModel extends BaseModel {
 
     public static final String WHERE_CASE = "AID = ?";
     public static final String WHERE_CASE_SUB = "AID";
-    public static final String START = "START";
-    public static final String END = "END";
 
     private int aid;
     private int type;

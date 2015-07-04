@@ -1,9 +1,13 @@
 package com.wrriormedia.app.util;
 
-import java.text.SimpleDateFormat;
+import com.wrriormedia.app.app.WrriormediaApplication;
+import com.wrriormedia.app.common.ConstantSet;
+import com.wrriormedia.app.model.CmdModel;
+import com.wrriormedia.library.util.EvtLog;
+import com.wrriormedia.library.util.StringUtil;
+
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * 时间工具类
@@ -13,22 +17,48 @@ import java.util.Locale;
  */
 public class TimeUtil {
 
-    public static void setSystemTime(long time) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault());
-        String dateTime = sdf.format(new Date(time));
-        String[] timeList = dateTime.split("-");
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.YEAR, Integer.parseInt(timeList[0]));
-        c.set(Calendar.MONTH, Integer.parseInt(timeList[1]));
-        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(timeList[2]));
-        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeList[3]));
-        c.set(Calendar.MINUTE, Integer.parseInt(timeList[4]));
-        c.set(Calendar.SECOND, Integer.parseInt(timeList[5]));
-        long when = c.getTimeInMillis();
-        if (when / 1000 < Integer.MAX_VALUE) {
-            // 等作为系统应用正式测试时再打开
-            // ((AlarmManager) getSystemService(Context.ALARM_SERVICE)).setTime(when);
+    public static boolean isBetweenTime() {
+        CmdModel model = (CmdModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, CmdModel.class);
+        if (null == model || StringUtil.isNullOrEmpty(model.getEnd_time()) || StringUtil.isNullOrEmpty(model.getStart_time())) {
+            return true;
         }
+        EvtLog.d("aaa", model.toString());
+        String startTime = model.getStart_time();
+        String endTime = model.getEnd_time();
+        if (!startTime.contains(":") || !startTime.contains(":")){
+            return true;
+        }
+        int startHour = Integer.parseInt(startTime.split(":")[0]);
+        int startMinute = Integer.parseInt(startTime.split(":")[1]);
+        int endHour = Integer.parseInt(endTime.split(":")[0]);
+        int endMinute = Integer.parseInt(endTime.split(":")[0]);
+
+        Calendar currentDate = Calendar.getInstance();
+        currentDate.setTime(new Date());
+
+        Calendar min = Calendar.getInstance();
+        min.set(Calendar.YEAR, currentDate.get(Calendar.YEAR));
+        min.set(Calendar.MONTH, currentDate.get(Calendar.MONTH));
+        min.set(Calendar.HOUR_OF_DAY, startHour);
+        min.set(Calendar.MINUTE, startMinute);
+        min.set(Calendar.SECOND, 0);
+        min.set(Calendar.MILLISECOND, 0);
+
+        Calendar max = Calendar.getInstance();
+        max.set(Calendar.YEAR, currentDate.get(Calendar.YEAR));
+        max.set(Calendar.MONTH, currentDate.get(Calendar.MONTH));
+
+        max.set(Calendar.MINUTE, endMinute);
+        max.set(Calendar.SECOND, 0);
+        max.set(Calendar.MILLISECOND, 0);
+
+        if (startHour * 60 + startMinute > endHour * 60 + endMinute) {
+            max.set(Calendar.HOUR_OF_DAY, 24 + endHour);
+        } else {
+            max.set(Calendar.HOUR_OF_DAY, endHour);
+        }
+        return currentDate.getTimeInMillis() >= min.getTimeInMillis()
+                && currentDate.getTimeInMillis() <= max.getTimeInMillis();
     }
 
 }

@@ -6,9 +6,9 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.common.ConstantSet;
-import com.wrriormedia.app.model.DownLoadVideoModel;
 import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.app.model.EventBusModel;
+import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.FileUtil;
@@ -34,7 +34,7 @@ public class DownLoadUtil {
         } catch (MessageException e) {
             e.printStackTrace();
         }
-        DownLoadVideoModel downLoadVideoModel = model.getVideo();
+        MediaVideoModel downLoadVideoModel = model.getVideo();
         String url = downLoadVideoModel.getFirst();
         String fileName = downLoadVideoModel.getFileName();
         if (StringUtil.isNullOrEmpty(url)) {

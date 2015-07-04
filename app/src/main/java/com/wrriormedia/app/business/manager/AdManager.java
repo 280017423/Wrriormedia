@@ -4,66 +4,98 @@ package com.wrriormedia.app.business.manager;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.common.ConstantSet;
-import com.wrriormedia.app.model.AdContentModel;
 import com.wrriormedia.app.model.CmdModel;
+import com.wrriormedia.app.model.DownloadModel;
+import com.wrriormedia.app.model.DownloadTextModel;
 import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.MediaImageModel;
-import com.wrriormedia.app.model.MediaModel;
 import com.wrriormedia.app.model.MediaVideoModel;
+import com.wrriormedia.app.model.TextModel;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.EvtLog;
+import com.wrriormedia.library.util.FileUtil;
+import com.wrriormedia.library.util.MessageException;
 import com.wrriormedia.library.util.StringUtil;
 
+import java.io.File;
 import java.util.List;
 
 public class AdManager {
-
-    /**
-     * 是否有东西播放
-     *
-     * @return boolean 是否有播放的广告
-     */
-    public static boolean canPlayAd() {
-
-        AdContentModel model = DBMgr.getBaseModel(AdContentModel.class, "");
-        if (null == model) {
-            return false;
-        }
-        List<MediaModel> mediaModels = model.getMedia();
-        return null != mediaModels && !mediaModels.isEmpty();
-    }
-
     /**
      * 获取要播放的广告
      *
      * @param index 播放索引
      */
-    public static void getPlayAd(int index) {
-        EvtLog.d("aaa", "获取要播放的视屏");
-        AdContentModel model = DBMgr.getBaseModel(AdContentModel.class, "");
+    public static void getPlayAd(final int index) {
+        if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long current = System.currentTimeMillis() / 1000;
+                String whereCase = DownloadModel.START + "<" + current + " AND " + DownloadModel.END + ">" + current;
+                List<DownloadModel> downloadModels = DBMgr.getBaseModels(DownloadModel.class, whereCase);
+                if (null == downloadModels || downloadModels.isEmpty()) {
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
+                    return;
+                }
+                DownloadModel mediaModel = downloadModels.get(index % downloadModels.size());
+                MediaVideoModel mediaVideoModel = mediaModel.getVideo();
+                MediaImageModel mediaImageModel = mediaModel.getImage();
+                if (null != mediaVideoModel && !StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) {
+                    if (0 == mediaModel.getIsDownloadFinish()) {
+                        EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+                        return;
+                    } else {
+                        EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO, mediaVideoModel));
+                    }
+                }
+                if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5())) {
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaImageModel));
+                }
+            }
+        }).start();
+    }
+
+    public static void getTextAd(int index) {
+        if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
+            return;
+        }
+        EvtLog.d("aaa", "获取要播放的文本");
+        List<DownloadTextModel> downloadModels = DBMgr.getBaseModels(DownloadTextModel.class);
+        if (null == downloadModels || downloadModels.isEmpty()) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_TEXT_AD, null));
+            return;
+        }
+        DownloadTextModel mediaModel = downloadModels.get(index % downloadModels.size());
+        TextModel textModel = mediaModel.getText();
+        if (null != textModel && !StringUtil.isNullOrEmpty(textModel.getMsg())) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT, textModel));
+        }
+    }
+
+    public static void deleteAd(String aid) {
+        DownloadModel model = DBMgr.getBaseModel(DownloadModel.class, DownloadModel.WHERE_CASE_SUB + " = " + aid);
         if (null == model) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
             return;
         }
-        List<MediaModel> mediaModels = model.getMedia();
-        if (null == mediaModels || mediaModels.isEmpty()) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
-            return;
+        File downloadDir = null;
+        try {
+            downloadDir = FileUtil.getDownloadDir();
+        } catch (MessageException e) {
+            e.printStackTrace();
         }
-        MediaModel mediaModel = mediaModels.get(index % mediaModels.size());
-        MediaVideoModel mediaVideoModel = mediaModel.getVideo();
-        MediaImageModel mediaImageModel = mediaModel.getImage();
-        if ((null == mediaVideoModel || StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) && (null == mediaImageModel || StringUtil.isNullOrEmpty(mediaImageModel.getMd5()))) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-        } else {
-            if (null != mediaVideoModel && !StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) {
-                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO, mediaVideoModel));
-            }
-            if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5())) {
-                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaImageModel));
+        MediaVideoModel downLoadVideoModel = model.getVideo();
+        if (null != downLoadVideoModel) {
+            String fileName = downLoadVideoModel.getFileName();
+            File downloadFile = new File(downloadDir, fileName);
+            if (downloadFile.exists()) { // 如果存在，先删除
+                downloadFile.delete();
             }
         }
+        DBMgr.delete(DownloadModel.class, DownloadModel.WHERE_CASE_SUB + " = " + aid);
     }
 
     /**
