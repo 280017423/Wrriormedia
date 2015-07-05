@@ -104,6 +104,7 @@ public class DeviceRequest {
                 if (jsonResult.isOK()) {
                     CmdModel model = jsonResult.getData(CmdModel.class); // 保存到本地
                     SharedPreferenceUtil.saveObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, model);
+                    SystemManager.setModifyTime(ServerAPIConstant.ACTION_KEY_MODIFY);// 更新model时间
                     result.ResultObject = model;
                 } else {
                     result.ResultObject = jsonResult.Msg;

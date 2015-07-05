@@ -14,11 +14,10 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.wrriormedia.app.R;
+import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.manager.AdManager;
-import com.wrriormedia.app.business.manager.SystemManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
-import com.wrriormedia.app.common.ServerAPIConstant;
 import com.wrriormedia.app.model.CmdModel;
 import com.wrriormedia.app.model.DeleteAdModel;
 import com.wrriormedia.app.model.EventBusModel;
@@ -26,6 +25,7 @@ import com.wrriormedia.app.model.MediaImageModel;
 import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.app.model.PushAdModel;
 import com.wrriormedia.app.model.PushVersionModel;
+import com.wrriormedia.app.model.SysStatusModel;
 import com.wrriormedia.app.model.TextModel;
 import com.wrriormedia.app.service.DelOldFilesService;
 import com.wrriormedia.app.service.DownloadService;
@@ -98,6 +98,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_NEW_AD);
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_NEW_TEXT_AD);
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_DELETE_AD);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_SYS_STATUS);
         filter.addAction(Intent.ACTION_TIME_TICK);
         registerReceiver(mPushBroadCast, filter);
     }
@@ -237,9 +238,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             dismissLoadingUpView(mLoadingUpView);
             if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
                 CmdModel model = (CmdModel) result.ResultObject;
-                SystemUtil.changeBrightnessSlide(MainActivity.this, model.getBrightness() / 10f);// 改变屏幕亮度
+                AdManager.adStatus(MainActivity.this);
                 SystemUtil.setStreamVolume(MainActivity.this, model.getVolume());// 改变声音大小
-                SystemManager.setModifyTime(ServerAPIConstant.ACTION_KEY_MODIFY);// 更新model时间
             } else {
                 //TODO 记录日志
                 showErrorMsg(result);
@@ -472,6 +472,15 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getAid())) {
                     new DownloadTask(versionModel.getAid(), true, true).execute();
                 }
+            } else if (ConstantSet.KEY_EVENT_ACTION_SYS_STATUS.equals(action)) {
+                toast("系统状态设置推送");
+                SysStatusModel versionModel = (SysStatusModel) intent.getSerializableExtra(SysStatusModel.class.getName());
+                if (null != versionModel) {
+                    CmdModel model = (CmdModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, CmdModel.class);
+                    model.setSys_status(versionModel.getSys_status());
+                    SharedPreferenceUtil.saveObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, model);
+                    AdManager.adStatus(MainActivity.this);
+                }
             } else if (ConstantSet.KEY_EVENT_ACTION_DELETE_AD.equals(action)) {
                 toast("删除广告推送");
                 DeleteAdModel deleteAdModel = (DeleteAdModel) intent.getSerializableExtra(DeleteAdModel.class.getName());
@@ -487,25 +496,12 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     new UpdateTask("delete_ad").execute();
                 }
             } else if (Intent.ACTION_TIME_TICK.equals(action)) {
-                isLockScreen();
+                CmdModel model = (CmdModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, CmdModel.class);
+                if (null == model || 0 != model.getSys_status()) {
+                    return;
+                }
+                AdManager.setLockScreen(!TimeUtil.isBetweenTime());
             }
-        }
-    }
-
-    private void isLockScreen() {
-        if (TimeUtil.isBetweenTime()) {
-            SharedPreferenceUtil.saveValue(MainActivity.this, ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_AD_ACTIVITY, true);
-            SharedPreferenceUtil.saveValue(MainActivity.this, ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_TEXT_AD_ACTIVITY, true);
-            if (SharedPreferenceUtil.getBooleanValueByKey(MainActivity.this, ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
-                SharedPreferenceUtil.saveValue(MainActivity.this, ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN, false);
-                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT, null));
-            }
-        } else {
-            SharedPreferenceUtil.saveValue(MainActivity.this, ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_AD_ACTIVITY, false);
-            SharedPreferenceUtil.saveValue(MainActivity.this, ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_TEXT_AD_ACTIVITY, false);
-            SharedPreferenceUtil.saveValue(MainActivity.this, ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN, true);
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOCK_SCREEN, null));
         }
     }
 

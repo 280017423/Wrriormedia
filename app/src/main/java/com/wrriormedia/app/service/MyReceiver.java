@@ -11,6 +11,7 @@ import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.DeleteAdModel;
 import com.wrriormedia.app.model.PushAdModel;
 import com.wrriormedia.app.model.PushVersionModel;
+import com.wrriormedia.app.model.SysStatusModel;
 import com.wrriormedia.library.util.StringUtil;
 
 import cn.jpush.android.api.JPushInterface;
@@ -61,6 +62,12 @@ public class MyReceiver extends BroadcastReceiver {
             DeleteAdModel deleteAdModel = gson.fromJson(extra, DeleteAdModel.class);
             Intent adIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_DELETE_AD);
             adIntent.putExtra(DeleteAdModel.class.getName(), deleteAdModel);
+            context.sendBroadcast(adIntent);
+        }else if ("sys_status".equals(alert) && !StringUtil.isNullOrEmpty(extra)) {
+            Gson gson = new Gson();
+            SysStatusModel sysStatusModel = gson.fromJson(extra, SysStatusModel.class);
+            Intent adIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_SYS_STATUS);
+            adIntent.putExtra(SysStatusModel.class.getName(), sysStatusModel);
             context.sendBroadcast(adIntent);
         }
     }

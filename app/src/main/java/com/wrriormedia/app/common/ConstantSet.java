@@ -28,6 +28,7 @@ public class ConstantSet {
     public static final String KEY_EVENT_ACTION_NEW_AD = "KEY_EVENT_ACTION_NEW_AD";
     public static final String KEY_EVENT_ACTION_NEW_TEXT_AD = "KEY_EVENT_ACTION_NEW_TEXT_AD";
     public static final String KEY_EVENT_ACTION_DELETE_AD = "KEY_EVENT_ACTION_DELETE_AD";
+    public static final String KEY_EVENT_ACTION_SYS_STATUS = "KEY_EVENT_ACTION_SYS_STATUS";
 
     //下载app
     public static final String KEY_EVENT_ACTION_DOWNLOAD_STATUS_START = "KEY_EVENT_ACTION_DOWNLOAD_STATUS_START";
