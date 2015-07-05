@@ -508,6 +508,7 @@ public class DefaultPDWHttpClient implements IPDWHttpClient {
     private void addHeader(HttpURLConnection hrc, List<NameValuePair> nameValuePairs) {
         if (hrc != null) {
             hrc.addRequestProperty("referer", "http://warriormedia.cn/");
+            hrc.addRequestProperty("version", PackageUtil.getVersionName());
         }
     }
 

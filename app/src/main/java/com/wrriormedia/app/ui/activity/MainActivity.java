@@ -85,6 +85,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         checkStorage();
         AdManager.getPlayAd(mPlayIndex);
         AdManager.getTextAd(mTextIndex);
+        startService(new Intent(MainActivity.this, DownloadService.class));
     }
 
     private void initVariable() {
@@ -250,10 +251,12 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
         private String mAid;
         private boolean mIsTextAd;
+        private boolean mNeedFeedback;
 
-        public DownloadTask(String aid, boolean isTextAd) {
+        public DownloadTask(String aid, boolean isTextAd, boolean needFeedback) {
             this.mAid = aid;
             this.mIsTextAd = isTextAd;
+            this.mNeedFeedback = needFeedback;
         }
 
         @Override
@@ -270,9 +273,39 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         @Override
         protected void onPostExecute(ActionResult result) {
             dismissLoadingUpView(mLoadingUpView);
-            showErrorMsg(result);
-            if (!mIsTextAd) {
-                startService(new Intent(MainActivity.this, DownloadService.class));// 开启下载服务
+            if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
+                if (mNeedFeedback) {
+                    new UpdateTask(mIsTextAd ? "text_ad" : "ad").execute();
+                }
+            } else {
+                showErrorMsg(result);
+            }
+        }
+    }
+
+    class UpdateTask extends AsyncTask<Void, Void, ActionResult> {
+
+        private String mAlert;
+
+        public UpdateTask(String alert) {
+            this.mAlert = alert;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected ActionResult doInBackground(Void... params) {
+            return DeviceRequest.update(mAlert);
+        }
+
+        @Override
+        protected void onPostExecute(ActionResult result) {
+            dismissLoadingUpView(mLoadingUpView);
+            if (!ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
+                // TODO 写日志
             }
         }
     }
@@ -431,13 +464,13 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 toast("新广告推送");
                 PushAdModel versionModel = (PushAdModel) intent.getSerializableExtra(PushAdModel.class.getName());
                 if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getAid())) {
-                    new DownloadTask(versionModel.getAid(), false).execute();
+                    new DownloadTask(versionModel.getAid(), false, true).execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_NEW_TEXT_AD.equals(action)) {
                 toast("新文本广告推送");
                 PushAdModel versionModel = (PushAdModel) intent.getSerializableExtra(PushAdModel.class.getName());
                 if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getAid())) {
-                    new DownloadTask(versionModel.getAid(), true).execute();
+                    new DownloadTask(versionModel.getAid(), true, true).execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_DELETE_AD.equals(action)) {
                 toast("删除广告推送");
@@ -451,6 +484,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     for (String deleteAid : aids) {
                         AdManager.deleteAd(deleteAid);
                     }
+                    new UpdateTask("delete_ad").execute();
                 }
             } else if (Intent.ACTION_TIME_TICK.equals(action)) {
                 isLockScreen();
