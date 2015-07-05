@@ -28,7 +28,7 @@
     <ImageView
         android:id="@+id/iv_ad_pos_1"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:contentDescription="@null"
@@ -37,7 +37,7 @@
     <ImageView
         android:id="@+id/iv_ad_pos_2"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:contentDescription="@null"
@@ -46,7 +46,7 @@
     <ImageView
         android:id="@+id/iv_ad_pos_3"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:contentDescription="@null"
@@ -55,7 +55,7 @@
     <ImageView
         android:id="@+id/iv_ad_pos_4"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:contentDescription="@null"
@@ -64,7 +64,7 @@
     <ImageView
         android:id="@+id/iv_ad_pos_5"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:contentDescription="@null"
         android:visibility="gone" />
@@ -72,7 +72,7 @@
     <ImageView
         android:id="@+id/iv_ad_pos_6"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:contentDescription="@null"
@@ -81,7 +81,7 @@
     <ImageView
         android:id="@+id/iv_ad_pos_7"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:contentDescription="@null"
@@ -90,11 +90,11 @@
     <ImageView
         android:id="@+id/iv_ad_pos_8"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:contentDescription="@null"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <ImageView
         android:id="@+id/iv_ad_pos_9"

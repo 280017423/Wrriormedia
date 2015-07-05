@@ -32,7 +32,6 @@ import com.wrriormedia.app.model.PushVersionModel;
 import com.wrriormedia.app.model.SysStatusModel;
 import com.wrriormedia.app.model.TextModel;
 import com.wrriormedia.app.model.VolumeModel;
-import com.wrriormedia.app.service.DelOldFilesService;
 import com.wrriormedia.app.service.DownloadService;
 import com.wrriormedia.app.ui.widget.AutoScrollTextView;
 import com.wrriormedia.app.util.ActionResult;
@@ -47,18 +46,14 @@ import com.wrriormedia.library.util.FileUtil;
 import com.wrriormedia.library.util.MessageException;
 import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.util.UIUtil;
-import com.wrriormedia.library.widget.LoadingUpView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.TimeZone;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 
 public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callback {
-    private LoadingUpView mLoadingUpView;
     private int mPlayIndex;
     private int mTextIndex;
     private ImageView mIvAdPos0;
@@ -88,7 +83,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         initVariable();
         initViews();
         new CmdTask().execute();
-        //checkStorage();
         AdManager.getPlayAd(mPlayIndex);
         AdManager.getTextAd(mTextIndex);
         startService(new Intent(MainActivity.this, DownloadService.class));
@@ -97,7 +91,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private void initVariable() {
         Vitamio.initialize(this);
         EventBus.getDefault().register(this);
-        mLoadingUpView = new LoadingUpView(this, false);
         mPushBroadCast = new PushBroadCast();
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_NEW_VERSION);
@@ -113,7 +106,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     }
 
     private void initViews() {
-
         mIvAdPos0 = (ImageView) findViewById(R.id.iv_ad_pos_0);
         mIvAdPos1 = (ImageView) findViewById(R.id.iv_ad_pos_1);
         mIvAdPos2 = (ImageView) findViewById(R.id.iv_ad_pos_2);
@@ -155,19 +147,16 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             return;
         }
         if (ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO.equals(model.getEventBusAction())) {
-            toast("视频广告");
-            mViewVideo.setVisibility(View.VISIBLE);
             playVideo((MediaVideoModel) model.getEventBusObject());
+            mViewVideo.setVisibility(View.VISIBLE);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE.equals(model.getEventBusAction())) {
             showPosImg((MediaImageModel) model.getEventBusObject());
-            toast("图像广告");
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT.equals(model.getEventBusAction())) {
             TextModel textModel = (TextModel) model.getEventBusObject();
             mTvAdPos10.setVisibility(View.GONE);
             mTvAdPos11.setVisibility(View.GONE);
             if (textModel.getPos() == 10) {
                 mTvAdPos10.setVisibility(View.VISIBLE);
-                toast("文字广告" + textModel.toString());
                 mTvAdPos10.setText(textModel.getMsg());
                 mTvAdPos10.setSpeed(AutoScrollTextView.SPEED_SLOW);
                 mTvAdPos10.startScroll();
@@ -191,7 +180,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             }
 
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT.equals(model.getEventBusAction())) {
-            toast("播放下一个");
             mViewVideo.setVisibility(View.GONE);
             mPlayIndex++;
             hideAllImg();
@@ -200,8 +188,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             mTextIndex++;
             AdManager.getTextAd(mTextIndex);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD.equals(model.getEventBusAction())) {
-            EvtLog.d("aaa", "当前没有广告数据");
-            toast("当前没有广告数据");
             new CountDownTimer(10 * 1000, 10 * 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -233,7 +219,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
         @Override
         protected void onPreExecute() {
-            showLoadingUpView(mLoadingUpView, "正在获取指令信息...");
             super.onPreExecute();
         }
 
@@ -244,7 +229,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
         @Override
         protected void onPostExecute(ActionResult result) {
-            dismissLoadingUpView(mLoadingUpView);
             if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
                 CmdModel model = (CmdModel) result.ResultObject;
                 AdManager.adStatus(MainActivity.this);
@@ -268,7 +252,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
         @Override
         protected void onPreExecute() {
-            showLoadingUpView(mLoadingUpView, "正在获取下载信息...");
             super.onPreExecute();
         }
 
@@ -279,7 +262,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
         @Override
         protected void onPostExecute(ActionResult result) {
-            dismissLoadingUpView(mLoadingUpView);
             if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
                 if (mNeedFeedback) {
                     new UpdateTask(mIsTextAd ? "text_ad" : "ad").execute();
@@ -310,7 +292,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
         @Override
         protected void onPostExecute(ActionResult result) {
-            dismissLoadingUpView(mLoadingUpView);
+
         }
     }
 
@@ -330,7 +312,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private void showPosImg(final MediaImageModel mediaImageModel) {
         ImageView displayView = null;
         int position = mediaImageModel.getPos();
-        EvtLog.d("aaa", "显示第" + position + "张");
         switch (position) {
             case 0:
                 displayView = mIvAdPos0;
@@ -384,17 +365,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         }
     }
 
-    // 每周一检查卡的容量
-    private void checkStorage() {
-        final Calendar c = Calendar.getInstance();
-        c.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
-        if (2 == c.get(Calendar.DAY_OF_WEEK)) {
-            startService(new Intent(MainActivity.this, DelOldFilesService.class));
-        }
-    }
-
     private void playVideo(MediaVideoModel mediaVideoModel) {
-        EvtLog.d("aaa", "即将播放视屏" + mediaVideoModel.toString());
         File downloadDir = null;
         try {
             downloadDir = FileUtil.getDownloadDir();
@@ -457,7 +428,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (ConstantSet.KEY_EVENT_ACTION_NEW_VERSION.equals(action)) {
-                toast("新版本推送");
                 PushVersionModel versionModel = (PushVersionModel) intent.getSerializableExtra(PushVersionModel.class.getName());
                 if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getUrl())) {
                     Intent versionIntent = new Intent(MainActivity.this, UpdateStateActivity.class);
@@ -467,38 +437,32 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             } else if (ConstantSet.KEY_EVENT_ACTION_LOG_TIME.equals(action)) {
                 PushLogModel sysStatusModel = (PushLogModel) intent.getSerializableExtra(PushLogModel.class.getName());
                 if (null != sysStatusModel) {
-                    toast("日志时间" + sysStatusModel.getLog_time());
                     SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_LOG_TIME, sysStatusModel.getLog_time());
                     LogManager.timeUploadLog();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_BRITENESS.equals(action)) {
                 PushBrightnessModel sysStatusModel = (PushBrightnessModel) intent.getSerializableExtra(PushBrightnessModel.class.getName());
-                toast("亮度推送");
                 if (null != sysStatusModel) {
                     SystemUtil.changeBrightnessSlide(MainActivity.this, sysStatusModel.getBrightness() / 10f);
                     new UpdateTask("brightness").execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_VOLUME.equals(action)) {
                 VolumeModel sysStatusModel = (VolumeModel) intent.getSerializableExtra(VolumeModel.class.getName());
-                toast("声音推送");
                 if (null != sysStatusModel) {
                     SystemUtil.setStreamVolume(MainActivity.this, sysStatusModel.getVolume());
                     new UpdateTask("volume").execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_NEW_AD.equals(action)) {
-                toast("新广告推送");
                 PushAdModel versionModel = (PushAdModel) intent.getSerializableExtra(PushAdModel.class.getName());
                 if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getAid())) {
                     new DownloadTask(versionModel.getAid(), false, true).execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_NEW_TEXT_AD.equals(action)) {
-                toast("新文本广告推送");
                 PushAdModel versionModel = (PushAdModel) intent.getSerializableExtra(PushAdModel.class.getName());
                 if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getAid())) {
                     new DownloadTask(versionModel.getAid(), true, true).execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_SYS_STATUS.equals(action)) {
-                toast("系统状态设置推送");
                 SysStatusModel versionModel = (SysStatusModel) intent.getSerializableExtra(SysStatusModel.class.getName());
                 if (null != versionModel) {
                     CmdModel model = (CmdModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, CmdModel.class);
@@ -507,7 +471,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     AdManager.adStatus(MainActivity.this);
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_DELETE_AD.equals(action)) {
-                toast("删除广告推送");
                 DeleteAdModel deleteAdModel = (DeleteAdModel) intent.getSerializableExtra(DeleteAdModel.class.getName());
                 if (null == deleteAdModel) {
                     return;

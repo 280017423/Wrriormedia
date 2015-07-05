@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sharedUserId="android.uid.packageinstaller"
-    package="com.wrriormedia.app">
+    package="com.wrriormedia.app"
+    android:sharedUserId="android.uid.packageinstaller">
 
     <permission
         android:name="com.wrriormedia.app.permission.JPUSH_MESSAGE"
@@ -93,8 +93,9 @@
         </activity>
         <activity
             android:name=".ui.activity.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:process=":vitamio"
             android:screenOrientation="landscape" />
         <activity

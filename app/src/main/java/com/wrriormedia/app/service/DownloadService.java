@@ -36,7 +36,6 @@ public class DownloadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        DownloadManager.downTask();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -85,7 +84,7 @@ public class DownloadService extends Service {
             timeDownload();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_NEXT)) {
             timeDownload();
-        }else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_START)) {
+        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_START)) {
             mNotificationManager.notify(model.getEventId(), mNotification);
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
             timeDownload();
@@ -107,7 +106,6 @@ public class DownloadService extends Service {
     }
 
     private void timeDownload() {
-        // 10秒倒计时开始下载
         TimerUtil.startTimer(TAG, 10, 1 * 1000, new TimerUtil.TimerActionListener() {
             @Override
             public void doAction() {

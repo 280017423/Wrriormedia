@@ -2,6 +2,7 @@ package com.wrriormedia.app.business.manager;
 
 
 import android.app.Activity;
+import android.os.CountDownTimer;
 
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
@@ -31,7 +32,16 @@ public class AdManager {
      */
     public static void getPlayAd(final int index) {
         if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+            new CountDownTimer(10 * 1000, 10 * 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                }
+
+                @Override
+                public void onFinish() {
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+                }
+            }.start();
             return;
         }
         new Thread(new Runnable() {
@@ -47,6 +57,10 @@ public class AdManager {
                 DownloadModel mediaModel = downloadModels.get(index % downloadModels.size());
                 MediaVideoModel mediaVideoModel = mediaModel.getVideo();
                 MediaImageModel mediaImageModel = mediaModel.getImage();
+                if ((null == mediaVideoModel || StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) && (null == mediaImageModel || StringUtil.isNullOrEmpty(mediaImageModel.getMd5()))) {
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+                    return;
+                }
                 if (null != mediaVideoModel && !StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) {
                     if (0 == mediaModel.getIsDownloadFinish()) {
                         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
@@ -64,7 +78,16 @@ public class AdManager {
 
     public static void getTextAd(int index) {
         if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT, null));
+            new CountDownTimer(10 * 1000, 10 * 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                }
+
+                @Override
+                public void onFinish() {
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT, null));
+                }
+            }.start();
             return;
         }
         long current = System.currentTimeMillis() / 1000;

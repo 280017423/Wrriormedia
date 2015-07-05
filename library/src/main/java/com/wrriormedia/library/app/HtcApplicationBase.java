@@ -2,6 +2,10 @@ package com.wrriormedia.library.app;
 
 import android.app.Application;
 
+import org.apache.http.NameValuePair;
+
+import java.util.List;
+
 /**
  * 全局应用程序
  *
@@ -21,4 +25,6 @@ public abstract class HtcApplicationBase extends Application {
         super.onCreate();
         instance = this;
     }
+
+    public abstract void savaLog(String url, List<NameValuePair> postParams, String errorInfo);
 }

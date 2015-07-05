@@ -8,7 +8,7 @@
     </style>
 
     <!-- application主题设置 -->
-    <style name="ThemeActivity" mce_bogus="1" parent="android:Theme">
+    <style name="ThemeActivity" mce_bogus="1" parent="android:Theme.Black.NoTitleBar.Fullscreen">
         <item name="android:windowAnimationStyle">@style/AnimationActivity</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:screenOrientation">landscape</item>

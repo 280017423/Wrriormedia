@@ -1,9 +1,7 @@
 package com.wrriormedia.app.business.requst;
 
-import com.pdw.gson.Gson;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
-import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.business.manager.SystemManager;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.common.ServerAPIConstant;
@@ -66,12 +64,6 @@ public class DeviceRequest {
         } catch (Exception e) {
             result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             EvtLog.w(TAG, e);
-            ArrayList<String> logList = new ArrayList<>();
-            logList.add(url);
-            logList.add(LogManager.getPostData(postParams));
-            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
-            logList.add(e.toString());
-            LogManager.saveLog(3, new Gson().toJson(logList));
         }
         return result;
     }
@@ -94,12 +86,6 @@ public class DeviceRequest {
         } catch (Exception e) {
             result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             EvtLog.w(TAG, e);
-            ArrayList<String> logList = new ArrayList<>();
-            logList.add(url);
-            logList.add(LogManager.getPostData(postParams));
-            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
-            logList.add(e.toString());
-            LogManager.saveLog(3, new Gson().toJson(logList));
         }
         return result;
     }
@@ -121,12 +107,6 @@ public class DeviceRequest {
         } catch (Exception e) {
             result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             EvtLog.w(TAG, e);
-            ArrayList<String> logList = new ArrayList<>();
-            logList.add(url);
-            logList.add(LogManager.getPostData(postParams));
-            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
-            logList.add(e.toString());
-            LogManager.saveLog(3, new Gson().toJson(logList));
         }
         return result;
     }
@@ -158,12 +138,6 @@ public class DeviceRequest {
         } catch (Exception e) {
             result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             EvtLog.w(TAG, e);
-            ArrayList<String> logList = new ArrayList<>();
-            logList.add(url);
-            logList.add(LogManager.getPostData(postParams));
-            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
-            logList.add(e.toString());
-            LogManager.saveLog(3, new Gson().toJson(logList));
         }
         return result;
     }
@@ -216,12 +190,6 @@ public class DeviceRequest {
         } catch (Exception e) {
             result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             EvtLog.w(TAG, e);
-            ArrayList<String> logList = new ArrayList<>();
-            logList.add(url);
-            logList.add(LogManager.getPostData(postParams));
-            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
-            logList.add(e.toString());
-            LogManager.saveLog(3, new Gson().toJson(logList));
         }
         return result;
     }

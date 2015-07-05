@@ -1,12 +1,21 @@
 package com.wrriormedia.app.app;
 
 
+import com.pdw.gson.Gson;
+import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.util.CrashHandler;
 import com.wrriormedia.app.util.DBUtil;
 import com.wrriormedia.library.app.HtcApplicationBase;
+import com.wrriormedia.library.http.DefaultPDWHttpClient;
 import com.wrriormedia.library.imageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.wrriormedia.library.imageloader.core.ImageLoader;
 import com.wrriormedia.library.imageloader.core.ImageLoaderConfiguration;
+import com.wrriormedia.library.util.NetUtil;
+
+import org.apache.http.NameValuePair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.jpush.android.api.JPushInterface;
 
@@ -49,4 +58,13 @@ public class WrriormediaApplication extends HtcApplicationBase {
         ImageLoader.getInstance().init(config);
     }
 
+    @Override
+    public void savaLog(String url, List<NameValuePair> postParams, String errorInfo) {
+        ArrayList<String> logList = new ArrayList<>();
+        logList.add(url);
+        logList.add(DefaultPDWHttpClient.buildContent(postParams));
+        logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
+        logList.add(errorInfo);
+        LogManager.saveLog(3, new Gson().toJson(logList));
+    }
 }

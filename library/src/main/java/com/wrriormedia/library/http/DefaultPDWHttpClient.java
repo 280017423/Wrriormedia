@@ -1,6 +1,7 @@
 package com.wrriormedia.library.http;
 
 import com.wrriormedia.library.R;
+import com.wrriormedia.library.app.HtcApplicationBase;
 import com.wrriormedia.library.app.JsonResult;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.MessageException;
@@ -102,7 +103,7 @@ public class DefaultPDWHttpClient implements IPDWHttpClient {
      * @param getParams 参数
      * @return String 拼接后的参数
      */
-    private static String buildContent(List<NameValuePair> getParams) {
+    public static String buildContent(List<NameValuePair> getParams) {
         if (null == getParams) {
             return "";
         }
@@ -285,9 +286,11 @@ public class DefaultPDWHttpClient implements IPDWHttpClient {
                     COOKIE_STORE = client.getCookieStore();
                 }
             } else {
+                HtcApplicationBase.getInstance().savaLog(url, postParams, returnString);
                 EvtLog.e(TAG, "server response: " + returnString + ";  status:" + status);
             }
         } catch (Exception e) {
+            HtcApplicationBase.getInstance().savaLog(url, postParams, e.toString());
             if (e instanceof IOException) {
                 EvtLog.e(TAG, "NetworkException");
                 HttpClientUtil.LAST_REQUEST_IS_OK = false;
@@ -472,14 +475,17 @@ public class DefaultPDWHttpClient implements IPDWHttpClient {
                     EvtLog.w(TAG, "返回为null");
                 }
             } else {
+                HtcApplicationBase.getInstance().savaLog(url, params, httpURLConnection.getResponseMessage());
                 EvtLog.d(TAG, "server response code  " + respCode + "; msg :" + httpURLConnection.getResponseMessage());
             }
         } catch (IOException ioe) {
+            HtcApplicationBase.getInstance().savaLog(url, params, ioe.toString());
             EvtLog.w(TAG, ioe);
             HttpClientUtil.LAST_REQUEST_IS_OK = false;
             throw new NetworkException(
                     PackageUtil.getString(R.string.network_is_not_available));
         } catch (JSONException e) {
+            HtcApplicationBase.getInstance().savaLog(url, params, e.toString());
             EvtLog.w(TAG, e);
             HttpClientUtil.LAST_REQUEST_IS_OK = false;
         } finally {

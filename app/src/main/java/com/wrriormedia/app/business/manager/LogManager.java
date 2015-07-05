@@ -12,8 +12,6 @@ import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.TimerUtil;
 
-import org.apache.http.NameValuePair;
-
 import java.util.List;
 
 public class LogManager {
@@ -24,17 +22,6 @@ public class LogManager {
         model.setLogType(type);
         model.setLog(logInfo);
         DBMgr.saveModel(model);
-    }
-
-    public static String getPostData(List<NameValuePair> params) {
-        StringBuilder builder = new StringBuilder();
-        if (params == null || params.isEmpty()) {
-            return "";
-        }
-        for (int i = 0; i < params.size(); ++i) {
-            builder.append(params.get(i).getName() + ":" + params.get(i).getValue());
-        }
-        return builder.toString();
     }
 
     public static void timeUploadLog() {
