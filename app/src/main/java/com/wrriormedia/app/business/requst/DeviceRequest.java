@@ -1,7 +1,9 @@
 package com.wrriormedia.app.business.requst;
 
+import com.pdw.gson.Gson;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
+import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.business.manager.SystemManager;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.common.ServerAPIConstant;
@@ -64,6 +66,12 @@ public class DeviceRequest {
         } catch (Exception e) {
             result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             EvtLog.w(TAG, e);
+            ArrayList<String> logList = new ArrayList<>();
+            logList.add(url);
+            logList.add(LogManager.getPostData(postParams));
+            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
+            logList.add(e.toString());
+            LogManager.saveLog(3, new Gson().toJson(logList));
         }
         return result;
     }
@@ -86,6 +94,39 @@ public class DeviceRequest {
         } catch (Exception e) {
             result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             EvtLog.w(TAG, e);
+            ArrayList<String> logList = new ArrayList<>();
+            logList.add(url);
+            logList.add(LogManager.getPostData(postParams));
+            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
+            logList.add(e.toString());
+            LogManager.saveLog(3, new Gson().toJson(logList));
+        }
+        return result;
+    }
+
+    public static ActionResult uploadLog(String loginfo) {
+        ActionResult result = new ActionResult();
+        String url = ServerAPIConstant.getAPIUrl(ServerAPIConstant.ACTION_LOG_UPLOAD);
+        List<NameValuePair> postParams = new ArrayList<>();
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_LOG, loginfo));
+        try {
+            JsonResult jsonResult = HttpClientUtil.post(url, null, postParams);
+            if (jsonResult != null) {
+                result.ResultObject = jsonResult.Msg;
+                result.ResultCode = jsonResult.Code;
+            } else {
+                result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
+            }
+        } catch (Exception e) {
+            result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
+            EvtLog.w(TAG, e);
+            ArrayList<String> logList = new ArrayList<>();
+            logList.add(url);
+            logList.add(LogManager.getPostData(postParams));
+            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
+            logList.add(e.toString());
+            LogManager.saveLog(3, new Gson().toJson(logList));
         }
         return result;
     }
@@ -103,6 +144,7 @@ public class DeviceRequest {
             if (jsonResult != null) {
                 if (jsonResult.isOK()) {
                     CmdModel model = jsonResult.getData(CmdModel.class); // 保存到本地
+                    SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_LOG_TIME, model.getLog_time());
                     SharedPreferenceUtil.saveObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, model);
                     SystemManager.setModifyTime(ServerAPIConstant.ACTION_KEY_MODIFY);// 更新model时间
                     result.ResultObject = model;
@@ -116,6 +158,12 @@ public class DeviceRequest {
         } catch (Exception e) {
             result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             EvtLog.w(TAG, e);
+            ArrayList<String> logList = new ArrayList<>();
+            logList.add(url);
+            logList.add(LogManager.getPostData(postParams));
+            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
+            logList.add(e.toString());
+            LogManager.saveLog(3, new Gson().toJson(logList));
         }
         return result;
     }
@@ -137,11 +185,8 @@ public class DeviceRequest {
                             textModel.setAid(aid);
                             DownloadTextModel localTextModel = DBMgr.getBaseModel(DownloadTextModel.class, DownloadTextModel.WHERE_CASE_SUB + " = " + aid);
                             if (null == localTextModel) {
-                                EvtLog.d("aaa", "服务器新增的" + aid);
                                 DBMgr.saveModel(textModel);
                             } else {
-                                EvtLog.d("aaa", "这个是服务器修改本地数据库的" + aid);
-                                // TODO 先删除本地已经下载的数据
                                 DBMgr.saveModel(textModel, DownloadTextModel.WHERE_CASE, "" + aid);
                             }
                         }
@@ -156,8 +201,6 @@ public class DeviceRequest {
                                 DBMgr.saveModel(downloadModel);
                             } else {
                                 EvtLog.d("aaa", "这个是服务器修改本地数据库的" + aid);
-                                // TODO 先删除本地已经下载的数据
-                                downloadModel.setIsDownloadFinish(1); // TODO 正式环境去掉
                                 DBMgr.saveModel(downloadModel, DownloadModel.WHERE_CASE, "" + aid);
                             }
                         }
@@ -173,6 +216,12 @@ public class DeviceRequest {
         } catch (Exception e) {
             result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
             EvtLog.w(TAG, e);
+            ArrayList<String> logList = new ArrayList<>();
+            logList.add(url);
+            logList.add(LogManager.getPostData(postParams));
+            logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
+            logList.add(e.toString());
+            LogManager.saveLog(3, new Gson().toJson(logList));
         }
         return result;
     }

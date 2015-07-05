@@ -5,6 +5,7 @@ import android.content.Context;
 import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.app.model.DownloadTextModel;
+import com.wrriormedia.app.model.LogModel;
 import com.wrriormedia.library.app.HtcApplicationBase;
 import com.wrriormedia.library.orm.DataManager;
 import com.wrriormedia.library.orm.DatabaseBuilder;
@@ -26,6 +27,7 @@ public class DBUtil {
             DATABASE_BUILDER = new DatabaseBuilder(PackageUtil.getConfigString("db_name"));
             DATABASE_BUILDER.addClass(DownloadModel.class);
             DATABASE_BUILDER.addClass(DownloadTextModel.class);
+            DATABASE_BUILDER.addClass(LogModel.class);
         }
     }
 

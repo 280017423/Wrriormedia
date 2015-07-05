@@ -13,6 +13,7 @@ public class DownloadModel extends BaseModel {
     public static final String WHERE_CASE_SUB = "AID";
     public static final String START = "START";
     public static final String END = "END";
+    public static final String IS_DOWNLOAD_FINISH = "IS_DOWNLOAD_FINISH";
 
     private int aid;
     private int type;

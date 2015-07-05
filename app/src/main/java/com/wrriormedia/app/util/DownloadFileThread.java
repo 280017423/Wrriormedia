@@ -53,7 +53,7 @@ public class DownloadFileThread extends Thread {
      * @param downloadFile 本地保存文件
      * @return boolean false 文件下载出错 true 文件下载成功
      */
-    public boolean downFile(String urlStr, File downloadFile) {
+    public boolean downFile(final String urlStr, File downloadFile) {
         InputStream inputStream = null;
         try {
             HttpURLConnection urlConn;

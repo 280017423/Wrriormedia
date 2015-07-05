@@ -12,6 +12,7 @@ public class ServerAPIConstant {
     public static final String ACTION_CMD_UPDATE = "/cmd/update";
     public static final String ACTION_AD = "/ad/get2";
     public static final String ACTION_AD_GET = "/ad/get";
+    public static final String ACTION_LOG_UPLOAD = "/log/upload";
 
     // KEY字段
     public static final String ACTION_KEY_ID = "id";
@@ -23,6 +24,7 @@ public class ServerAPIConstant {
     public static final String ACTION_KEY_MODIFY = "modify";
     public static final String ACTION_KEY_NET = "net";
     public static final String ACTION_KEY_KEY = "key";
+    public static final String ACTION_KEY_LOG = "log";
     public static final String ACTION_KEY_STATUS = "status";
 
     /**

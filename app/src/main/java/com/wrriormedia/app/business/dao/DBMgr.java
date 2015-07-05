@@ -1,13 +1,11 @@
 package com.wrriormedia.app.business.dao;
 
-import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.util.DBUtil;
 import com.wrriormedia.library.orm.BaseModel;
 import com.wrriormedia.library.orm.DataAccessException;
 import com.wrriormedia.library.orm.DataManager;
 import com.wrriormedia.library.util.StringUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -117,53 +115,15 @@ public class DBMgr {
     }
 
     public static <T extends BaseModel> List<T> getBaseModels(Class<T> type, String where) {
+        return getBaseModels(type, where, "");
+    }
+
+    public static <T extends BaseModel> List<T> getBaseModels(Class<T> type, String where, String limit) {
         List<T> results = null;
         DataManager dataManager = DBUtil.getDataManager();
         dataManager.open();
         try {
-            results = dataManager.getList(type, where, null, "_id asc", null);
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-        }
-        dataManager.close();
-        return results;
-    }
-
-    /**
-     * 下拉刷新
-     *
-     * @param type 指定的model
-     * @param <T>  BaseModel的子类
-     * @param key  主键
-     * @return List<T> 指定的model的缓存数据
-     */
-    public static <T extends BaseModel> List<T> getHistoryData(Class<T> type, String key) {
-        List<T> results = new ArrayList<>();
-        DataManager dataManager = DBUtil.getDataManager();
-        dataManager.open();
-        try {
-            results = dataManager
-                    .getList(type, true, null, null, null, null, key + " asc", ConstantSet.PAGE_SIZE + "");
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-        }
-        dataManager.close();
-        return results;
-    }
-
-    /**
-     * 下拉刷新
-     *
-     * @param type 指定的model
-     * @param <T>  BaseModel的子类
-     * @return List<T> 指定的model的缓存数据
-     */
-    public static <T extends BaseModel> List<T> getHistoryData(Class<T> type) {
-        List<T> results = new ArrayList<>();
-        DataManager dataManager = DBUtil.getDataManager();
-        dataManager.open();
-        try {
-            results = dataManager.getList(type, null, null);
+            results = dataManager.getList(type, where, null, "_id asc", limit);
         } catch (DataAccessException e) {
             e.printStackTrace();
         }
@@ -196,6 +156,18 @@ public class DBMgr {
                 DataManager dataManager = DBUtil.getDataManager();
                 dataManager.open();
                 dataManager.delete(type, where, null);
+                dataManager.close();
+            }
+        }).start();
+    }
+
+    public static <T extends BaseModel> void delete(final Class<T> type, final long id) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DataManager dataManager = DBUtil.getDataManager();
+                dataManager.open();
+                dataManager.delete(type, id);
                 dataManager.close();
             }
         }).start();

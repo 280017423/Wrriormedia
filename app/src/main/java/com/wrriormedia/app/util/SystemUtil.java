@@ -3,9 +3,13 @@ package com.wrriormedia.app.util;
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
+import android.os.Environment;
+import android.os.StatFs;
 import android.view.WindowManager;
 
 import com.wrriormedia.library.util.EvtLog;
+
+import java.io.File;
 
 /**
  * 系统工具类
@@ -37,6 +41,14 @@ public class SystemUtil {
         AudioManager audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
         int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, current * max / 10, AudioManager.ADJUST_SAME);
+    }
+
+    public static String getLeftSpace() {
+        File root = Environment.getRootDirectory();
+        StatFs sf = new StatFs(root.getPath());
+        long blockSize = sf.getBlockSize();
+        long availCount = sf.getAvailableBlocks();
+        return (availCount * blockSize) / 1024 / 1024 + "MB";
     }
 
 }

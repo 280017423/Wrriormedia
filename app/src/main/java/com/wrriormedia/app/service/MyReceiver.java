@@ -10,8 +10,11 @@ import com.pdw.gson.Gson;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.DeleteAdModel;
 import com.wrriormedia.app.model.PushAdModel;
+import com.wrriormedia.app.model.PushBrightnessModel;
+import com.wrriormedia.app.model.PushLogModel;
 import com.wrriormedia.app.model.PushVersionModel;
 import com.wrriormedia.app.model.SysStatusModel;
+import com.wrriormedia.app.model.VolumeModel;
 import com.wrriormedia.library.util.StringUtil;
 
 import cn.jpush.android.api.JPushInterface;
@@ -56,18 +59,36 @@ public class MyReceiver extends BroadcastReceiver {
             Intent adIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_NEW_TEXT_AD);
             adIntent.putExtra(PushAdModel.class.getName(), pushAdModel);
             context.sendBroadcast(adIntent);
-        }else if ("delete_ad".equals(alert) && !StringUtil.isNullOrEmpty(extra)) {
+        } else if ("delete_ad".equals(alert) && !StringUtil.isNullOrEmpty(extra)) {
             // 用逗号隔开广告id
             Gson gson = new Gson();
             DeleteAdModel deleteAdModel = gson.fromJson(extra, DeleteAdModel.class);
             Intent adIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_DELETE_AD);
             adIntent.putExtra(DeleteAdModel.class.getName(), deleteAdModel);
             context.sendBroadcast(adIntent);
-        }else if ("sys_status".equals(alert) && !StringUtil.isNullOrEmpty(extra)) {
+        } else if ("sys_status".equals(alert) && !StringUtil.isNullOrEmpty(extra)) {
             Gson gson = new Gson();
             SysStatusModel sysStatusModel = gson.fromJson(extra, SysStatusModel.class);
             Intent adIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_SYS_STATUS);
             adIntent.putExtra(SysStatusModel.class.getName(), sysStatusModel);
+            context.sendBroadcast(adIntent);
+        } else if ("log_time".equals(alert) && !StringUtil.isNullOrEmpty(extra)) {
+            Gson gson = new Gson();
+            PushLogModel sysStatusModel = gson.fromJson(extra, PushLogModel.class);
+            Intent adIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_LOG_TIME);
+            adIntent.putExtra(PushLogModel.class.getName(), sysStatusModel);
+            context.sendBroadcast(adIntent);
+        } else if ("brightness".equals(alert) && !StringUtil.isNullOrEmpty(extra)) {
+            Gson gson = new Gson();
+            PushBrightnessModel sysStatusModel = gson.fromJson(extra, PushBrightnessModel.class);
+            Intent adIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_BRITENESS);
+            adIntent.putExtra(PushBrightnessModel.class.getName(), sysStatusModel);
+            context.sendBroadcast(adIntent);
+        }else if ("volume".equals(alert) && !StringUtil.isNullOrEmpty(extra)) {
+            Gson gson = new Gson();
+            VolumeModel sysStatusModel = gson.fromJson(extra, VolumeModel.class);
+            Intent adIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_VOLUME);
+            adIntent.putExtra(VolumeModel.class.getName(), sysStatusModel);
             context.sendBroadcast(adIntent);
         }
     }

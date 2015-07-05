@@ -221,7 +221,7 @@ public abstract class DataManager {
      */
     public <T extends BaseModel> List<T> getList(Class<T> type, String whereClause, String[] whereArgs, String orderBy,
                                                  String limit) throws DataAccessException {
-        return getList(type, false, whereClause, whereArgs, null, null, orderBy, null);
+        return getList(type, false, whereClause, whereArgs, null, null, orderBy, limit);
     }
 
     /**

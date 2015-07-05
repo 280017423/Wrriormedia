@@ -43,6 +43,7 @@ public class DownloadService extends Service {
     private void initVariables() {
         EventBus.getDefault().register(this);
         setUpNotification();
+        timeDownload();
     }
 
     private void setUpNotification() {
@@ -82,7 +83,9 @@ public class DownloadService extends Service {
         if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH)) {
             mNotificationManager.cancel(model.getEventId());
             timeDownload();
-        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_START)) {
+        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_NEXT)) {
+            timeDownload();
+        }else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_START)) {
             mNotificationManager.notify(model.getEventId(), mNotification);
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
             timeDownload();

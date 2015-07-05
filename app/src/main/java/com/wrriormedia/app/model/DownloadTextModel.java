@@ -84,4 +84,18 @@ public class DownloadTextModel extends BaseModel {
     public void setType(int type) {
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+        return "DownloadTextModel{" +
+                "aid=" + aid +
+                ", type=" + type +
+                ", start=" + start +
+                ", end=" + end +
+                ", text=" + text +
+                ", video=" + video +
+                ", image=" + image +
+                ", isDownloadFinish=" + isDownloadFinish +
+                '}';
+    }
 }

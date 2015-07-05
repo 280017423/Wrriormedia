@@ -16,7 +16,6 @@ import com.wrriormedia.app.model.TextModel;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
 import com.wrriormedia.library.eventbus.EventBus;
-import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.FileUtil;
 import com.wrriormedia.library.util.MessageException;
 import com.wrriormedia.library.util.StringUtil;
@@ -32,6 +31,7 @@ public class AdManager {
      */
     public static void getPlayAd(final int index) {
         if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
             return;
         }
         new Thread(new Runnable() {
@@ -64,10 +64,12 @@ public class AdManager {
 
     public static void getTextAd(int index) {
         if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT, null));
             return;
         }
-        EvtLog.d("aaa", "获取要播放的文本");
-        List<DownloadTextModel> downloadModels = DBMgr.getBaseModels(DownloadTextModel.class);
+        long current = System.currentTimeMillis() / 1000;
+        String whereCase = DownloadModel.START + "<" + current + " AND " + DownloadModel.END + ">" + current;
+        List<DownloadTextModel> downloadModels = DBMgr.getBaseModels(DownloadTextModel.class, whereCase);
         if (null == downloadModels || downloadModels.isEmpty()) {
             EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_TEXT_AD, null));
             return;
@@ -76,7 +78,10 @@ public class AdManager {
         TextModel textModel = mediaModel.getText();
         if (null != textModel && !StringUtil.isNullOrEmpty(textModel.getMsg())) {
             EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT, textModel));
+        } else {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT, textModel));
         }
+
     }
 
     public static void deleteAd(String aid) {

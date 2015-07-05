@@ -1,6 +1,7 @@
 package com.wrriormedia.app.app;
 
 
+import com.wrriormedia.app.util.CrashHandler;
 import com.wrriormedia.app.util.DBUtil;
 import com.wrriormedia.library.app.HtcApplicationBase;
 import com.wrriormedia.library.imageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -29,6 +30,8 @@ public class WrriormediaApplication extends HtcApplicationBase {
                 DBUtil.getDataManager().firstOpen();
             }
         }).start();
+        CrashHandler crashHandler = CrashHandler.getInstance();
+        crashHandler.init(this);
     }
 
     /**

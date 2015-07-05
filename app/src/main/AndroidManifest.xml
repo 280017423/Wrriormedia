@@ -66,7 +66,7 @@
             android:value="true" />
         <meta-data
             android:name="api_root_url"
-            android:value="http://101.200.234.245/api" />
+            android:value="http://api.warriormedia.cn/api" />
         <meta-data
             android:name="is_developing"
             android:value="true" />

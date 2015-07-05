@@ -13,9 +13,11 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.pdw.gson.Gson;
 import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.manager.AdManager;
+import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.CmdModel;
@@ -24,9 +26,12 @@ import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.MediaImageModel;
 import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.app.model.PushAdModel;
+import com.wrriormedia.app.model.PushBrightnessModel;
+import com.wrriormedia.app.model.PushLogModel;
 import com.wrriormedia.app.model.PushVersionModel;
 import com.wrriormedia.app.model.SysStatusModel;
 import com.wrriormedia.app.model.TextModel;
+import com.wrriormedia.app.model.VolumeModel;
 import com.wrriormedia.app.service.DelOldFilesService;
 import com.wrriormedia.app.service.DownloadService;
 import com.wrriormedia.app.ui.widget.AutoScrollTextView;
@@ -45,6 +50,7 @@ import com.wrriormedia.library.util.UIUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -99,6 +105,9 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_NEW_TEXT_AD);
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_DELETE_AD);
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_SYS_STATUS);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_LOG_TIME);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_BRITENESS);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_VOLUME);
         filter.addAction(Intent.ACTION_TIME_TICK);
         registerReceiver(mPushBroadCast, filter);
     }
@@ -240,9 +249,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 CmdModel model = (CmdModel) result.ResultObject;
                 AdManager.adStatus(MainActivity.this);
                 SystemUtil.setStreamVolume(MainActivity.this, model.getVolume());// 改变声音大小
-            } else {
-                //TODO 记录日志
-                showErrorMsg(result);
+                LogManager.timeUploadLog();
             }
         }
     }
@@ -304,9 +311,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         @Override
         protected void onPostExecute(ActionResult result) {
             dismissLoadingUpView(mLoadingUpView);
-            if (!ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
-                // TODO 写日志
-            }
         }
     }
 
@@ -460,6 +464,27 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     versionIntent.putExtra(PushVersionModel.class.getName(), versionModel);
                     startActivity(versionIntent);
                 }
+            } else if (ConstantSet.KEY_EVENT_ACTION_LOG_TIME.equals(action)) {
+                PushLogModel sysStatusModel = (PushLogModel) intent.getSerializableExtra(PushLogModel.class.getName());
+                if (null != sysStatusModel) {
+                    toast("日志时间" + sysStatusModel.getLog_time());
+                    SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_LOG_TIME, sysStatusModel.getLog_time());
+                    LogManager.timeUploadLog();
+                }
+            } else if (ConstantSet.KEY_EVENT_ACTION_BRITENESS.equals(action)) {
+                PushBrightnessModel sysStatusModel = (PushBrightnessModel) intent.getSerializableExtra(PushBrightnessModel.class.getName());
+                toast("亮度推送");
+                if (null != sysStatusModel) {
+                    SystemUtil.changeBrightnessSlide(MainActivity.this, sysStatusModel.getBrightness() / 10f);
+                    new UpdateTask("brightness").execute();
+                }
+            } else if (ConstantSet.KEY_EVENT_ACTION_VOLUME.equals(action)) {
+                VolumeModel sysStatusModel = (VolumeModel) intent.getSerializableExtra(VolumeModel.class.getName());
+                toast("声音推送");
+                if (null != sysStatusModel) {
+                    SystemUtil.setStreamVolume(MainActivity.this, sysStatusModel.getVolume());
+                    new UpdateTask("volume").execute();
+                }
             } else if (ConstantSet.KEY_EVENT_ACTION_NEW_AD.equals(action)) {
                 toast("新广告推送");
                 PushAdModel versionModel = (PushAdModel) intent.getSerializableExtra(PushAdModel.class.getName());
@@ -492,6 +517,10 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     String[] aids = aid.split(",");
                     for (String deleteAid : aids) {
                         AdManager.deleteAd(deleteAid);
+                        ArrayList<String> logList = new ArrayList<>();
+                        logList.add(deleteAid);
+                        logList.add(SystemUtil.getLeftSpace());
+                        LogManager.saveLog(5, new Gson().toJson(logList));
                     }
                     new UpdateTask("delete_ad").execute();
                 }

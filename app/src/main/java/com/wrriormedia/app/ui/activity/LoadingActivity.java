@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
+import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.model.StatusModel;
 import com.wrriormedia.app.util.ActionResult;
@@ -36,6 +37,7 @@ public class LoadingActivity extends HtcBaseActivity {
         initVariable();
         initViews();
         getReadCmd();
+        LogManager.saveLog(2, "" + (int) (System.currentTimeMillis() / 1000));
     }
 
     private void initVariable() {

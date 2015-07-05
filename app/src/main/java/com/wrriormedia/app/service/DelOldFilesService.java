@@ -26,7 +26,7 @@ public class DelOldFilesService extends Service {
         long totalStorage = getTotalStorage();
         if (((double) freeStorage) / totalStorage <= 0.2) {
             long needDelSize = (long) (totalStorage - freeStorage - totalStorage * 0.6);
-            List<DownloadModel> downloadModels = DBMgr.getHistoryData(DownloadModel.class);
+            List<DownloadModel> downloadModels = DBMgr.getBaseModels(DownloadModel.class);
             if (downloadModels != null && downloadModels.size() > 0) {
                 new DelOldFilesThread(downloadModels, needDelSize).start();
             }
