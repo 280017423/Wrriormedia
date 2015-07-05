@@ -1,15 +1,21 @@
 package com.wrriormedia.app.util;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 
+import com.wrriormedia.library.util.EvtLog;
+
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class WifiAdmin {
+    private static final String TAG = WifiAdmin.class.getName();
+    private Context mContext;
     private WifiManager mWifiManager;
     private WifiInfo mWifiInfo;
     private List<ScanResult> mWifiList;
@@ -17,6 +23,7 @@ public class WifiAdmin {
     private WifiLock mWifiLock;
 
     public WifiAdmin(Context context) {
+        mContext = context;
         mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         mWifiInfo = mWifiManager.getConnectionInfo();
     }
@@ -171,6 +178,48 @@ public class WifiAdmin {
             }
         }
         return null;
+    }
+
+    /**
+     * 设置手机的移动数据
+     */
+    public void setMobileData(boolean pBoolean) {
+        try {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            Class ownerClass = mConnectivityManager.getClass();
+            Class[] argsClass = new Class[1];
+            argsClass[0] = boolean.class;
+            Method method = ownerClass.getMethod("setMobileDataEnabled", argsClass);
+            method.invoke(mConnectivityManager, pBoolean);
+        } catch (Exception e) {
+            e.printStackTrace();
+            EvtLog.d(TAG, "移动数据设置错误: " + e.toString());
+        }
+    }
+
+    /**
+     * 返回手机移动数据的状态
+     *
+     * @param arg
+     *            默认填null
+     * @return true 连接 false 未连接
+     */
+    public boolean getMobileDataState(Object[] arg) {
+        try {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            Class ownerClass = mConnectivityManager.getClass();
+            Class[] argsClass = null;
+            if (arg != null) {
+                argsClass = new Class[1];
+                argsClass[0] = arg.getClass();
+            }
+            Method method = ownerClass.getMethod("getMobileDataEnabled", argsClass);
+            Boolean isOpen = (Boolean) method.invoke(mConnectivityManager, arg);
+            return isOpen;
+        } catch (Exception e) {
+            EvtLog.d(TAG, "得到移动数据状态出错");
+            return false;
+        }
     }
 
 }

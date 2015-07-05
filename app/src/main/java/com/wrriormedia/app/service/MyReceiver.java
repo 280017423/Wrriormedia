@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.pdw.gson.Gson;
+import com.wrriormedia.app.business.manager.WifiManager;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.DeleteAdModel;
 import com.wrriormedia.app.model.PushAdModel;
 import com.wrriormedia.app.model.PushVersionModel;
 import com.wrriormedia.app.model.SysStatusModel;
+import com.wrriormedia.app.model.WifiModel;
 import com.wrriormedia.library.util.StringUtil;
 
 import cn.jpush.android.api.JPushInterface;
@@ -69,6 +71,12 @@ public class MyReceiver extends BroadcastReceiver {
             Intent adIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_SYS_STATUS);
             adIntent.putExtra(SysStatusModel.class.getName(), sysStatusModel);
             context.sendBroadcast(adIntent);
+        } else if ("net".equals(alert) && !StringUtil.isNullOrEmpty(extra)) {
+            Gson gson = new Gson();
+            WifiModel wifiModel = gson.fromJson(extra, WifiModel.class);
+            if (wifiModel != null) {
+                new WifiManager().connectWifi(context, wifiModel);
+            }
         }
     }
 

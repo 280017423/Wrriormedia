@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sharedUserId="android.uid.packageinstaller"
     package="com.wrriormedia.app">
 
     <permission
@@ -48,7 +49,7 @@
             android:value="wrriormedia.db" />
         <meta-data
             android:name="download_dir"
-            android:value="wrriormedia/com.wrriormedia.app/download" />
+            android:value="wrriormedia/com..wrriormediaapp/download" />
         <meta-data
             android:name="image_dir"
             android:value="wrriormedia/com.wrriormedia.app/image" />
@@ -66,7 +67,7 @@
             android:value="true" />
         <meta-data
             android:name="api_root_url"
-            android:value="http://101.200.234.245/api" />
+            android:value="http://api.warriormedia.cn/api" />
         <meta-data
             android:name="is_developing"
             android:value="true" />
