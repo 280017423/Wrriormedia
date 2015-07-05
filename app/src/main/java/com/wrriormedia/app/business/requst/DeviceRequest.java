@@ -225,4 +225,23 @@ public class DeviceRequest {
         }
         return result;
     }
+
+    public static ActionResult wifiCheck() {
+        ActionResult result = new ActionResult();
+        String url = "http://api.warriormedia.cn" + ServerAPIConstant.ACTION_WIFI_CHECK;
+        try {
+            JsonResult jsonResult = HttpClientUtil.get(url, null, null);
+            if (jsonResult != null) {
+                result.ResultObject = jsonResult.Msg;
+                result.ResultCode = jsonResult.Code;
+            } else {
+                result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
+            }
+        } catch (Exception e) {
+            result.ResultCode = ActionResult.RESULT_CODE_NET_ERROR;
+            EvtLog.w(TAG, e);
+        }
+        return result;
+    }
+
 }

@@ -13,6 +13,8 @@ public class ServerAPIConstant {
     public static final String ACTION_AD = "/ad/get2";
     public static final String ACTION_AD_GET = "/ad/get";
     public static final String ACTION_LOG_UPLOAD = "/log/upload";
+    public static final String ACTION_WIFI_CHECK = "/check.html";
+
 
     // KEY字段
     public static final String ACTION_KEY_ID = "id";

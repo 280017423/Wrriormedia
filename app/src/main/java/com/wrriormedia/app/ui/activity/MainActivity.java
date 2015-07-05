@@ -88,7 +88,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         initVariable();
         initViews();
         new CmdTask().execute();
-        checkStorage();
+        //checkStorage();
         AdManager.getPlayAd(mPlayIndex);
         AdManager.getTextAd(mTextIndex);
         startService(new Intent(MainActivity.this, DownloadService.class));
