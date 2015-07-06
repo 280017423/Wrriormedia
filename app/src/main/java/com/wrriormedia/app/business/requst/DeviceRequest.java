@@ -91,6 +91,7 @@ public class DeviceRequest {
     }
 
     public static ActionResult uploadLog(String loginfo) {
+        EvtLog.d("aaa", "开始上传日志");
         ActionResult result = new ActionResult();
         String url = ServerAPIConstant.getAPIUrl(ServerAPIConstant.ACTION_LOG_UPLOAD);
         List<NameValuePair> postParams = new ArrayList<>();

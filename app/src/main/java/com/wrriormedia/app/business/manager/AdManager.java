@@ -48,8 +48,7 @@ public class AdManager {
             @Override
             public void run() {
                 long current = System.currentTimeMillis() / 1000;
-                String whereCase = DownloadModel.START + "<" + current + " AND " + DownloadModel.END + ">" + current;
-                List<DownloadModel> downloadModels = DBMgr.getBaseModels(DownloadModel.class, whereCase);
+                List<DownloadModel> downloadModels = DBMgr.getBaseModels(DownloadModel.class);
                 if (null == downloadModels || downloadModels.isEmpty()) {
                     EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
                     return;
@@ -62,15 +61,15 @@ public class AdManager {
                     return;
                 }
                 if (null != mediaVideoModel && !StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) {
-                    if (0 == mediaModel.getIsDownloadFinish()) {
+                    if (0 == mediaModel.getIsDownloadFinish() || current < mediaModel.getStart() || current > mediaModel.getEnd()) {
                         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
                         return;
                     } else {
                         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO, mediaVideoModel));
                     }
                 }
-                if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5())) {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaImageModel));
+                if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5()) && current > mediaModel.getStart() && current < mediaModel.getEnd()) {
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaModel));
                 }
             }
         }).start();

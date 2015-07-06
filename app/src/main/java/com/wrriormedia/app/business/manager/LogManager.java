@@ -6,9 +6,11 @@ import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
+import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.LogModel;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
+import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.TimerUtil;
 
@@ -32,7 +34,7 @@ public class LogManager {
     }
 
     private static void upload(final int logTime) {
-        EvtLog.d("bbb", "logTime:" + logTime);
+        TimerUtil.stopTimer(LogManager.class.getName());
         TimerUtil.startTimer(LogManager.class.getName(), logTime, 1000, new TimerUtil.TimerActionListener() {
             @Override
             public void doAction() {
@@ -41,21 +43,27 @@ public class LogManager {
                     return;
                 }
                 TimerUtil.stopTimer(LogManager.class.getName());
-                LogManager.timeUploadLog();
-                List<LogModel> logModels = DBMgr.getBaseModels(LogModel.class, "", 50 + "");
-                String logInfo = "";
-                if (null != logModels && !logModels.isEmpty()) {
-                    Gson gson = new Gson();
-                    logInfo = gson.toJson(logModels);
-                }
-                ActionResult result = DeviceRequest.uploadLog(logInfo);
-                if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
-                    if (null != logModels && !logModels.isEmpty()) {
-                        for (int i = 0; i < logModels.size(); i++) {
-                            DBMgr.delete(LogModel.class, logModels.get(i).getID());
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<LogModel> logModels = DBMgr.getBaseModels(LogModel.class, "", 50 + "");
+                        String logInfo = "";
+                        if (null != logModels && !logModels.isEmpty()) {
+                            Gson gson = new Gson();
+                            logInfo = gson.toJson(logModels);
                         }
+                        ActionResult result = DeviceRequest.uploadLog(logInfo);
+                        if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
+                            if (null != logModels && !logModels.isEmpty()) {
+                                for (int i = 0; i < logModels.size(); i++) {
+                                    EvtLog.d("aaa", "" + logModels.get(i).getID());
+                                    DBMgr.delete(LogModel.class, logModels.get(i).getID());
+                                }
+                            }
+                        }
+                        EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOG_TIMER, null));
                     }
-                }
+                }).start();
             }
         });
     }

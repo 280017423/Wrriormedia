@@ -22,6 +22,7 @@ import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.CmdModel;
 import com.wrriormedia.app.model.DeleteAdModel;
+import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.MediaImageModel;
 import com.wrriormedia.app.model.MediaVideoModel;
@@ -45,6 +46,7 @@ import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.FileUtil;
 import com.wrriormedia.library.util.MessageException;
 import com.wrriormedia.library.util.StringUtil;
+import com.wrriormedia.library.util.TimerUtil;
 import com.wrriormedia.library.util.UIUtil;
 
 import java.io.File;
@@ -73,7 +75,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private SurfaceView mPreview;
     private SurfaceHolder holder;
     private View mViewVideo;
-
+    private Intent mIntent;
     private PushBroadCast mPushBroadCast;
 
     @Override
@@ -85,12 +87,13 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         new CmdTask().execute();
         AdManager.getPlayAd(mPlayIndex);
         AdManager.getTextAd(mTextIndex);
-        startService(new Intent(MainActivity.this, DownloadService.class));
+        startService(mIntent);
     }
 
     private void initVariable() {
         Vitamio.initialize(this);
         EventBus.getDefault().register(this);
+        mIntent = new Intent(MainActivity.this, DownloadService.class);
         mPushBroadCast = new PushBroadCast();
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_NEW_VERSION);
@@ -150,7 +153,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             playVideo((MediaVideoModel) model.getEventBusObject());
             mViewVideo.setVisibility(View.VISIBLE);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE.equals(model.getEventBusAction())) {
-            showPosImg((MediaImageModel) model.getEventBusObject());
+            DownloadModel downloadModel = (DownloadModel) model.getEventBusObject();
+            showPosImg(downloadModel);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT.equals(model.getEventBusAction())) {
             TextModel textModel = (TextModel) model.getEventBusObject();
             mTvAdPos10.setVisibility(View.GONE);
@@ -212,6 +216,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         } else if (ConstantSet.KEY_EVENT_ACTION_LOCK_SCREEN.equals(model.getEventBusAction())) {
             mIvAdPos0.setVisibility(View.VISIBLE);
             mIvAdPos0.setImageResource(R.mipmap.stop_bg);
+        } else if (ConstantSet.KEY_EVENT_ACTION_LOG_TIMER.equals(model.getEventBusAction())) {
+            LogManager.timeUploadLog();
         }
     }
 
@@ -292,7 +298,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
         @Override
         protected void onPostExecute(ActionResult result) {
-
         }
     }
 
@@ -309,7 +314,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         UIUtil.setViewInVisible(mIvAdPos9);
     }
 
-    private void showPosImg(final MediaImageModel mediaImageModel) {
+    private void showPosImg(final DownloadModel downloadModel) {
+        MediaImageModel mediaImageModel = downloadModel.getImage();
         ImageView displayView = null;
         int position = mediaImageModel.getPos();
         switch (position) {
@@ -350,6 +356,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         mImageLoader.displayImage(mediaImageModel.getFirst(), displayView, new DisplayImageOptions.Builder()
                 .cacheInMemory().cacheOnDisc().displayer(new SimpleBitmapDisplayer())
                 .build());
+//        new UpdateTask("ad:" + downloadModel.getAid() + ":image").execute();
         int time = mediaImageModel.getTime();
         if (0 != time) {
             new CountDownTimer(time * 1000, time * 1000) {
@@ -388,15 +395,18 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             mMediaPlayer.setDataSource(downloadFile.getAbsolutePath()); //Path to video file
             mMediaPlayer.setDisplay(holder); //Set SurfaceHolder
             mMediaPlayer.prepareAsync();
+            mMediaPlayer.setScreenOnWhilePlaying(true);
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
+                    releaseMediaPlayer();
                     EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
                 }
             });
             mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                    releaseMediaPlayer();
                     EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
                     return true;
                 }
@@ -439,6 +449,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 if (null != sysStatusModel) {
                     SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_LOG_TIME, sysStatusModel.getLog_time());
                     LogManager.timeUploadLog();
+                    new UpdateTask("log_time").execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_BRITENESS.equals(action)) {
                 PushBrightnessModel sysStatusModel = (PushBrightnessModel) intent.getSerializableExtra(PushBrightnessModel.class.getName());
@@ -455,12 +466,12 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             } else if (ConstantSet.KEY_EVENT_ACTION_NEW_AD.equals(action)) {
                 PushAdModel versionModel = (PushAdModel) intent.getSerializableExtra(PushAdModel.class.getName());
                 if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getAid())) {
-                    new DownloadTask(versionModel.getAid(), false, true).execute();
+                    new DownloadTask(versionModel.getAid(), false, false).execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_NEW_TEXT_AD.equals(action)) {
                 PushAdModel versionModel = (PushAdModel) intent.getSerializableExtra(PushAdModel.class.getName());
                 if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getAid())) {
-                    new DownloadTask(versionModel.getAid(), true, true).execute();
+                    new DownloadTask(versionModel.getAid(), true, false).execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_SYS_STATUS.equals(action)) {
                 SysStatusModel versionModel = (SysStatusModel) intent.getSerializableExtra(SysStatusModel.class.getName());
@@ -469,6 +480,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     model.setSys_status(versionModel.getSys_status());
                     SharedPreferenceUtil.saveObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, model);
                     AdManager.adStatus(MainActivity.this);
+                    new UpdateTask("sys_status").execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_DELETE_AD.equals(action)) {
                 DeleteAdModel deleteAdModel = (DeleteAdModel) intent.getSerializableExtra(DeleteAdModel.class.getName());
@@ -501,9 +513,14 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
         releaseMediaPlayer();
+        TimerUtil.stopTimer(LogManager.class.getName());
         if (null != mPushBroadCast) {
             unregisterReceiver(mPushBroadCast);
         }
+        if (null != mIntent) {
+            stopService(mIntent);
+        }
+        TimerUtil.stopTimer("DownloadService");
         super.onDestroy();
     }
 

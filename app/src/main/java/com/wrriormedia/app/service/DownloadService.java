@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.wrriormedia.app.R;
 import com.wrriormedia.app.business.manager.DownloadManager;
+import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.library.eventbus.EventBus;
@@ -75,12 +76,18 @@ public class DownloadService extends Service {
         return null;
     }
 
-    public void onEventMainThread(EventBusModel model) {
+    public void onEventMainThread(final EventBusModel model) {
         if (null == model || StringUtil.isNullOrEmpty(model.getEventBusAction())) {
             return;
         }
         if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH)) {
             mNotificationManager.cancel(model.getEventId());
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    DeviceRequest.update("ad:" + model.getEventId());
+                }
+            }).start();
             timeDownload();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_NEXT)) {
             timeDownload();

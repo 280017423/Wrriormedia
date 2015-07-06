@@ -3,6 +3,7 @@ package com.wrriormedia.app.app;
 
 import com.pdw.gson.Gson;
 import com.wrriormedia.app.business.manager.LogManager;
+import com.wrriormedia.app.common.ServerAPIConstant;
 import com.wrriormedia.app.util.CrashHandler;
 import com.wrriormedia.app.util.DBUtil;
 import com.wrriormedia.library.app.HtcApplicationBase;
@@ -60,6 +61,10 @@ public class WrriormediaApplication extends HtcApplicationBase {
 
     @Override
     public void savaLog(String url, List<NameValuePair> postParams, String errorInfo) {
+        String uploadUrl = ServerAPIConstant.getAPIUrl(ServerAPIConstant.ACTION_LOG_UPLOAD);
+        if (url.equals(uploadUrl)) {
+            return;
+        }
         ArrayList<String> logList = new ArrayList<>();
         logList.add(url);
         logList.add(DefaultPDWHttpClient.buildContent(postParams));

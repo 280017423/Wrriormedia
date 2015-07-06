@@ -22,7 +22,7 @@ public class ConstantSet {
     public static final String KEY_EVENT_ACTION_PLAY_NO_AD = "KEY_EVENT_ACTION_PLAY_NO_AD";
     public static final String KEY_EVENT_ACTION_PLAY_NO_TEXT_AD = "KEY_EVENT_ACTION_PLAY_NO_TEXT_AD";
 
-//    public static final String KEY_EVENT_ACTION_LOG_TIMER = "KEY_EVENT_ACTION_LOG_TIMER";
+    public static final String KEY_EVENT_ACTION_LOG_TIMER = "KEY_EVENT_ACTION_LOG_TIMER";
 
     public static final String KEY_EVENT_ACTION_LOCK_SCREEN = "KEY_EVENT_ACTION_LOCK_SCREEN";
 
