@@ -1,7 +1,7 @@
 package com.wrriormedia.app.ui.activity;
 
-import android.content.ComponentName;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -11,14 +11,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.wrriormedia.app.R;
-import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.PushVersionModel;
 import com.wrriormedia.app.service.AppUpdateService;
 import com.wrriormedia.library.eventbus.EventBus;
-import com.wrriormedia.library.util.EvtLog;
-import com.wrriormedia.library.util.FileUtil;
 import com.wrriormedia.library.util.StringUtil;
 
 import java.io.File;
@@ -80,8 +77,13 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
         if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH)) {
             mTxtState.setText(getString(R.string.download_success));
             File file = (File) model.getEventBusObject();
+            Intent installHideIntent = new Intent("android.intent.action.VIEW.HIDE");
+            installHideIntent.setDataAndType(Uri.parse("file://" + file.getAbsolutePath()),
+                    "application/vnd.android.package-archive");
+            startActivity(installHideIntent);
+
             //boolean success = FileUtil.silentInstall(file);
-            String success = FileUtil.installApkFile(file);
+            /*String success = FileUtil.installApkFile(file);
             toast(">>> success = " + success);
             if (StringUtil.isNullOrEmpty(success)) {
                 toast(getString(R.string.install_apk_fail));
@@ -101,7 +103,7 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
                 ComponentName cn = new ComponentName(packageName, packageName + ".ui.activity.LoadingActivity");
                 intent.setComponent(cn);
                 startActivity(intent);
-            }
+            }*/
             finish();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
             toast((String) model.getEventBusObject());
