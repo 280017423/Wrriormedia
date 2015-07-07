@@ -90,13 +90,13 @@ public class DeviceRequest {
         return result;
     }
 
-    public static ActionResult uploadLog(String loginfo) {
+    public static ActionResult uploadLog(String logInfo) {
         EvtLog.d("aaa", "开始上传日志");
         ActionResult result = new ActionResult();
         String url = ServerAPIConstant.getAPIUrl(ServerAPIConstant.ACTION_LOG_UPLOAD);
         List<NameValuePair> postParams = new ArrayList<>();
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
-        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_LOG, loginfo));
+        postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_LOG, logInfo));
         try {
             JsonResult jsonResult = HttpClientUtil.post(url, null, postParams);
             if (jsonResult != null) {

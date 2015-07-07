@@ -23,6 +23,7 @@ public class DownloadModel extends BaseModel {
     private MediaVideoModel video;
     private MediaImageModel image;
     private int isDownloadFinish;
+    private int isImageFinish;
 
     public int getIsDownloadFinish() {
         return isDownloadFinish;
@@ -86,5 +87,13 @@ public class DownloadModel extends BaseModel {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public int getIsImageFinish() {
+        return isImageFinish;
+    }
+
+    public void setIsImageFinish(int isImageFinish) {
+        this.isImageFinish = isImageFinish;
     }
 }

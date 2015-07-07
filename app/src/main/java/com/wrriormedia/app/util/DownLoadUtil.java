@@ -11,6 +11,7 @@ import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.app.model.EventBusModel;
+import com.wrriormedia.app.model.MediaImageModel;
 import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.EvtLog;
@@ -33,6 +34,7 @@ public class DownLoadUtil {
     private static HttpUtils mHttpUtils = new HttpUtils();
 
     public static void download(final DownloadModel model) {
+
         File downloadDir = null;
         try {
             downloadDir = FileUtil.getDownloadDir();
@@ -40,6 +42,10 @@ public class DownLoadUtil {
             e.printStackTrace();
         }
         MediaVideoModel downLoadVideoModel = model.getVideo();
+        MediaImageModel mediaImageModel = model.getImage();
+        if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getFirst()) && 1 != model.getIsImageFinish()) {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE, model));
+        }
         String url = downLoadVideoModel.getFirst();
         String fileName = downLoadVideoModel.getFileName();
         if (StringUtil.isNullOrEmpty(url)) {

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import com.pdw.gson.Gson;
 import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
+import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.business.manager.AdManager;
 import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
@@ -41,6 +43,8 @@ import com.wrriormedia.app.util.SystemUtil;
 import com.wrriormedia.app.util.TimeUtil;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.imageloader.core.DisplayImageOptions;
+import com.wrriormedia.library.imageloader.core.assist.FailReason;
+import com.wrriormedia.library.imageloader.core.assist.ImageLoadingListener;
 import com.wrriormedia.library.imageloader.core.display.SimpleBitmapDisplayer;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.FileUtil;
@@ -68,6 +72,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private ImageView mIvAdPos7;
     private ImageView mIvAdPos8;
     private ImageView mIvAdPos9;
+    private ImageView mIvEmpty;
     private AutoScrollTextView mTvAdPos10;
     private AutoScrollTextView mTvAdPos11;
 
@@ -119,6 +124,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         mIvAdPos7 = (ImageView) findViewById(R.id.iv_ad_pos_7);
         mIvAdPos8 = (ImageView) findViewById(R.id.iv_ad_pos_8);
         mIvAdPos9 = (ImageView) findViewById(R.id.iv_ad_pos_9);
+
+        mIvEmpty = (ImageView) findViewById(R.id.iv_empty);
 
         mTvAdPos10 = (AutoScrollTextView) findViewById(R.id.tv_10);
         mTvAdPos11 = (AutoScrollTextView) findViewById(R.id.tv_11);
@@ -218,6 +225,36 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             mIvAdPos0.setImageResource(R.mipmap.stop_bg);
         } else if (ConstantSet.KEY_EVENT_ACTION_LOG_TIMER.equals(model.getEventBusAction())) {
             LogManager.timeUploadLog();
+        } else if (ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE.equals(model.getEventBusAction())) {
+            final DownloadModel downloadModel = (DownloadModel) model.getEventBusObject();
+            if (null == downloadModel || null == downloadModel.getImage()) {
+                return;
+            }
+            mImageLoader.displayImage(downloadModel.getImage().getFirst(), mIvEmpty, new DisplayImageOptions.Builder()
+                    .cacheInMemory().cacheOnDisc().displayer(new SimpleBitmapDisplayer())
+                    .build(), new ImageLoadingListener() {
+                @Override
+                public void onLoadingStarted() {
+
+                }
+
+                @Override
+                public void onLoadingFailed(FailReason failReason) {
+
+                }
+
+                @Override
+                public void onLoadingComplete(Bitmap loadedImage) {
+                    downloadModel.setIsImageFinish(1);
+                    DBMgr.saveModel(downloadModel);
+                    new UpdateTask("ad:" + downloadModel.getAid() + ":image").execute();
+                }
+
+                @Override
+                public void onLoadingCancelled() {
+
+                }
+            });
         }
     }
 
@@ -356,7 +393,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         mImageLoader.displayImage(mediaImageModel.getFirst(), displayView, new DisplayImageOptions.Builder()
                 .cacheInMemory().cacheOnDisc().displayer(new SimpleBitmapDisplayer())
                 .build());
-//        new UpdateTask("ad:" + downloadModel.getAid() + ":image").execute();
         int time = mediaImageModel.getTime();
         if (0 != time) {
             new CountDownTimer(time * 1000, time * 1000) {
