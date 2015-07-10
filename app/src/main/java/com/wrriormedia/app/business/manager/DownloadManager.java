@@ -24,7 +24,7 @@ public class DownloadManager {
                     MediaImageModel downLoadImageModel = model.getImage();
                     if (null == downLoadVideoModel || StringUtil.isNullOrEmpty(downLoadVideoModel.getFileName())) {
                         if (downLoadImageModel != null && !StringUtil.isNullOrEmpty(downLoadImageModel.getMd5())) {
-                            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE, downLoadImageModel));
+                            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE, model));
                         }
                         continue;
                     }
