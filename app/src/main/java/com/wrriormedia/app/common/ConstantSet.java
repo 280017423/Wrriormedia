@@ -24,6 +24,7 @@ public class ConstantSet {
 
     public static final String KEY_EVENT_ACTION_LOG_TIMER = "KEY_EVENT_ACTION_LOG_TIMER";
     public static final String KEY_EVENT_ACTION_LOADER_IMAGE = "KEY_EVENT_ACTION_LOADER_IMAGE";
+    public static final String KEY_EVENT_ACTION_DOWNLOAD_IMAGE = "KEY_EVENT_ACTION_DOWNLOAD_IMAGE";
 
     public static final String KEY_EVENT_ACTION_LOCK_SCREEN = "KEY_EVENT_ACTION_LOCK_SCREEN";
 

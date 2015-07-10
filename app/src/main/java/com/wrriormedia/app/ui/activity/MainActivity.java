@@ -9,6 +9,7 @@ import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.business.manager.AdManager;
+import com.wrriormedia.app.business.manager.DownloadManager;
 import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
@@ -284,10 +286,26 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 if (mNeedFeedback) {
                     new UpdateTask(mIsTextAd ? "text_ad" : "ad").execute();
                 }
+                if (!mIsTextAd) {
+                    timeDownload();
+                }
             } else {
                 showErrorMsg(result);
             }
         }
+    }
+
+    private void timeDownload() {
+        TimerUtil.startTimer(DownloadService.TAG, 2, 1 * 1000, new TimerUtil.TimerActionListener() {
+            @Override
+            public void doAction() {
+                if (TimerUtil.getTimerTime(DownloadService.TAG) <= 0) {
+                    EvtLog.d("aaa", "2秒倒计时开始下载");
+                    DownloadManager.downTask();
+                    TimerUtil.stopTimer(DownloadService.TAG);
+                }
+            }
+        });
     }
 
     class UpdateTask extends AsyncTask<Void, Void, ActionResult> {
@@ -392,6 +410,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             }
         });
         int time = mediaImageModel.getTime();
+        Log.d("aaa", ">>>>  time = " + time);
         if (0 != time) {
             new CountDownTimer(time * 1000, time * 1000) {
                 @Override

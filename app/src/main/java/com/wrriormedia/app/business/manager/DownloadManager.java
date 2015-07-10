@@ -23,8 +23,8 @@ public class DownloadManager {
                     MediaVideoModel downLoadVideoModel = model.getVideo();
                     MediaImageModel downLoadImageModel = model.getImage();
                     if (null == downLoadVideoModel || StringUtil.isNullOrEmpty(downLoadVideoModel.getFileName())) {
-                        if (downLoadImageModel != null && !StringUtil.isNullOrEmpty(downLoadImageModel.getMd5())) {
-                            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE, model));
+                        if (downLoadImageModel != null && !StringUtil.isNullOrEmpty(downLoadImageModel.getMd5()) && 1 != model.getIsImageFinish()) {
+                            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_IMAGE, model));
                         }
                         continue;
                     }

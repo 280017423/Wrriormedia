@@ -11,9 +11,11 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.wrriormedia.app.R;
+import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.business.manager.DownloadManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
+import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.EvtLog;
@@ -22,7 +24,7 @@ import com.wrriormedia.library.util.TimerUtil;
 
 public class DownloadService extends Service {
 
-    private static final String TAG = "DownloadService";
+    public static final String TAG = "DownloadService";
 
     private static final int PROGRESS_MAX = 100;
     private Notification mNotification;
@@ -104,6 +106,20 @@ public class DownloadService extends Service {
             mRemoteViews.setTextViewText(R.id.tip, "下载进度:" + progress + "%");
             mNotification.contentView = mRemoteViews;
             mNotificationManager.notify(model.getEventId(), mNotification);
+        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_IMAGE)) {
+            final DownloadModel downloadModel = (DownloadModel) model.getEventBusObject();
+            if (null == downloadModel || null == downloadModel.getImage()) {
+                return;
+            }
+            downloadModel.setIsImageFinish(1);
+            DBMgr.saveModel(downloadModel);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    DeviceRequest.update("ad:" + downloadModel.getAid() + ":image");
+                }
+            }).start();
+            timeDownload();
         }
     }
 
