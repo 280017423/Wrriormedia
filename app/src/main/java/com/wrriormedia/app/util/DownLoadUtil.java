@@ -11,7 +11,6 @@ import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.DownloadModel;
 import com.wrriormedia.app.model.EventBusModel;
-import com.wrriormedia.app.model.MediaImageModel;
 import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.EvtLog;
@@ -42,10 +41,6 @@ public class DownLoadUtil {
             e.printStackTrace();
         }
         MediaVideoModel downLoadVideoModel = model.getVideo();
-        MediaImageModel mediaImageModel = model.getImage();
-        if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getFirst()) && 1 != model.getIsImageFinish()) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE, model));
-        }
         String url = downLoadVideoModel.getFirst();
         String fileName = downLoadVideoModel.getFileName();
         if (StringUtil.isNullOrEmpty(url)) {
@@ -55,9 +50,9 @@ public class DownLoadUtil {
             return;
         }
         File downloadFile = new File(downloadDir, fileName);
-//        if (downloadFile.exists()) { // 如果存在，先删除
-//            downloadFile.delete();
-//        }
+        if (downloadFile.exists()) { // 如果存在，先删除
+            downloadFile.delete();
+        }
         EvtLog.d("aaa", "下载路径：" + downloadFile.getAbsolutePath());
         mHttpUtils.download(url, downloadFile.getAbsolutePath(), true, false, new RequestCallBack<File>() {
 

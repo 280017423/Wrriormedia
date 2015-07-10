@@ -35,11 +35,6 @@ public class DownloadService extends Service {
         initVariables();
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
-
     private void initVariables() {
         EventBus.getDefault().register(this);
         setUpNotification();

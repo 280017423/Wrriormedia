@@ -17,6 +17,7 @@ import com.wrriormedia.app.model.TextModel;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
 import com.wrriormedia.library.eventbus.EventBus;
+import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.FileUtil;
 import com.wrriormedia.library.util.MessageException;
 import com.wrriormedia.library.util.StringUtil;
@@ -31,6 +32,7 @@ public class AdManager {
      * @param index 播放索引
      */
     public static void getPlayAd(final int index) {
+        EvtLog.d("aaa", "循环播放...");
         if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
             new CountDownTimer(10 * 1000, 10 * 1000) {
                 @Override
@@ -48,7 +50,8 @@ public class AdManager {
             @Override
             public void run() {
                 long current = System.currentTimeMillis() / 1000;
-                List<DownloadModel> downloadModels = DBMgr.getBaseModels(DownloadModel.class);
+                String where = DownloadModel.IS_DOWNLOAD_FINISH + " = 1 OR " + DownloadModel.IS_IMAGE_FINISH + " = 1 ";
+                List<DownloadModel> downloadModels = DBMgr.getBaseModels(DownloadModel.class, where);
                 if (null == downloadModels || downloadModels.isEmpty()) {
                     EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
                     return;

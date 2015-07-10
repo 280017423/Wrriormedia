@@ -14,6 +14,7 @@ public class DownloadModel extends BaseModel {
     public static final String START = "START";
     public static final String END = "END";
     public static final String IS_DOWNLOAD_FINISH = "IS_DOWNLOAD_FINISH";
+    public static final String IS_IMAGE_FINISH = "IS_IMAGE_FINISH";
 
     private int aid;
     private int type;
