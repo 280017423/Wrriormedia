@@ -9,6 +9,7 @@ import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -20,7 +21,6 @@ import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
 import com.wrriormedia.app.business.manager.AdManager;
-import com.wrriormedia.app.business.manager.DownloadManager;
 import com.wrriormedia.app.business.manager.LogManager;
 import com.wrriormedia.app.business.requst.DeviceRequest;
 import com.wrriormedia.app.common.ConstantSet;
@@ -83,6 +83,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private View mViewVideo;
     private Intent mIntent;
     private PushBroadCast mPushBroadCast;
+    private PowerManager mPowerManger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         setContentView(R.layout.activity_main);
         initVariable();
         initViews();
+        mPowerManger = (PowerManager) getSystemService(Context.POWER_SERVICE);
         new CmdTask().execute();
         AdManager.getPlayAd(mPlayIndex);
         AdManager.getTextAd(mTextIndex);
@@ -251,7 +253,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         protected void onPostExecute(ActionResult result) {
             if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
                 CmdModel model = (CmdModel) result.ResultObject;
-                AdManager.adStatus(MainActivity.this);
+                AdManager.adStatus(MainActivity.this, mPowerManger);
                 SystemUtil.setStreamVolume(MainActivity.this, model.getVolume());// 改变声音大小
                 LogManager.timeUploadLog();
             }
@@ -283,29 +285,23 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         @Override
         protected void onPostExecute(ActionResult result) {
             if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
+                if (!mIsTextAd && null != result.ResultObject) {
+                    DownloadModel downloadModel = (DownloadModel) result.ResultObject;
+                    if (2 == downloadModel.getType()) {
+                        // 是图片
+                        MediaImageModel imageModel = downloadModel.getImage();
+                        if (null != imageModel && !StringUtil.isNullOrEmpty(imageModel.getMd5())) {
+                            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE, downloadModel));
+                        }
+                    }
+                }
                 if (mNeedFeedback) {
                     new UpdateTask(mIsTextAd ? "text_ad" : "ad").execute();
-                }
-                if (!mIsTextAd) {
-                    timeDownload();
                 }
             } else {
                 showErrorMsg(result);
             }
         }
-    }
-
-    private void timeDownload() {
-        TimerUtil.startTimer(DownloadService.TAG, 2, 1 * 1000, new TimerUtil.TimerActionListener() {
-            @Override
-            public void doAction() {
-                if (TimerUtil.getTimerTime(DownloadService.TAG) <= 0) {
-                    EvtLog.d("aaa", "2秒倒计时开始下载");
-                    DownloadManager.downTask();
-                    TimerUtil.stopTimer(DownloadService.TAG);
-                }
-            }
-        });
     }
 
     class UpdateTask extends AsyncTask<Void, Void, ActionResult> {
@@ -532,7 +528,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     CmdModel model = (CmdModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, CmdModel.class);
                     model.setSys_status(versionModel.getSys_status());
                     SharedPreferenceUtil.saveObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, model);
-                    AdManager.adStatus(MainActivity.this);
+                    AdManager.adStatus(MainActivity.this, mPowerManger);
                     new UpdateTask("sys_status").execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_DELETE_AD.equals(action)) {
@@ -557,7 +553,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 if (null == model || 0 != model.getSys_status()) {
                     return;
                 }
-                AdManager.setLockScreen(!TimeUtil.isBetweenTime());
+                AdManager.setLockScreen(!TimeUtil.isBetweenTime(), mPowerManger, false);
             }
         }
     }

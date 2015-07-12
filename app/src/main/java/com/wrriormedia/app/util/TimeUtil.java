@@ -25,13 +25,13 @@ public class TimeUtil {
         EvtLog.d("aaa", model.toString());
         String startTime = model.getStart_time();
         String endTime = model.getEnd_time();
-        if (!startTime.contains(":") || !startTime.contains(":")){
+        if (!startTime.contains(":") || !endTime.contains(":")){
             return true;
         }
         int startHour = Integer.parseInt(startTime.split(":")[0]);
         int startMinute = Integer.parseInt(startTime.split(":")[1]);
         int endHour = Integer.parseInt(endTime.split(":")[0]);
-        int endMinute = Integer.parseInt(endTime.split(":")[0]);
+        int endMinute = Integer.parseInt(endTime.split(":")[1]);
 
         Calendar currentDate = Calendar.getInstance();
         currentDate.setTime(new Date());
@@ -47,7 +47,7 @@ public class TimeUtil {
         Calendar max = Calendar.getInstance();
         max.set(Calendar.YEAR, currentDate.get(Calendar.YEAR));
         max.set(Calendar.MONTH, currentDate.get(Calendar.MONTH));
-
+        max.set(Calendar.HOUR_OF_DAY, endHour);
         max.set(Calendar.MINUTE, endMinute);
         max.set(Calendar.SECOND, 0);
         max.set(Calendar.MILLISECOND, 0);

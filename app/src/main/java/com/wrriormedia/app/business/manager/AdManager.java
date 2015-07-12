@@ -3,6 +3,7 @@ package com.wrriormedia.app.business.manager;
 
 import android.app.Activity;
 import android.os.CountDownTimer;
+import android.os.PowerManager;
 
 import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.business.dao.DBMgr;
@@ -134,43 +135,47 @@ public class AdManager {
     /**
      * 获取当前视屏播放状态
      *
-     * @return 0 正常播放广告; 1 暂停播放，展示默认图;2，亮度调为0
+     * @return 0 正常播放广告; 1 暂停播放，展示默认图;2，休眠
      */
-    public static void adStatus(Activity context) {
+    public static void adStatus(Activity context, PowerManager pm) {
         CmdModel model = (CmdModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, CmdModel.class);
         if (null == model) {
-            setLockScreen(false);
+            setLockScreen(false, pm, false);
             return;
         }
         switch (model.getSys_status()) {
             case 0:
                 SystemUtil.changeBrightnessSlide(context, model.getBrightness() / 10f);// 改变屏幕亮度
-                setLockScreen(false);
+                setLockScreen(false, pm, false);
                 break;
             case 1:
                 SystemUtil.changeBrightnessSlide(context, model.getBrightness() / 10f);// 改变屏幕亮度
-                setLockScreen(true);
+                setLockScreen(false, pm, true);
                 break;
             case 2:
-                setLockScreen(true);
-                SystemUtil.changeBrightnessSlide(context, 0.01f);
+                setLockScreen(true, pm, false);
+                //SystemUtil.changeBrightnessSlide(context, 0.01f);
                 break;
         }
     }
 
-    public static void setLockScreen(boolean lockScreen) {
+    public static void setLockScreen(boolean lockScreen, PowerManager pm, boolean showDefaultPic) {
         if (lockScreen) {
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_AD_ACTIVITY, false);
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_TEXT_AD_ACTIVITY, false);
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN, true);
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOCK_SCREEN, null));
+            //pm.goToSleep(SystemClock.uptimeMillis());
         } else {
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_AD_ACTIVITY, true);
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_TEXT_AD_ACTIVITY, true);
             if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
                 SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN, false);
+                //pm.wakeUp(SystemClock.uptimeMillis());
                 EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
                 EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT, null));
+            }
+            if (showDefaultPic) {
+                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOCK_SCREEN, null));
             }
         }
     }
