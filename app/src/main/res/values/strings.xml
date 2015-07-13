@@ -9,4 +9,5 @@
     <string name="download_success">下载成功</string>
     <string name="install_apk_success">静默安装成功</string>
     <string name="install_apk_fail">静默安装失败</string>
+    <string name="update_version_less_than_curr">升级版本小于当前版本，无法升级</string>
 </resources>

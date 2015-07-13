@@ -50,6 +50,7 @@ import com.wrriormedia.library.imageloader.core.display.SimpleBitmapDisplayer;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.FileUtil;
 import com.wrriormedia.library.util.MessageException;
+import com.wrriormedia.library.util.PackageUtil;
 import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.util.TimerUtil;
 import com.wrriormedia.library.util.UIUtil;
@@ -477,10 +478,34 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             String action = intent.getAction();
             if (ConstantSet.KEY_EVENT_ACTION_NEW_VERSION.equals(action)) {
                 PushVersionModel versionModel = (PushVersionModel) intent.getSerializableExtra(PushVersionModel.class.getName());
-                if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getUrl())) {
-                    Intent versionIntent = new Intent(MainActivity.this, UpdateStateActivity.class);
-                    versionIntent.putExtra(PushVersionModel.class.getName(), versionModel);
-                    startActivity(versionIntent);
+                if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getUrl()) && !StringUtil.isNullOrEmpty(versionModel.getVersion())) {
+                    boolean flag = false;
+                    String version = versionModel.getVersion();
+                    try {
+                        if (version.contains(".")) {
+                            version = version.replaceAll(".", "");
+                            String currVersionName = PackageUtil.getVersionName();
+                            if (currVersionName.contains(".")) {
+                                currVersionName = currVersionName.replaceAll(".", "");
+                            }
+                            if (Integer.parseInt(version) > Integer.parseInt(currVersionName)) {
+                                flag = true;
+                            }
+                        } else {
+                            if (Integer.parseInt(version) > PackageUtil.getVersionCode()) {
+                                flag = true;
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (flag) {
+                        Intent versionIntent = new Intent(MainActivity.this, UpdateStateActivity.class);
+                        versionIntent.putExtra(PushVersionModel.class.getName(), versionModel);
+                        startActivity(versionIntent);
+                    } else {
+                        toast(getString(R.string.update_version_less_than_curr));
+                    }
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_LOG_TIME.equals(action)) {
                 PushLogModel sysStatusModel = (PushLogModel) intent.getSerializableExtra(PushLogModel.class.getName());
