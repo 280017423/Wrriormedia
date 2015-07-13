@@ -170,6 +170,10 @@ public class DeviceRequest {
                         DownloadModel downloadModel = jsonResult.getData(DownloadModel.class);
                         if (null != downloadModel) {
                             downloadModel.setAid(aid);
+                            if (2 == downloadModel.getType() && null != downloadModel.getImage()
+                                    && !StringUtil.isNullOrEmpty(downloadModel.getImage().getMd5())) {
+                                downloadModel.setIsImageFinish(1);
+                            }
                             DownloadModel localModel = DBMgr.getBaseModel(DownloadModel.class, DownloadModel.WHERE_CASE_SUB + " = " + aid);
                             if (null == localModel) {
                                 EvtLog.d("aaa", "服务器新增的" + aid);

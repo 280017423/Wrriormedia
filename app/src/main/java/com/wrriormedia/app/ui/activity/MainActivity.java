@@ -285,16 +285,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         @Override
         protected void onPostExecute(ActionResult result) {
             if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
-                if (!mIsTextAd && null != result.ResultObject) {
-                    DownloadModel downloadModel = (DownloadModel) result.ResultObject;
-                    if (2 == downloadModel.getType()) {
-                        // 是图片
-                        MediaImageModel imageModel = downloadModel.getImage();
-                        if (null != imageModel && !StringUtil.isNullOrEmpty(imageModel.getMd5())) {
-                            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE, downloadModel));
-                        }
-                    }
-                }
                 if (mNeedFeedback) {
                     new UpdateTask(mIsTextAd ? "text_ad" : "ad").execute();
                 }
