@@ -483,10 +483,10 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     String version = versionModel.getVersion();
                     try {
                         if (version.contains(".")) {
-                            version = version.replaceAll(".", "");
+                            version = version.replaceAll("\\.", "");
                             String currVersionName = PackageUtil.getVersionName();
                             if (currVersionName.contains(".")) {
-                                currVersionName = currVersionName.replaceAll(".", "");
+                                currVersionName = currVersionName.replaceAll("\\.", "");
                             }
                             if (Integer.parseInt(version) > Integer.parseInt(currVersionName)) {
                                 flag = true;
