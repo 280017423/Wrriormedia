@@ -10,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.PowerManager;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -396,7 +395,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             }
         });
         int time = mediaImageModel.getTime();
-        Log.d("aaa", ">>>>  time = " + time);
+        EvtLog.d("aaa", ">>>>  time = " + time);
         if (0 != time) {
             new CountDownTimer(time * 1000, time * 1000) {
                 @Override
@@ -543,7 +542,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 if (null == model || 0 != model.getSys_status()) {
                     return;
                 }
-                AdManager.setLockScreen(!TimeUtil.isBetweenTime(), mPowerManger, false);
+                AdManager.setLockScreen(MainActivity.this, !TimeUtil.isBetweenTime(), mPowerManger, false);
             }
         }
     }

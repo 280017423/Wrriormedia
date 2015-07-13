@@ -5,7 +5,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -20,7 +22,6 @@ import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.StringUtil;
-import com.wrriormedia.library.util.TimerUtil;
 
 public class DownloadService extends Service {
 
@@ -30,6 +31,19 @@ public class DownloadService extends Service {
     private Notification mNotification;
     private RemoteViews mRemoteViews;
     private NotificationManager mNotificationManager;
+    private static final int WHAT_RESTART_DOWNLOAD = 1;
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+            case WHAT_RESTART_DOWNLOAD:
+                EvtLog.d("aaa", "10秒倒计时开始下载");
+                DownloadManager.downTask();
+                break;
+            }
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -87,6 +101,7 @@ public class DownloadService extends Service {
             }).start();
             timeDownload();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_NEXT)) {
+            EvtLog.d("aaa", ">>>> DownloadService, 重启定时器.............");
             timeDownload();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_START)) {
             mNotificationManager.notify(model.getEventId(), mNotification);
@@ -124,7 +139,7 @@ public class DownloadService extends Service {
     }
 
     private void timeDownload() {
-        TimerUtil.startTimer(TAG, 10, 1 * 1000, new TimerUtil.TimerActionListener() {
+        /*TimerUtil.startTimer(TAG, 10, 1 * 1000, new TimerUtil.TimerActionListener() {
             @Override
             public void doAction() {
                 if (TimerUtil.getTimerTime(TAG) <= 0) {
@@ -133,7 +148,12 @@ public class DownloadService extends Service {
                     TimerUtil.stopTimer(TAG);
                 }
             }
-        });
+        });*/
+
+        if (mHandler.hasMessages(WHAT_RESTART_DOWNLOAD)) {
+            mHandler.removeMessages(WHAT_RESTART_DOWNLOAD);
+        }
+        mHandler.sendEmptyMessageDelayed(WHAT_RESTART_DOWNLOAD, 10 * 1000);
     }
 
     @Override

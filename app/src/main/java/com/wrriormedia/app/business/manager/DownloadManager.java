@@ -8,6 +8,7 @@ import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.MediaVideoModel;
 import com.wrriormedia.app.util.DownLoadUtil;
 import com.wrriormedia.library.eventbus.EventBus;
+import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.StringUtil;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class DownloadManager {
                             EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_IMAGE, model));
                         }*/
                         if (count == downloadModels.size()) {
+                            EvtLog.d("aaa", "没有需要下载的视频，图片或者文本是最后一条广告，重新开启定时器.....................");
                             EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_NEXT, null));
                         }
                         continue;
