@@ -84,6 +84,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private Intent mIntent;
     private PushBroadCast mPushBroadCast;
     private PowerManager mPowerManger;
+    private MediaVideoModel currVideoModel;
+    private boolean videoPauseFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,12 +147,20 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
+        this.holder = holder;
+        if (videoPauseFlag && currVideoModel != null) {
+            videoPauseFlag = false;
+            playVideo(currVideoModel);
+        }
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        this.holder = null;
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            releaseMediaPlayer();
+            videoPauseFlag = true;
+        }
     }
 
     public void onEventMainThread(EventBusModel model) {
@@ -158,7 +168,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             return;
         }
         if (ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO.equals(model.getEventBusAction())) {
-            playVideo((MediaVideoModel) model.getEventBusObject());
+            currVideoModel = (MediaVideoModel) model.getEventBusObject();
+            playVideo(currVideoModel);
             mViewVideo.setVisibility(View.VISIBLE);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE.equals(model.getEventBusAction())) {
             DownloadModel downloadModel = (DownloadModel) model.getEventBusObject();

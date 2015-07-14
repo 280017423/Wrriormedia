@@ -21,6 +21,7 @@ import com.wrriormedia.library.util.StringUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 下载工具类
@@ -49,10 +50,10 @@ public class DownLoadUtil {
         if (StringUtil.isNullOrEmpty(url)) {
             return;
         }
-        File downloadFile = new File(downloadDir, fileName);
-        if (downloadFile.exists()) { // 如果存在，先删除
+        final File downloadFile = new File(downloadDir, fileName);
+        /*if (downloadFile.exists()) { // 如果存在，先删除
             downloadFile.delete();
-        }
+        }*/
         EvtLog.d("aaa", "下载路径：" + downloadFile.getAbsolutePath());
         mHttpUtils.download(url, downloadFile.getAbsolutePath(), true, false, new RequestCallBack<File>() {
 
@@ -92,6 +93,7 @@ public class DownLoadUtil {
                 model.setIsDownloadFinish(1);
                 DBMgr.saveModel(model);
                 EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH, null, model.getAid()));
+                deleteOldVideoFile();
             }
 
 
@@ -111,8 +113,49 @@ public class DownLoadUtil {
                 logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
                 LogManager.saveLog(4, new Gson().toJson(logList));
                 EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED, msg, model.getAid()));
+                if (downloadFile.exists()) {
+                    downloadFile.delete();
+                }
             }
         });
+    }
+
+    private static void deleteOldVideoFile() {
+        File downloadDir = null;
+        try {
+            downloadDir = FileUtil.getDownloadDir();
+        } catch (MessageException e) {
+            e.printStackTrace();
+        }
+        if (!downloadDir.exists()) {
+            return;
+        }
+        File[] fileList = downloadDir.listFiles();
+        List<DownloadModel> downloadModels = DBMgr.getBaseModels(DownloadModel.class);
+        if (downloadModels != null && downloadModels.size() > 0) {
+            if (fileList != null && fileList.length > 0) {
+                for (int i = 0; i < fileList.length; i++) {
+                    String name = fileList[i].getName();
+                    boolean existsFlag = false;
+                    for (int j = 0; j < downloadModels.size(); j++) {
+                        MediaVideoModel videoModel = downloadModels.get(j).getVideo();
+                        if (videoModel != null && name.equals(videoModel.getFileName())) {
+                            existsFlag = true;
+                            break;
+                        }
+                    }
+                    if (!existsFlag) {
+                        fileList[i].delete();
+                    }
+                }
+            }
+        } else {
+            if (fileList != null && fileList.length > 0) {
+                for (int i = 0; i < fileList.length; i++) {
+                    fileList[i].delete();
+                }
+            }
+        }
     }
 
 }
