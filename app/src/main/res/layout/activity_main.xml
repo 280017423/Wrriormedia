@@ -8,14 +8,14 @@
         android:id="@+id/ll_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
 
         <SurfaceView
             android:id="@+id/surface"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:visibility="gone"/>
     </io.vov.vitamio.widget.CenterLayout>
 
     <ImageView

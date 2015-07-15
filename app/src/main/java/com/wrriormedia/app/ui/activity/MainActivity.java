@@ -148,8 +148,10 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         this.holder = holder;
-        if (videoPauseFlag && currVideoModel != null) {
-            videoPauseFlag = false;
+        if (null != currVideoModel) {
+            if (videoPauseFlag) {
+                videoPauseFlag = false;
+            }
             playVideo(currVideoModel);
         }
     }
@@ -160,6 +162,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
             releaseMediaPlayer();
             videoPauseFlag = true;
+        } else {
+            releaseMediaPlayer();
         }
     }
 
@@ -169,8 +173,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         }
         if (ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO.equals(model.getEventBusAction())) {
             currVideoModel = (MediaVideoModel) model.getEventBusObject();
-            playVideo(currVideoModel);
-            mViewVideo.setVisibility(View.VISIBLE);
+            //mViewVideo.setVisibility(View.VISIBLE);
+            mPreview.setVisibility(View.VISIBLE);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE.equals(model.getEventBusAction())) {
             DownloadModel downloadModel = (DownloadModel) model.getEventBusObject();
             showPosImg(downloadModel);
@@ -203,7 +207,9 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             }
 
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT.equals(model.getEventBusAction())) {
-            mViewVideo.setVisibility(View.GONE);
+            //mViewVideo.setVisibility(View.GONE);
+            currVideoModel = null;
+            mPreview.setVisibility(View.GONE);
             mPlayIndex++;
             hideAllImg();
             AdManager.getPlayAd(mPlayIndex);
@@ -442,10 +448,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         releaseMediaPlayer();
         try {
             mMediaPlayer = new MediaPlayer(this);
-            mMediaPlayer.setDataSource(downloadFile.getAbsolutePath()); //Path to video file
-            mMediaPlayer.setDisplay(holder); //Set SurfaceHolder
-            mMediaPlayer.prepareAsync();
-            mMediaPlayer.setScreenOnWhilePlaying(true);
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
@@ -467,6 +469,11 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     mMediaPlayer.start();
                 }
             });
+            mMediaPlayer.setDataSource(downloadFile.getAbsolutePath()); //Path to video file
+            mMediaPlayer.setDisplay(holder); //Set SurfaceHolder
+            mMediaPlayer.setBufferSize(0L);
+            mMediaPlayer.setScreenOnWhilePlaying(true);
+            mMediaPlayer.prepareAsync();
         } catch (Exception e) {
             EvtLog.d("aaa", e.toString());
         }
@@ -477,6 +484,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.stop();
             }
+            mMediaPlayer.reset();
             mMediaPlayer.release();
             mMediaPlayer = null;
         }

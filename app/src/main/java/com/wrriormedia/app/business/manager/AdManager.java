@@ -70,11 +70,15 @@ public class AdManager {
                         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
                         return;
                     } else {
+                        if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5())) {
+                            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaModel));
+                        }
                         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO, mediaVideoModel));
                     }
-                }
-                if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5()) && current > mediaModel.getStart() && current < mediaModel.getEnd()) {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaModel));
+                } else {
+                    if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5()) && current > mediaModel.getStart() && current < mediaModel.getEnd()) {
+                        EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaModel));
+                    }
                 }
             }
         }).start();
