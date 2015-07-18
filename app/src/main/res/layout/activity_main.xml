@@ -133,4 +133,12 @@
         android:textSize="30sp"
         android:visibility="gone" />
 
+    <ImageView
+        android:id="@+id/iv_default_pic"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"
+        android:background="@mipmap/stop_bg"
+        android:visibility="gone" />
+
 </RelativeLayout>

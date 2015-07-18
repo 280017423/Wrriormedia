@@ -172,6 +172,7 @@ public class AdManager {
             //pm.goToSleep(SystemClock.uptimeMillis());
             Intent intent = new Intent("com.wrriormedia.app.sleep");
             context.sendBroadcast(intent);
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PAUSE_PLAY, null));
         } else {
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_AD_ACTIVITY, true);
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_TEXT_AD_ACTIVITY, true);
@@ -180,11 +181,13 @@ public class AdManager {
                 //pm.wakeUp(SystemClock.uptimeMillis());
                 Intent intent = new Intent("com.wrriormedia.app.wakeup");
                 context.sendBroadcast(intent);
-                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT, null));
+                //EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+                //EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT, null));
             }
             if (showDefaultPic) {
                 EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOCK_SCREEN, null));
+            } else {
+                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_RESTART_PLAY, null));
             }
         }
     }

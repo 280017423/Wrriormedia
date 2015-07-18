@@ -75,6 +75,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private ImageView mIvAdPos7;
     private ImageView mIvAdPos8;
     private ImageView mIvAdPos9;
+    private ImageView mIvDefaultPic;
     private AutoScrollTextView mTvAdPos10;
     private AutoScrollTextView mTvAdPos11;
 
@@ -87,6 +88,9 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private PowerManager mPowerManger;
     private MediaVideoModel currVideoModel;
     private boolean videoPauseFlag = false;
+    private CountDownTimer mPicCountTimer;
+    private int picShowTime;
+    private boolean pausePlayingFlag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +138,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         mIvAdPos7 = (ImageView) findViewById(R.id.iv_ad_pos_7);
         mIvAdPos8 = (ImageView) findViewById(R.id.iv_ad_pos_8);
         mIvAdPos9 = (ImageView) findViewById(R.id.iv_ad_pos_9);
+        mIvDefaultPic = (ImageView) findViewById(R.id.iv_default_pic);
 
         mTvAdPos10 = (AutoScrollTextView) findViewById(R.id.tv_10);
         mTvAdPos11 = (AutoScrollTextView) findViewById(R.id.tv_11);
@@ -152,6 +157,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        EvtLog.d("aaa", ">>>> surfaceCreated, surfaceCreated, surfaceCreated");
         this.holder = holder;
         if (null != currVideoModel) {
             if (videoPauseFlag) {
@@ -163,6 +169,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+        EvtLog.d("aaa", ">>>> surfaceDestroyed, surfaceDestroyed, surfaceDestroyed");
         this.holder = null;
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
             releaseMediaPlayer();
@@ -244,8 +251,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 }
             }.start();
         } else if (ConstantSet.KEY_EVENT_ACTION_LOCK_SCREEN.equals(model.getEventBusAction())) {
-            mIvAdPos0.setVisibility(View.VISIBLE);
-            mIvAdPos0.setImageResource(R.mipmap.stop_bg);
+            pausePlay();
+            mIvDefaultPic.setVisibility(View.VISIBLE);
         } else if (ConstantSet.KEY_EVENT_ACTION_LOG_TIMER.equals(model.getEventBusAction())) {
             LogManager.timeUploadLog();
         } else if (ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE.equals(model.getEventBusAction())) {
@@ -256,6 +263,40 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             downloadModel.setIsImageFinish(1);
             DBMgr.saveModel(downloadModel);
             new UpdateTask("ad:" + downloadModel.getAid() + ":image").execute();
+        } else if (ConstantSet.KEY_EVENT_ACTION_PAUSE_PLAY.equals(model.getEventBusAction())) {
+            pausePlay();
+        } else if (ConstantSet.KEY_EVENT_ACTION_RESTART_PLAY.equals(model.getEventBusAction())) {
+            if (mIvDefaultPic.getVisibility() == View.VISIBLE) {
+                mIvDefaultPic.setVisibility(View.GONE);
+            }
+            try {
+                if (pausePlayingFlag) {
+                    pausePlayingFlag = false;
+                    if (null != mMediaPlayer) {
+                        mMediaPlayer.start();
+                    }
+                } else if (picShowTime > 0 && null == mPicCountTimer) {
+                    mPicCountTimer = new PicCountTimer(picShowTime * 1000, picShowTime * 1000);
+                    mPicCountTimer.start();
+                } else {
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+            }
+        }
+    }
+
+    private void pausePlay() {
+        if (null != mMediaPlayer && mMediaPlayer.isPlaying()) {
+            mMediaPlayer.pause();
+            pausePlayingFlag = true;
+        } else if (picShowTime > 0) {
+            if (mPicCountTimer != null) {
+                mPicCountTimer.cancel();
+                mPicCountTimer = null;
+            }
         }
     }
 
@@ -417,19 +458,35 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
             }
         });
-        int time = mediaImageModel.getTime();
-        EvtLog.d("aaa", ">>>>  time = " + time);
-        if (0 != time) {
-            new CountDownTimer(time * 1000, time * 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                }
+        picShowTime = mediaImageModel.getTime();
+        EvtLog.d("aaa", ">>>>  picShowTime = " + picShowTime);
+        if (0 != picShowTime) {
+            mPicCountTimer = new PicCountTimer(picShowTime * 1000, picShowTime * 1000);
+            mPicCountTimer.start();
+        }
+    }
 
-                @Override
-                public void onFinish() {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-                }
-            }.start();
+    class PicCountTimer extends  CountDownTimer {
+
+        /**
+         * @param millisInFuture    The number of millis in the future from the call
+         *                          to {@link #start()} until the countdown is done and {@link #onFinish()}
+         *                          is called.
+         * @param countDownInterval The interval along the way to receive
+         *                          {@link #onTick(long)} callbacks.
+         */
+        public PicCountTimer(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+
+        }
+
+        @Override
+        public void onFinish() {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
         }
     }
 

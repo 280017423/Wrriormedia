@@ -27,6 +27,8 @@ public class ConstantSet {
     public static final String KEY_EVENT_ACTION_DOWNLOAD_IMAGE = "KEY_EVENT_ACTION_DOWNLOAD_IMAGE";
 
     public static final String KEY_EVENT_ACTION_LOCK_SCREEN = "KEY_EVENT_ACTION_LOCK_SCREEN";
+    public static final String KEY_EVENT_ACTION_PAUSE_PLAY = "KEY_EVENT_ACTION_PAUSE_PLAY";
+    public static final String KEY_EVENT_ACTION_RESTART_PLAY = "KEY_EVENT_ACTION_RESTART_PLAY";
 
     //推送action
     public static final String KEY_EVENT_ACTION_NEW_VERSION = "KEY_EVENT_ACTION_NEW_VERSION";

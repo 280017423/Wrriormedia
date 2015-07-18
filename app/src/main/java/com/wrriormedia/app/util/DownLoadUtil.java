@@ -112,6 +112,7 @@ public class DownLoadUtil {
                 logList.add(url);
                 logList.add(NetUtil.isWifi(WrriormediaApplication.getInstance().getBaseContext()) ? "wifi" : "3g");
                 LogManager.saveLog(4, new Gson().toJson(logList));
+                EvtLog.d("aaa", "******************** 下载失败 ********************");
                 EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED, msg, model.getAid()));
                 if (downloadFile.exists()) {
                     downloadFile.delete();
