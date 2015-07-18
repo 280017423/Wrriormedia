@@ -58,7 +58,6 @@ import com.wrriormedia.library.util.UIUtil;
 import java.io.File;
 import java.util.ArrayList;
 
-import io.vov.vitamio.LibsChecker;
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 
@@ -95,10 +94,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!LibsChecker.checkVitamioLibs(this)) {
-            EvtLog.e("aaa", ">>>> vitamio checker libs failed.");
-            return;
-        }
         setContentView(R.layout.activity_main);
         initVariable();
         initViews();
