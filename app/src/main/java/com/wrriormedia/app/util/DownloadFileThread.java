@@ -44,7 +44,7 @@ public class DownloadFileThread extends Thread {
             File downloadFile = new File(downloadDir, apkFileName);
             downFile(mUpdateModel.getUrl(), downloadFile);
         } catch (Exception e) {
-            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED, PackageUtil.getString(R.string.no_sdcard)));
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FAILED, PackageUtil.getString(R.string.no_sdcard)));
         }
     }
 
@@ -70,21 +70,22 @@ public class DownloadFileThread extends Thread {
             FileUtil.write2SDFromInput(downloadFile, inputStream, fileSize, new DownloadListener() {
                 @Override
                 public void onDownloadFail() {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED, null));
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FAILED, null));
                 }
 
                 @Override
                 public void onDownloading(int progress) {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_NORMAL, progress));
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_NORMAL, progress));
                 }
 
                 @Override
                 public void onDownloadFinish(File file) {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH, file));
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FINISH, file));
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FAILED, null));
             return false;
         } finally {
             try {

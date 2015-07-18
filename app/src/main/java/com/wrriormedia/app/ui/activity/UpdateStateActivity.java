@@ -74,7 +74,7 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
         if (null == model || StringUtil.isNullOrEmpty(model.getEventBusAction())) {
             return;
         }
-        if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH)) {
+        if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FINISH)) {
             mTxtState.setText(getString(R.string.download_success));
             File file = (File) model.getEventBusObject();
             Intent installHideIntent = new Intent("android.intent.action.VIEW.HIDE");
@@ -105,12 +105,12 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
                 startActivity(intent);
             }*/
             finish();
-        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
+        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FAILED)) {
             toast((String) model.getEventBusObject());
             toast(getString(R.string.download_failed));
             finish();
-        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_NORMAL)) {
-            int progress = (int) model.getEventBusObject();
+        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_NORMAL)) {
+            int progress = (Integer) model.getEventBusObject();
             if (progress > 100) {
                 progress = 100;
             }

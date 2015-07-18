@@ -112,7 +112,7 @@ public class DownloadService extends Service {
                 Toast.makeText(this, (String) model.getEventBusObject(), Toast.LENGTH_LONG).show();
             }
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_NORMAL)) {
-            long progress = (long) model.getEventBusObject();
+            int progress = (Integer) model.getEventBusObject();
             if (progress > PROGRESS_MAX) {
                 progress = PROGRESS_MAX;
             }
