@@ -274,11 +274,11 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     mPicCountTimer = new PicCountTimer(picShowTime * 1000, picShowTime * 1000);
                     mPicCountTimer.start();
                 } else {
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+//                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+//                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
             }
         }
     }
@@ -461,7 +461,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         }
     }
 
-    class PicCountTimer extends  CountDownTimer {
+    class PicCountTimer extends CountDownTimer {
 
         /**
          * @param millisInFuture    The number of millis in the future from the call
