@@ -14,6 +14,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.pdw.gson.Gson;
 import com.wrriormedia.app.R;
@@ -108,7 +109,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private void wakeupMachine() {
         Intent intent = new Intent("com.wrriormedia.app.wakeup");
         sendBroadcast(intent);
-        EvtLog.d("aaa", "*************************** 1.0.0 ************************");
+        EvtLog.d("aaa", "*************************** " + PackageUtil.getVersionName() + " ************************");
+        Toast.makeText(this, "****** " + PackageUtil.getVersionName() + " ******", Toast.LENGTH_LONG).show();
     }
 
     private void initVariable() {

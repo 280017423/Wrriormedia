@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
@@ -14,7 +15,9 @@ import com.wrriormedia.app.model.StatusModel;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.library.eventbus.EventBus;
+import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.NetUtil;
+import com.wrriormedia.library.util.PackageUtil;
 import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
 
@@ -43,6 +46,8 @@ public class LoadingActivity extends HtcBaseActivity {
     private void initVariable() {
         if (!LibsChecker.checkVitamioLibs(this)) {
             // 初始化Vitamio库
+            EvtLog.d("aaa", "init check vitamio lib fail.......");
+            Toast.makeText(this, "init check vitamio lib fail", Toast.LENGTH_SHORT).show();
             return;
         }
         EventBus.getDefault().register(this);
@@ -58,7 +63,7 @@ public class LoadingActivity extends HtcBaseActivity {
     private void getReadCmd() {
         // 如果网络可以，直接请求ready接口，如果还没有准备好就等待网络开启广播
         StatusModel model = (StatusModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), StatusModel.class.getName(), StatusModel.class);
-        if (null != model || !StringUtil.isNullOrEmpty(model.getSerial())) {
+        if (null != model && !StringUtil.isNullOrEmpty(model.getSerial())) {
             startActivity(new Intent(LoadingActivity.this, MainActivity.class));
             finish();
         } else {
@@ -73,8 +78,21 @@ public class LoadingActivity extends HtcBaseActivity {
     public void onEventMainThread(ActionResult result) {
         dismissLoadingUpView(mLoadingUpView);
         if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
-            startActivity(new Intent(LoadingActivity.this, MainActivity.class));
-            finish();
+            if (null != result.ResultObject) {
+                StatusModel model = (StatusModel) result.ResultObject;
+                String ready = model.getReady();
+                if ("0".equals(ready)) {
+                    mTvImmeInfo.setText(PackageUtil.getTerminalSign());
+                    mTvSerial.setText(model.getSerial());
+                    mTvAddress.setText(model.getAddress());
+                } else {
+                    startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+                    finish();
+                }
+            } else {
+                startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+                finish();
+            }
         } else {
             //TODO 记录日志
             showErrorMsg(result);

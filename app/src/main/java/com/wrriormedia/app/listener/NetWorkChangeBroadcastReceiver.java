@@ -15,6 +15,7 @@ import com.wrriormedia.app.model.StatusModel;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.library.eventbus.EventBus;
+import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.StringUtil;
 
 public class NetWorkChangeBroadcastReceiver extends BroadcastReceiver {
@@ -31,8 +32,10 @@ public class NetWorkChangeBroadcastReceiver extends BroadcastReceiver {
                     Toast.makeText(context, "网络打开", Toast.LENGTH_LONG).show();
                     StatusModel model = (StatusModel) SharedPreferenceUtil.getObject(WrriormediaApplication.getInstance().getBaseContext(), StatusModel.class.getName(), StatusModel.class);
                     if (null == model || StringUtil.isNullOrEmpty(model.getSerial())) {
+                        EvtLog.d("aaa", "NetWorkChangeBroadcastReceiver, serial is null, start VerifyTask");
                         new VerifyTask().execute();
                     } else {
+                        EvtLog.d("aaa", "NetWorkChangeBroadcastReceiver, model is not null, return jump to MainActivity");
                         ActionResult result = new ActionResult();
                         result.ResultCode = ActionResult.RESULT_CODE_SUCCESS;
                         EventBus.getDefault().post(result);
