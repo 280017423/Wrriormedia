@@ -98,10 +98,17 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         initVariable();
         initViews();
         mPowerManger = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wakeupMachine();
         new CmdTask().execute();
         AdManager.getPlayAd(mPlayIndex);
         AdManager.getTextAd(mTextIndex);
         startService(mIntent);
+    }
+
+    private void wakeupMachine() {
+        Intent intent = new Intent("com.wrriormedia.app.wakeup");
+        sendBroadcast(intent);
+        EvtLog.d("aaa", "*************************** 1.0.0 ************************");
     }
 
     private void initVariable() {
@@ -426,7 +433,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             default:
                 break;
         }
-        UIUtil.setViewVisible(displayView);
         mImageLoader.displayImage(mediaImageModel.getFirst(), displayView, new DisplayImageOptions.Builder()
                 .cacheInMemory().cacheOnDisc().displayer(new SimpleBitmapDisplayer())
                 .build(), new ImageLoadingListener() {
@@ -453,6 +459,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
             }
         });
+        UIUtil.setViewVisible(displayView);
         picShowTime = mediaImageModel.getTime();
         EvtLog.d("aaa", ">>>>  picShowTime = " + picShowTime);
         if (0 != picShowTime) {

@@ -137,6 +137,10 @@ public class DownLoadUtil {
             if (fileList != null && fileList.length > 0) {
                 for (int i = 0; i < fileList.length; i++) {
                     String name = fileList[i].getName();
+                    if (name.endsWith(".apk")) {
+                        // needn't delete apk
+                        continue;
+                    }
                     boolean existsFlag = false;
                     for (int j = 0; j < downloadModels.size(); j++) {
                         MediaVideoModel videoModel = downloadModels.get(j).getVideo();

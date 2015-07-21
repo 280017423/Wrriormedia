@@ -8,10 +8,12 @@ import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.PushVersionModel;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.listener.DownloadListener;
+import com.wrriormedia.library.util.EvtLog;
 import com.wrriormedia.library.util.FileUtil;
 import com.wrriormedia.library.util.PackageUtil;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -39,6 +41,21 @@ public class DownloadFileThread extends Thread {
         }
         try {
             File downloadDir = FileUtil.getDownloadDir();
+            File apkList[] = downloadDir.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    if (pathname.getName().endsWith(".apk")) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            if (apkList != null && apkList.length > 0) {
+                for (int i = 0; i < apkList.length; i++) {
+                    apkList[i].delete();
+                    EvtLog.d("aaa", ">>>> delete old apk before download new apk.");
+                }
+            }
             String apkFileName = WrriormediaApplication.getInstance().getBaseContext().getPackageName() + "_" + mUpdateModel.getVersion()
                     + ".apk";
             File downloadFile = new File(downloadDir, apkFileName);
