@@ -6,6 +6,7 @@ public class ConstantSet {
     //页面跳转参数key
 
     public static final String KEY_GLOBAL_CONFIG_FILENAME = "KEY_GLOBAL_CONFIG_FILENAME";
+    public static final String KEY_GLOBAL_DOWNLOAD_APP = "KEY_GLOBAL_DOWNLOAD_APP";
     public static final int PAGE_SIZE = 20;
 
     public static final String KEY_IS_AD_ACTIVITY = "KEY_IS_AD_ACTIVITY";
@@ -39,6 +40,11 @@ public class ConstantSet {
     public static final String KEY_EVENT_ACTION_LOG_TIME = "KEY_EVENT_ACTION_LOG_TIME";
     public static final String KEY_EVENT_ACTION_BRITENESS = "KEY_EVENT_ACTION_BRITENESS";
     public static final String KEY_EVENT_ACTION_VOLUME = "KEY_EVENT_ACTION_VOLUME";
+    public static final String KEY_EVENT_ACTION_DOWNLOAD_SHOW_START = "KEY_EVENT_ACTION_DOWNLOAD_SHOW_START";
+    public static final String KEY_EVENT_ACTION_DOWNLOAD_SHOW_FINISH = "KEY_EVENT_ACTION_DOWNLOAD_SHOW_FINISH";
+    public static final String KEY_EVENT_ACTION_DOWNLOAD_SHOW_FAILED = "KEY_EVENT_ACTION_DOWNLOAD_SHOW_FAILED";
+    public static final String KEY_EVENT_ACTION_DOWNLOAD_SHOW_NORMAL = "KEY_EVENT_ACTION_DOWNLOAD_SHOW_NORMAL";
+    public static final String KEY_EVENT_ACTION_RESTART_PLAY_DOWNLOAD_APP_FAILED = "KEY_EVENT_ACTION_RESTART_PLAY_DOWNLOAD_APP_FAILED";
 
     //下载视频文件
     public static final String KEY_EVENT_ACTION_DOWNLOAD_STATUS_START = "KEY_EVENT_ACTION_DOWNLOAD_STATUS_START";

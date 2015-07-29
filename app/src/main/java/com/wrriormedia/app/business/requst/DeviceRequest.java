@@ -32,6 +32,7 @@ import java.util.List;
 public class DeviceRequest {
 
     private static final String TAG = "DeviceRequest";
+    public static String aidFlag = "";
 
     public static ActionResult ready() {
         ActionResult result = new ActionResult();
@@ -177,9 +178,11 @@ public class DeviceRequest {
                             DownloadModel localModel = DBMgr.getBaseModel(DownloadModel.class, DownloadModel.WHERE_CASE_SUB + " = " + aid);
                             if (null == localModel) {
                                 EvtLog.d("aaa", "服务器新增的" + aid);
+                                aidFlag = "服务器新增的: " + aid;
                                 DBMgr.saveModel(downloadModel);
                             } else {
                                 EvtLog.d("aaa", "这个是服务器修改本地数据库的" + aid);
+                                aidFlag = "服务器修改的: " + aid;
                                 DBMgr.saveModel(downloadModel, DownloadModel.WHERE_CASE, "" + aid);
                             }
                         }

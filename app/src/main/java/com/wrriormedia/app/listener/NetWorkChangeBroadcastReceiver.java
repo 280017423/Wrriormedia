@@ -34,12 +34,12 @@ public class NetWorkChangeBroadcastReceiver extends BroadcastReceiver {
                     if (null == model || StringUtil.isNullOrEmpty(model.getSerial())) {
                         EvtLog.d("aaa", "NetWorkChangeBroadcastReceiver, serial is null, start VerifyTask");
                         new VerifyTask().execute();
-                    } else {
+                    } /*else {
                         EvtLog.d("aaa", "NetWorkChangeBroadcastReceiver, model is not null, return jump to MainActivity");
                         ActionResult result = new ActionResult();
                         result.ResultCode = ActionResult.RESULT_CODE_SUCCESS;
                         EventBus.getDefault().post(result);
-                    }
+                    }*/
                     return;
                 }
             }

@@ -9,11 +9,14 @@ import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pdw.gson.Gson;
@@ -63,6 +66,11 @@ import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 
 public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callback {
+    private static final long START_PLAY_DELAY = 10 * 1000;
+    private static final long HIDE_AID_VIEW_DELAY = 2 * 1000;
+    private static final int WHAT_START_PLAY = 1;
+    private static final int WHAT_HIDE_AID_VIEW = 2;
+    private static final int WHAT_HIDE_DOWNLOAD_VIEW = 3;
     private int mPlayIndex;
     private int mTextIndex;
     private ImageView mIvAdPos0;
@@ -78,6 +86,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private ImageView mIvDefaultPic;
     private AutoScrollTextView mTvAdPos10;
     private AutoScrollTextView mTvAdPos11;
+    private TextView tv_aid, tv_download;
 
     private MediaPlayer mMediaPlayer;
     private SurfaceView mPreview;
@@ -91,6 +100,24 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private CountDownTimer mPicCountTimer;
     private int picShowTime;
     private boolean pausePlayingFlag;
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case WHAT_START_PLAY:
+                    AdManager.getPlayAd(mPlayIndex);
+                    AdManager.getTextAd(mTextIndex);
+                    break;
+                case WHAT_HIDE_AID_VIEW:
+                    tv_aid.setVisibility(View.GONE);
+                    break;
+                case WHAT_HIDE_DOWNLOAD_VIEW:
+                    tv_download.setVisibility(View.GONE);
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,17 +126,21 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         initVariable();
         initViews();
         mPowerManger = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(),
+                ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_GLOBAL_DOWNLOAD_APP)) {
+            SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
+                    ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, false);
+        }
         wakeupMachine();
         new CmdTask().execute();
-        AdManager.getPlayAd(mPlayIndex);
-        AdManager.getTextAd(mTextIndex);
+        mHandler.sendEmptyMessageDelayed(WHAT_START_PLAY, START_PLAY_DELAY);
         startService(mIntent);
     }
 
     private void wakeupMachine() {
         Intent intent = new Intent("com.wrriormedia.app.wakeup");
         sendBroadcast(intent);
-        EvtLog.d("aaa", "*************************** " + PackageUtil.getVersionName() + " ************************");
+        EvtLog.d("aaa", "****** " + PackageUtil.getVersionName() + " ******");
         Toast.makeText(this, "****** " + PackageUtil.getVersionName() + " ******", Toast.LENGTH_LONG).show();
     }
 
@@ -128,6 +159,11 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_BRITENESS);
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_VOLUME);
         filter.addAction(Intent.ACTION_TIME_TICK);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_START);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_FINISH);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_FAILED);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_NORMAL);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_RESTART_PLAY_DOWNLOAD_APP_FAILED);
         registerReceiver(mPushBroadCast, filter);
     }
 
@@ -146,6 +182,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
 
         mTvAdPos10 = (AutoScrollTextView) findViewById(R.id.tv_10);
         mTvAdPos11 = (AutoScrollTextView) findViewById(R.id.tv_11);
+        tv_aid = (TextView) findViewById(R.id.tv_aid);
+        tv_download = (TextView) findViewById(R.id.tv_download);
 
         mViewVideo = findViewById(R.id.ll_video);
         mPreview = (SurfaceView) findViewById(R.id.surface);
@@ -270,25 +308,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         } else if (ConstantSet.KEY_EVENT_ACTION_PAUSE_PLAY.equals(model.getEventBusAction())) {
             pausePlay();
         } else if (ConstantSet.KEY_EVENT_ACTION_RESTART_PLAY.equals(model.getEventBusAction())) {
-            if (mIvDefaultPic.getVisibility() == View.VISIBLE) {
-                mIvDefaultPic.setVisibility(View.GONE);
-            }
-            try {
-                if (pausePlayingFlag) {
-                    pausePlayingFlag = false;
-                    if (null != mMediaPlayer) {
-                        mMediaPlayer.start();
-                    }
-                } else if (picShowTime > 0 && null == mPicCountTimer) {
-                    mPicCountTimer = new PicCountTimer(picShowTime * 1000, picShowTime * 1000);
-                    mPicCountTimer.start();
-                } else {
-//                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-//                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-            }
+            restartPlay();
         }
     }
 
@@ -301,6 +321,34 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 mPicCountTimer.cancel();
                 mPicCountTimer = null;
             }
+        }
+    }
+
+    private void restartPlay() {
+        boolean isDownloadAppFlag = SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(),
+                ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_GLOBAL_DOWNLOAD_APP);
+        EvtLog.d("aaa", "****** restart play, isDownloadAppFlag = " + isDownloadAppFlag);
+        if (isDownloadAppFlag) {
+            return;
+        }
+        if (mIvDefaultPic.getVisibility() == View.VISIBLE) {
+            mIvDefaultPic.setVisibility(View.GONE);
+        }
+        try {
+            if (pausePlayingFlag) {
+                pausePlayingFlag = false;
+                if (null != mMediaPlayer) {
+                    mMediaPlayer.start();
+                }
+            } else if (picShowTime > 0 && null == mPicCountTimer) {
+                mPicCountTimer = new PicCountTimer(picShowTime * 1000, picShowTime * 1000);
+                mPicCountTimer.start();
+            } else {
+                // EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
         }
     }
 
@@ -354,6 +402,14 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
                 if (mNeedFeedback) {
                     new UpdateTask(mIsTextAd ? "text_ad" : "ad").execute();
+                }
+                if (!mIsTextAd) {
+                    if (mHandler.hasMessages(WHAT_HIDE_AID_VIEW)) {
+                        mHandler.removeMessages(WHAT_HIDE_AID_VIEW);
+                    }
+                    tv_aid.setText(DeviceRequest.aidFlag);
+                    tv_aid.setVisibility(View.VISIBLE);
+                    mHandler.sendEmptyMessageDelayed(WHAT_HIDE_AID_VIEW, HIDE_AID_VIEW_DELAY);
                 }
             } else {
                 showErrorMsg(result);
@@ -537,7 +593,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             });
             mMediaPlayer.setDataSource(downloadFile.getAbsolutePath()); //Path to video file
             mMediaPlayer.setDisplay(holder); //Set SurfaceHolder
-            mMediaPlayer.setBufferSize(0L);
+            //mMediaPlayer.setBufferSize(0L);
             mMediaPlayer.setScreenOnWhilePlaying(true);
             mMediaPlayer.prepareAsync();
         } catch (Exception e) {
@@ -585,6 +641,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                         e.printStackTrace();
                     }
                     if (flag) {
+                        pausePlay();
                         Intent versionIntent = new Intent(MainActivity.this, UpdateStateActivity.class);
                         versionIntent.putExtra(PushVersionModel.class.getName(), versionModel);
                         startActivity(versionIntent);
@@ -653,6 +710,19 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     return;
                 }
                 AdManager.setLockScreen(MainActivity.this, !TimeUtil.isBetweenTime(), mPowerManger, false);
+            } else if (ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_START.equals(action)) {
+                tv_download.setText(intent.getIntExtra("aid", 0) + " start");
+                tv_download.setVisibility(View.VISIBLE);
+            } else if (ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_FINISH.equals(action)) {
+                tv_download.setText("finish");
+                mHandler.sendEmptyMessageDelayed(WHAT_HIDE_DOWNLOAD_VIEW, HIDE_AID_VIEW_DELAY);
+            } else if (ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_FAILED.equals(action)) {
+                tv_download.setText("failed");
+                mHandler.sendEmptyMessageDelayed(WHAT_HIDE_DOWNLOAD_VIEW, HIDE_AID_VIEW_DELAY);
+            } else if (ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_NORMAL.equals(action)) {
+                tv_download.setText(intent.getIntExtra("aid", 0) + ": " + intent.getIntExtra("progress", 0) + "%");
+            } else if (ConstantSet.KEY_EVENT_ACTION_RESTART_PLAY_DOWNLOAD_APP_FAILED.equals(action)) {
+                restartPlay();
             }
         }
     }

@@ -32,9 +32,10 @@ import java.util.List;
 public class DownLoadUtil {
 
     private static HttpUtils mHttpUtils = new HttpUtils();
+    private static int count = 0;
 
     public static void download(final DownloadModel model) {
-
+        count = 0;
         File downloadDir = null;
         try {
             downloadDir = FileUtil.getDownloadDir();
@@ -51,9 +52,9 @@ public class DownLoadUtil {
             return;
         }
         final File downloadFile = new File(downloadDir, fileName);
-        /*if (downloadFile.exists()) { // 如果存在，先删除
+        if (downloadFile.exists()) { // 如果存在，先删除
             downloadFile.delete();
-        }*/
+        }
         EvtLog.d("aaa", "下载路径：" + downloadFile.getAbsolutePath());
         mHttpUtils.download(url, downloadFile.getAbsolutePath(), true, false, new RequestCallBack<File>() {
 
@@ -71,8 +72,11 @@ public class DownLoadUtil {
             @Override
             public void onLoading(long total, long current, boolean isUploading) {
                 long progress = current * 100 / total;
-                EvtLog.d("aaa", model.getAid() + "下载开始progress:" + progress);
-                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_NORMAL, progress, model.getAid()));
+                count++;
+                if (count % 5 == 0 || progress >= 100) {
+                    EvtLog.d("aaa", model.getAid() + "下载开始progress:" + progress);
+                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_NORMAL, progress, model.getAid()));
+                }
             }
 
             @Override

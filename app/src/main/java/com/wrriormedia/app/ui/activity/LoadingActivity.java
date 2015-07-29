@@ -77,6 +77,9 @@ public class LoadingActivity extends HtcBaseActivity {
 
     public void onEventMainThread(ActionResult result) {
         dismissLoadingUpView(mLoadingUpView);
+        if (null != result) {
+            EvtLog.d("aaa", ">>>> ready, ResultCode = " + result.ResultCode + ", msg = " + result.ResultObject);
+        }
         if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
             if (null != result.ResultObject) {
                 StatusModel model = (StatusModel) result.ResultObject;
@@ -89,13 +92,16 @@ public class LoadingActivity extends HtcBaseActivity {
                     startActivity(new Intent(LoadingActivity.this, MainActivity.class));
                     finish();
                 }
-            } else {
+            }/* else {
                 startActivity(new Intent(LoadingActivity.this, MainActivity.class));
                 finish();
-            }
+            }*/
         } else {
             //TODO 记录日志
             showErrorMsg(result);
+            // 现在由于机器没有IMEI，所以收到 id empty 的时候先跳到MainActivity界面
+            startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+            finish();
         }
     }
 

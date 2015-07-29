@@ -73,17 +73,13 @@ public class DownloadFileThread extends Thread {
     public boolean downFile(final String urlStr, File downloadFile) {
         InputStream inputStream = null;
         try {
+            EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PAUSE_PLAY, null));
             HttpURLConnection urlConn;
-            long fileSize = 0;
-            try {
-                URL url = new URL(urlStr);
-                urlConn = (HttpURLConnection) url.openConnection();
-                inputStream = urlConn.getInputStream();
-                // 计算默认文件大小
-                fileSize = urlConn.getContentLength();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            URL url = new URL(urlStr);
+            urlConn = (HttpURLConnection) url.openConnection();
+            inputStream = urlConn.getInputStream();
+            // 计算默认文件大小
+            long fileSize = urlConn.getContentLength();
             FileUtil.write2SDFromInput(downloadFile, inputStream, fileSize, new DownloadListener() {
                 @Override
                 public void onDownloadFail() {

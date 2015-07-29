@@ -32,6 +32,7 @@ public class DownloadService extends Service {
     private RemoteViews mRemoteViews;
     private NotificationManager mNotificationManager;
     private static final int WHAT_RESTART_DOWNLOAD = 1;
+    private Intent mShowDownloadViewIntent;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -53,6 +54,7 @@ public class DownloadService extends Service {
 
     private void initVariables() {
         EventBus.getDefault().register(this);
+        mShowDownloadViewIntent = new Intent();
         setUpNotification();
         timeDownload();
     }
@@ -91,7 +93,10 @@ public class DownloadService extends Service {
         if (null == model || StringUtil.isNullOrEmpty(model.getEventBusAction())) {
             return;
         }
-        if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH)) {
+        String action = model.getEventBusAction();
+        if (action.equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FINISH)) {
+            mShowDownloadViewIntent.setAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_FINISH);
+            sendBroadcast(mShowDownloadViewIntent);
             mNotificationManager.cancel(model.getEventId());
             new Thread(new Runnable() {
                 @Override
@@ -100,28 +105,37 @@ public class DownloadService extends Service {
                 }
             }).start();
             timeDownload();
-        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_NEXT)) {
+        } else if (action.equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_NEXT)) {
             EvtLog.d("aaa", ">>>> DownloadService, 重启定时器.............");
             timeDownload();
-        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_START)) {
+        } else if (action.equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_START)) {
+            mShowDownloadViewIntent.setAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_START);
+            mShowDownloadViewIntent.putExtra("aid", model.getEventId());
+            sendBroadcast(mShowDownloadViewIntent);
             mNotificationManager.notify(model.getEventId(), mNotification);
-        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
+        } else if (action.equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_FAILED)) {
             timeDownload();
+            mShowDownloadViewIntent.setAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_FAILED);
+            sendBroadcast(mShowDownloadViewIntent);
             mNotificationManager.cancel(model.getEventId());
             if (null != model.getEventBusObject()) {
                 Toast.makeText(this, (String) model.getEventBusObject(), Toast.LENGTH_LONG).show();
             }
-        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_NORMAL)) {
-            int progress = (Integer) model.getEventBusObject();
+        } else if (action.equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_STATUS_NORMAL)) {
+            long progress = (Long) model.getEventBusObject();
             if (progress > PROGRESS_MAX) {
                 progress = PROGRESS_MAX;
             }
+            mShowDownloadViewIntent.setAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_NORMAL);
+            mShowDownloadViewIntent.putExtra("aid", model.getEventId());
+            mShowDownloadViewIntent.putExtra("progress", (int) progress);
+            sendBroadcast(mShowDownloadViewIntent);
             mRemoteViews.setProgressBar(R.id.progress_horizontal, PROGRESS_MAX, (int) progress, false);
             mRemoteViews.setImageViewResource(R.id.notification_image, R.mipmap.ic_launcher);
             mRemoteViews.setTextViewText(R.id.tip, "下载进度:" + progress + "%");
             mNotification.contentView = mRemoteViews;
             mNotificationManager.notify(model.getEventId(), mNotification);
-        } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_IMAGE)) {
+        } else if (action.equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_IMAGE)) {
             final DownloadModel downloadModel = (DownloadModel) model.getEventBusObject();
             if (null == downloadModel || null == downloadModel.getImage()) {
                 return;

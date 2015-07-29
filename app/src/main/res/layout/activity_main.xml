@@ -142,4 +142,29 @@
         android:background="@mipmap/stop_bg"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/tv_aid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="15dip"
+        android:layout_marginBottom="15dip"
+        android:background="@color/white"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/tv_download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dip"
+        android:layout_marginBottom="15dip"
+        android:background="@color/white"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:visibility="gone"/>
+
 </RelativeLayout>
