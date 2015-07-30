@@ -66,7 +66,7 @@ import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 
 public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callback {
-    private static final long START_PLAY_DELAY = 10 * 1000;
+    private static final long START_PLAY_DELAY = 30 * 1000;
     private static final long HIDE_AID_VIEW_DELAY = 2 * 1000;
     private static final int WHAT_START_PLAY = 1;
     private static final int WHAT_HIDE_AID_VIEW = 2;
@@ -130,6 +130,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_GLOBAL_DOWNLOAD_APP)) {
             SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
                     ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, false);
+            EvtLog.d("aaa", "MainActivity onCreate, set KEY_GLOBAL_DOWNLOAD_APP false");
         }
         wakeupMachine();
         new CmdTask().execute();
@@ -328,11 +329,11 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         boolean isDownloadAppFlag = SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(),
                 ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_GLOBAL_DOWNLOAD_APP);
         EvtLog.d("aaa", "****** restart play, isDownloadAppFlag = " + isDownloadAppFlag);
-        if (isDownloadAppFlag) {
-            return;
-        }
         if (mIvDefaultPic.getVisibility() == View.VISIBLE) {
             mIvDefaultPic.setVisibility(View.GONE);
+        }
+        if (isDownloadAppFlag) {
+            return;
         }
         try {
             if (pausePlayingFlag) {
@@ -629,11 +630,11 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                             if (currVersionName.contains(".")) {
                                 currVersionName = currVersionName.replaceAll("\\.", "");
                             }
-                            if (Integer.parseInt(version) > Integer.parseInt(currVersionName)) {
+                            if (Integer.parseInt(version) >= Integer.parseInt(currVersionName)) {
                                 flag = true;
                             }
                         } else {
-                            if (Integer.parseInt(version) > PackageUtil.getVersionCode()) {
+                            if (Integer.parseInt(version) >= PackageUtil.getVersionCode()) {
                                 flag = true;
                             }
                         }
@@ -642,6 +643,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                     }
                     if (flag) {
                         pausePlay();
+                        SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
+                                ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, true);
                         Intent versionIntent = new Intent(MainActivity.this, UpdateStateActivity.class);
                         versionIntent.putExtra(PushVersionModel.class.getName(), versionModel);
                         startActivity(versionIntent);
@@ -722,7 +725,14 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             } else if (ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_NORMAL.equals(action)) {
                 tv_download.setText(intent.getIntExtra("aid", 0) + ": " + intent.getIntExtra("progress", 0) + "%");
             } else if (ConstantSet.KEY_EVENT_ACTION_RESTART_PLAY_DOWNLOAD_APP_FAILED.equals(action)) {
+                SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
+                        ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, false);
+                EvtLog.d("aaa", "download app failed, set KEY_GLOBAL_DOWNLOAD_APP false");
                 restartPlay();
+            } else if (ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_SUCCESS.equals(action)) {
+                SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
+                        ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, false);
+                EvtLog.d("aaa", "download app success, set KEY_GLOBAL_DOWNLOAD_APP false");
             }
         }
     }

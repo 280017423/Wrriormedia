@@ -11,12 +11,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.wrriormedia.app.R;
-import com.wrriormedia.app.app.WrriormediaApplication;
 import com.wrriormedia.app.common.ConstantSet;
 import com.wrriormedia.app.model.EventBusModel;
 import com.wrriormedia.app.model.PushVersionModel;
 import com.wrriormedia.app.service.AppUpdateService;
-import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.library.eventbus.EventBus;
 import com.wrriormedia.library.util.StringUtil;
 
@@ -62,8 +60,6 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
     }
 
     private void startDownloadService() {
-        SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
-                ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, true);
         Intent intent = new Intent(this, AppUpdateService.class);
         intent.putExtra(PushVersionModel.class.getName(), mVersionModel);
         startService(intent);
@@ -79,8 +75,8 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
             return;
         }
         if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FINISH)) {
-            SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
-                    ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, false);
+            Intent intent = new Intent(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_SUCCESS);
+            sendBroadcast(intent);
             mTxtState.setText(getString(R.string.download_success));
             File file = (File) model.getEventBusObject();
             Intent installHideIntent = new Intent("android.intent.action.VIEW.HIDE");
@@ -112,8 +108,6 @@ public class UpdateStateActivity extends HtcBaseFragmentActivity {
             }*/
             finish();
         } else if (model.getEventBusAction().equals(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FAILED)) {
-            SharedPreferenceUtil.saveValue(WrriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
-                    ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, false);
             Intent intent = new Intent(ConstantSet.KEY_EVENT_ACTION_RESTART_PLAY_DOWNLOAD_APP_FAILED);
             sendBroadcast(intent);
             toast((String) model.getEventBusObject());
