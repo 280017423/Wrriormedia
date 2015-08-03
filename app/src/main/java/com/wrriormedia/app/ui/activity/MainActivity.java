@@ -66,7 +66,7 @@ import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
 
 public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callback {
-    private static final long START_PLAY_DELAY = 30 * 1000;
+    private static final long START_PLAY_DELAY = 10 * 1000;
     private static final long HIDE_AID_VIEW_DELAY = 2 * 1000;
     private static final int WHAT_START_PLAY = 1;
     private static final int WHAT_HIDE_AID_VIEW = 2;
