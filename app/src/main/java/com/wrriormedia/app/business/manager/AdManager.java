@@ -55,29 +55,38 @@ public class AdManager {
                 String where = DownloadModel.IS_DOWNLOAD_FINISH + " = 1 OR " + DownloadModel.IS_IMAGE_FINISH + " = 1 ";
                 List<DownloadModel> downloadModels = DBMgr.getBaseModels(DownloadModel.class, where);
                 if (null == downloadModels || downloadModels.isEmpty()) {
+                    EvtLog.d("aaa", "getPlayAd, no play ad.");
                     EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
                     return;
                 }
                 DownloadModel mediaModel = downloadModels.get(index % downloadModels.size());
                 MediaVideoModel mediaVideoModel = mediaModel.getVideo();
                 MediaImageModel mediaImageModel = mediaModel.getImage();
-                if ((null == mediaVideoModel || StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) && (null == mediaImageModel || StringUtil.isNullOrEmpty(mediaImageModel.getMd5()))) {
+                if ((null == mediaVideoModel || StringUtil.isNullOrEmpty(mediaVideoModel.getMd5()))
+                        && (null == mediaImageModel || StringUtil.isNullOrEmpty(mediaImageModel.getMd5()))) {
+                    EvtLog.d("aaa", "getPlayAd, video and image is null ,play next one.");
                     EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
                     return;
                 }
                 if (null != mediaVideoModel && !StringUtil.isNullOrEmpty(mediaVideoModel.getMd5())) {
-                    if (0 == mediaModel.getIsDownloadFinish() || current < mediaModel.getStart() || current > mediaModel.getEnd()) {
+                    /*if (current < mediaModel.getStart() || current > mediaModel.getEnd()) {
+                        EvtLog.d("aaa", "getPlayAd, VideoModel current = " + current + ", start = " + mediaModel.getStart() + ", end = " + mediaModel.getEnd());
                         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
                         return;
-                    } else {
+                    } else {*/
                         if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5())) {
                             EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaModel));
                         }
                         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO, mediaVideoModel));
-                    }
+                    //}
                 } else {
-                    if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5()) && current > mediaModel.getStart() && current < mediaModel.getEnd()) {
+                    if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getMd5())
+                            /*&& current > mediaModel.getStart() && current < mediaModel.getEnd()*/) {
                         EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE, mediaModel));
+                    } else {
+                        EvtLog.d("aaa", "getPlayAd, ImageModel current = " + current +
+                                ", start = " + mediaModel.getStart() + ", end = " + mediaModel.getEnd());
+                        EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
                     }
                 }
             }

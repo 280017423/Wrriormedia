@@ -98,6 +98,9 @@ public class MyReceiver extends BroadcastReceiver {
             if (wifiModel != null) {
                 new WifiManager().connectWifi(context, wifiModel);
             }
+        } else if ("reboot".equals(alert)) {
+            Intent iReboot = new Intent("com.wrriormedia.app.reboot");
+            context.sendBroadcast(iReboot);
         }
     }
 

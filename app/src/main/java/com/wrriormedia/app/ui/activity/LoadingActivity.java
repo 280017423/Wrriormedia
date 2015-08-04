@@ -37,10 +37,16 @@ public class LoadingActivity extends HtcBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
+        wakeupMachine();
         initVariable();
         initViews();
         getReadCmd();
         LogManager.saveLog(2, "" + (int) (System.currentTimeMillis() / 1000));
+    }
+
+    private void wakeupMachine() {
+        Intent intent = new Intent("com.wrriormedia.app.wakeup");
+        sendBroadcast(intent);
     }
 
     private void initVariable() {
