@@ -404,14 +404,14 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
                 if (mNeedFeedback) {
                     new UpdateTask(mIsTextAd ? "text_ad" : "ad").execute();
                 }
-                if (!mIsTextAd) {
+                //if (!mIsTextAd) {
                     if (mHandler.hasMessages(WHAT_HIDE_AID_VIEW)) {
                         mHandler.removeMessages(WHAT_HIDE_AID_VIEW);
                     }
                     tv_aid.setText(DeviceRequest.aidFlag);
                     tv_aid.setVisibility(View.VISIBLE);
                     mHandler.sendEmptyMessageDelayed(WHAT_HIDE_AID_VIEW, HIDE_AID_VIEW_DELAY);
-                }
+                //}
             } else {
                 showErrorMsg(result);
             }

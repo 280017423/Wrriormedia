@@ -161,8 +161,10 @@ public class DeviceRequest {
                             textModel.setAid(aid);
                             DownloadTextModel localTextModel = DBMgr.getBaseModel(DownloadTextModel.class, DownloadTextModel.WHERE_CASE_SUB + " = " + aid);
                             if (null == localTextModel) {
+                                aidFlag = "服务器新增的: " + aid;
                                 DBMgr.saveModel(textModel);
                             } else {
+                                aidFlag = "服务器修改的: " + aid;
                                 DBMgr.saveModel(textModel, DownloadTextModel.WHERE_CASE, "" + aid);
                             }
                         }
