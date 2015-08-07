@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <io.vov.vitamio.widget.CenterLayout
+    <!--<io.vov.vitamio.widget.CenterLayout
         android:id="@+id/ll_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,7 +17,13 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="gone"/>
-    </io.vov.vitamio.widget.CenterLayout>
+    </io.vov.vitamio.widget.CenterLayout>-->
+
+    <com.wrriormedia.app.ui.widget.MyVideoView
+        android:id="@+id/video_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
     <ImageView
         android:id="@+id/iv_ad_pos_0"

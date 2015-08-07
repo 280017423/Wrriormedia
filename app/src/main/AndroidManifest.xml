@@ -106,13 +106,13 @@
             android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:theme="@style/Dialog" />
-        <activity
+        <!--<activity
             android:name="io.vov.vitamio.activity.InitActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden"
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+            android:windowSoftInputMode="stateAlwaysHidden" />-->
 
         <activity
             android:name="cn.jpush.android.ui.PushActivity"

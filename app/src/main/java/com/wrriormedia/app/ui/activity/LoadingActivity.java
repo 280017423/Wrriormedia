@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.wrriormedia.app.R;
 import com.wrriormedia.app.app.WrriormediaApplication;
@@ -20,8 +19,6 @@ import com.wrriormedia.library.util.NetUtil;
 import com.wrriormedia.library.util.PackageUtil;
 import com.wrriormedia.library.util.StringUtil;
 import com.wrriormedia.library.widget.LoadingUpView;
-
-import io.vov.vitamio.LibsChecker;
 
 /**
  * app启动界面
@@ -50,12 +47,12 @@ public class LoadingActivity extends HtcBaseActivity {
     }
 
     private void initVariable() {
-        if (!LibsChecker.checkVitamioLibs(this)) {
+        /*if (!LibsChecker.checkVitamioLibs(this)) {
             // 初始化Vitamio库
             EvtLog.d("aaa", "init check vitamio lib fail.......");
             Toast.makeText(this, "init check vitamio lib fail", Toast.LENGTH_SHORT).show();
             return;
-        }
+        }*/
         EventBus.getDefault().register(this);
         mLoadingUpView = new LoadingUpView(this, false);
     }

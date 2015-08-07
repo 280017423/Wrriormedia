@@ -5,15 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.PixelFormat;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,6 +39,7 @@ import com.wrriormedia.app.model.TextModel;
 import com.wrriormedia.app.model.VolumeModel;
 import com.wrriormedia.app.service.DownloadService;
 import com.wrriormedia.app.ui.widget.AutoScrollTextView;
+import com.wrriormedia.app.ui.widget.MyVideoView;
 import com.wrriormedia.app.util.ActionResult;
 import com.wrriormedia.app.util.SharedPreferenceUtil;
 import com.wrriormedia.app.util.SystemUtil;
@@ -62,10 +60,7 @@ import com.wrriormedia.library.util.UIUtil;
 import java.io.File;
 import java.util.ArrayList;
 
-import io.vov.vitamio.MediaPlayer;
-import io.vov.vitamio.Vitamio;
-
-public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callback {
+public class MainActivity extends HtcBaseActivity {
     private static final long START_PLAY_DELAY = 5 * 1000;
     private static final long HIDE_AID_VIEW_DELAY = 2 * 1000;
     private static final int WHAT_START_PLAY = 1;
@@ -88,10 +83,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     private AutoScrollTextView mTvAdPos11;
     private TextView tv_aid, tv_download;
 
-    private MediaPlayer mMediaPlayer;
-    private SurfaceView mPreview;
-    private SurfaceHolder holder;
-    private View mViewVideo;
+    private MyVideoView mViewVideo;
     private Intent mIntent;
     private PushBroadCast mPushBroadCast;
     private PowerManager mPowerManger;
@@ -125,6 +117,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         setContentView(R.layout.activity_main);
         initVariable();
         initViews();
+        initVideoView();
         mPowerManger = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (SharedPreferenceUtil.getBooleanValueByKey(WrriormediaApplication.getInstance().getBaseContext(),
                 ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_GLOBAL_DOWNLOAD_APP)) {
@@ -146,7 +139,6 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     }
 
     private void initVariable() {
-        Vitamio.initialize(this);
         EventBus.getDefault().register(this);
         mIntent = new Intent(MainActivity.this, DownloadService.class);
         mPushBroadCast = new PushBroadCast();
@@ -168,6 +160,30 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         registerReceiver(mPushBroadCast, filter);
     }
 
+    private void initVideoView() {
+        mViewVideo.setOnErrorListener(new android.media.MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(android.media.MediaPlayer mp, int what, int extra) {
+                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+                return false;
+            }
+        });
+
+        mViewVideo.setOnCompletionListener(new android.media.MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(android.media.MediaPlayer mp) {
+                EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
+            }
+        });
+
+        mViewVideo.setOnPreparedListener(new android.media.MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(android.media.MediaPlayer mp) {
+                mViewVideo.start();
+            }
+        });
+    }
+
     private void initViews() {
         mIvAdPos0 = (ImageView) findViewById(R.id.iv_ad_pos_0);
         mIvAdPos1 = (ImageView) findViewById(R.id.iv_ad_pos_1);
@@ -186,40 +202,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         tv_aid = (TextView) findViewById(R.id.tv_aid);
         tv_download = (TextView) findViewById(R.id.tv_download);
 
-        mViewVideo = findViewById(R.id.ll_video);
-        mPreview = (SurfaceView) findViewById(R.id.surface);
-        holder = mPreview.getHolder();
-        holder.addCallback(this);
-        holder.setFormat(PixelFormat.RGBA_8888);
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        EvtLog.d("aaa", ">>>> surfaceCreated, surfaceCreated, surfaceCreated");
-        this.holder = holder;
-        if (null != currVideoModel) {
-            if (videoPauseFlag) {
-                videoPauseFlag = false;
-            }
-            playVideo(currVideoModel);
-        }
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        EvtLog.d("aaa", ">>>> surfaceDestroyed, surfaceDestroyed, surfaceDestroyed");
-        this.holder = null;
-        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-            releaseMediaPlayer();
-            videoPauseFlag = true;
-        } else {
-            releaseMediaPlayer();
-        }
+        mViewVideo = (MyVideoView) findViewById(R.id.video_view);
     }
 
     public void onEventMainThread(EventBusModel model) {
@@ -228,8 +211,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         }
         if (ConstantSet.KEY_EVENT_ACTION_PLAY_VIDEO.equals(model.getEventBusAction())) {
             currVideoModel = (MediaVideoModel) model.getEventBusObject();
-            //mViewVideo.setVisibility(View.VISIBLE);
-            mPreview.setVisibility(View.VISIBLE);
+            mViewVideo.setVisibility(View.VISIBLE);
+            playVideo(currVideoModel);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_IMAGE.equals(model.getEventBusAction())) {
             DownloadModel downloadModel = (DownloadModel) model.getEventBusObject();
             showPosImg(downloadModel);
@@ -262,9 +245,9 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             }
 
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT.equals(model.getEventBusAction())) {
-            //mViewVideo.setVisibility(View.GONE);
+            mViewVideo.stopPlayback();
+            mViewVideo.setVisibility(View.GONE);
             currVideoModel = null;
-            mPreview.setVisibility(View.GONE);
             mPlayIndex++;
             hideAllImg();
             AdManager.getPlayAd(mPlayIndex);
@@ -314,8 +297,8 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     }
 
     private void pausePlay() {
-        if (null != mMediaPlayer && mMediaPlayer.isPlaying()) {
-            mMediaPlayer.pause();
+        if (mViewVideo.isPlaying()) {
+            mViewVideo.pause();
             pausePlayingFlag = true;
         } else if (picShowTime > 0) {
             if (mPicCountTimer != null) {
@@ -338,9 +321,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
         try {
             if (pausePlayingFlag) {
                 pausePlayingFlag = false;
-                if (null != mMediaPlayer) {
-                    mMediaPlayer.start();
-                }
+                mViewVideo.start();
             } else if (picShowTime > 0 && null == mPicCountTimer) {
                 mPicCountTimer = new PicCountTimer(picShowTime * 1000, picShowTime * 1000);
                 mPicCountTimer.start();
@@ -568,49 +549,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
             EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
             return;
         }
-        releaseMediaPlayer();
-        try {
-            mMediaPlayer = new MediaPlayer(this);
-            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    releaseMediaPlayer();
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-                }
-            });
-            mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                @Override
-                public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                    releaseMediaPlayer();
-                    EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
-                    return true;
-                }
-            });
-            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    mMediaPlayer.start();
-                }
-            });
-            mMediaPlayer.setDataSource(downloadFile.getAbsolutePath()); //Path to video file
-            mMediaPlayer.setDisplay(holder); //Set SurfaceHolder
-            //mMediaPlayer.setBufferSize(0L);
-            mMediaPlayer.setScreenOnWhilePlaying(true);
-            mMediaPlayer.prepareAsync();
-        } catch (Exception e) {
-            EvtLog.d("aaa", e.toString());
-        }
-    }
-
-    private void releaseMediaPlayer() {
-        if (mMediaPlayer != null) {
-            if (mMediaPlayer.isPlaying()) {
-                mMediaPlayer.stop();
-            }
-            mMediaPlayer.reset();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
+        mViewVideo.setVideoPath(downloadFile.getAbsolutePath());
     }
 
     public class PushBroadCast extends BroadcastReceiver {
@@ -740,7 +679,7 @@ public class MainActivity extends HtcBaseActivity implements SurfaceHolder.Callb
     @Override
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
-        releaseMediaPlayer();
+        mViewVideo.stopPlayback();
         TimerUtil.stopTimer(LogManager.class.getName());
         if (null != mPushBroadCast) {
             unregisterReceiver(mPushBroadCast);
