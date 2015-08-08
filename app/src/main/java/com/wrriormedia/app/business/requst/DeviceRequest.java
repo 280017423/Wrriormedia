@@ -33,6 +33,7 @@ public class DeviceRequest {
 
     private static final String TAG = "DeviceRequest";
     public static String aidFlag = "";
+    public static int adType = -1;
 
     public static ActionResult ready() {
         ActionResult result = new ActionResult();
@@ -151,6 +152,7 @@ public class DeviceRequest {
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_ID, PackageUtil.getTerminalSign()));
         postParams.add(new BasicNameValuePair(ServerAPIConstant.ACTION_KEY_AID, aid + ""));
         try {
+            adType = -1;
             JsonResult jsonResult = HttpClientUtil.get(url, null, postParams);
             if (jsonResult != null) {
                 if (jsonResult.isOK()) {
@@ -176,6 +178,7 @@ public class DeviceRequest {
                             if (2 == downloadModel.getType() && null != downloadModel.getImage()
                                     && !StringUtil.isNullOrEmpty(downloadModel.getImage().getMd5())) {
                                 downloadModel.setIsImageFinish(1);
+                                adType = 2;
                             }
                             DownloadModel localModel = DBMgr.getBaseModel(DownloadModel.class, DownloadModel.WHERE_CASE_SUB + " = " + aid);
                             if (null == localModel) {

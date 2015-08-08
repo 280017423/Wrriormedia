@@ -58,7 +58,9 @@ import com.wrriormedia.library.util.TimerUtil;
 import com.wrriormedia.library.util.UIUtil;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends HtcBaseActivity {
     private static final long START_PLAY_DELAY = 5 * 1000;
@@ -66,6 +68,7 @@ public class MainActivity extends HtcBaseActivity {
     private static final int WHAT_START_PLAY = 1;
     private static final int WHAT_HIDE_AID_VIEW = 2;
     private static final int WHAT_HIDE_DOWNLOAD_VIEW = 3;
+    private static final int WHAT_REBOOT = 4;
     private int mPlayIndex;
     private int mTextIndex;
     private ImageView mIvAdPos0;
@@ -106,6 +109,10 @@ public class MainActivity extends HtcBaseActivity {
                     break;
                 case WHAT_HIDE_DOWNLOAD_VIEW:
                     tv_download.setVisibility(View.GONE);
+                    break;
+                case WHAT_REBOOT:
+                    Intent iReboot = new Intent("com.wrriormedia.app.reboot");
+                    sendBroadcast(iReboot);
                     break;
             }
         }
@@ -382,7 +389,7 @@ public class MainActivity extends HtcBaseActivity {
         @Override
         protected void onPostExecute(ActionResult result) {
             if (ActionResult.RESULT_CODE_SUCCESS.equals(result.ResultCode)) {
-                if (mNeedFeedback) {
+                if (mNeedFeedback || (2 == DeviceRequest.adType)) {
                     new UpdateTask(mIsTextAd ? "text_ad" : "ad").execute();
                 }
                 //if (!mIsTextAd) {
@@ -618,7 +625,7 @@ public class MainActivity extends HtcBaseActivity {
             } else if (ConstantSet.KEY_EVENT_ACTION_NEW_TEXT_AD.equals(action)) {
                 PushAdModel versionModel = (PushAdModel) intent.getSerializableExtra(PushAdModel.class.getName());
                 if (null != versionModel && !StringUtil.isNullOrEmpty(versionModel.getAid())) {
-                    new DownloadTask(versionModel.getAid(), true, false).execute();
+                    new DownloadTask(versionModel.getAid(), true, true).execute();
                 }
             } else if (ConstantSet.KEY_EVENT_ACTION_SYS_STATUS.equals(action)) {
                 SysStatusModel versionModel = (SysStatusModel) intent.getSerializableExtra(SysStatusModel.class.getName());
@@ -652,6 +659,15 @@ public class MainActivity extends HtcBaseActivity {
                     return;
                 }
                 AdManager.setLockScreen(MainActivity.this, !TimeUtil.isBetweenTime(), mPowerManger, false);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+                String dateStr = sdf.format(new Date());
+                String[] list = dateStr.split("-");
+                if (list != null && list.length == 6) {
+                    EvtLog.d("aaa", ">>>> currentTime = " + list[3] + list[4] + list[5]);
+                    if ("040000".equals(list[3] + list[4] + list[5])) {
+                        mHandler.sendEmptyMessage(WHAT_REBOOT);
+                    }
+                }
             } else if (ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_START.equals(action)) {
                 tv_download.setText(intent.getIntExtra("aid", 0) + " start");
                 tv_download.setVisibility(View.VISIBLE);
