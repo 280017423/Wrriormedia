@@ -25,6 +25,5 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile files('libs/vitamio.jar')
-    compile files('libs/vitamiolibrary.jar')
     compile files('libs/jpush-sdk-release1.7.5.jar')
 }
