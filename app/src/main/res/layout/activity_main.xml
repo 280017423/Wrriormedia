@@ -19,7 +19,7 @@
             android:visibility="gone"/>
     </io.vov.vitamio.widget.CenterLayout>-->
 
-    <com.wrriormedia.app.ui.widget.MyVideoView
+    <com.warriormedia.app.ui.widget.MyVideoView
         android:id="@+id/video_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -112,7 +112,7 @@
         android:contentDescription="@null"
         android:visibility="gone" />
 
-    <com.wrriormedia.app.ui.widget.AutoScrollTextView
+    <com.warriormedia.app.ui.widget.AutoScrollTextView
         android:id="@+id/tv_10"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -126,7 +126,7 @@
         android:textSize="30sp"
         android:visibility="gone" />
 
-    <com.wrriormedia.app.ui.widget.AutoScrollTextView
+    <com.warriormedia.app.ui.widget.AutoScrollTextView
         android:id="@+id/tv_11"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

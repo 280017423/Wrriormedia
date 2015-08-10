@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.wrriormedia.app"
+        applicationId "com.warriormedia.app"
         minSdkVersion 14
         targetSdkVersion 22
         versionCode 10005

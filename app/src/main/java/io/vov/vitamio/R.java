@@ -5,6 +5,6 @@ package io.vov.vitamio;
  */
 public class R {
     public static final class raw {
-        public static final int libarm = com.wrriormedia.library.R.raw.libarm;
+        public static final int libarm = com.warriormedia.library.R.raw.libarm;
     }
 }

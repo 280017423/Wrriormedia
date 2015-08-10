@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.wrriormedia.app">
+    package="com.warriormedia.app">
 
     <permission
-        android:name="com.wrriormedia.app.permission.JPUSH_MESSAGE"
+        android:name="com.warriormedia.app.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.wrriormedia.app.permission.JPUSH_MESSAGE" />
@@ -36,7 +36,7 @@
     <!-- <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/> -->
 
     <application
-        android:name="com.wrriormedia.app.app.WrriormediaApplication"
+        android:name="com.warriormedia.app.app.WarriormediaApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -46,16 +46,16 @@
             android:value="1" />
         <meta-data
             android:name="db_name"
-            android:value="wrriormedia.db" />
+            android:value="warriormedia.db" />
         <meta-data
             android:name="download_dir"
-            android:value="wrriormedia/com.wrriormedia.app/download" />
+            android:value="warriormedia/com.warriormedia.app/download" />
         <meta-data
             android:name="image_dir"
-            android:value="wrriormedia/com.wrriormedia.app/image" />
+            android:value="warriormedia/com.warriormedia.app/image" />
         <meta-data
             android:name="http_cache_dir"
-            android:value="wrriormedia/com.wrriormedia.app/cache" />
+            android:value="warriormedia/com.warriormedia.app/cache" />
         <meta-data
             android:name="email_log_enable"
             android:value="true" />
@@ -82,7 +82,7 @@
             android:value="d3f1c62574b5d596d753565d" />
         <!--  </>值来自开发者平台取得的AppKey-->
         <activity
-            android:name=".ui.activity.LoadingActivity"
+            android:name="com.warriormedia.app.ui.activity.LoadingActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="landscape">
@@ -94,14 +94,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name="com.warriormedia.app.ui.activity.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:process=":vitamio"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activity.UpdateStateActivity"
+            android:name="com.warriormedia.app.ui.activity.UpdateStateActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="landscape"
@@ -122,7 +122,7 @@
                 <action android:name="cn.jpush.android.ui.PushActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="com.wrriormedia.app" />
+                <category android:name="com.warriormedia.app" />
             </intent-filter>
         </activity>
 
@@ -149,7 +149,7 @@
             <intent-filter android:priority="1000">
                 <action android:name="cn.jpush.android.intent.NOTIFICATION_RECEIVED_PROXY" />
                 <!--Required  显示通知栏 -->
-                <category android:name="com.wrriormedia.app" />
+                <category android:name="com.warriormedia.app" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT" />
@@ -165,12 +165,12 @@
         </receiver>
         <receiver android:name="cn.jpush.android.service.AlarmReceiver" />
 
-        <service android:name="com.wrriormedia.app.service.DownloadService" />
-        <service android:name="com.wrriormedia.app.service.AppUpdateService" />
-        <service android:name="com.wrriormedia.app.service.DelOldFilesService" />
+        <service android:name="com.warriormedia.app.service.DownloadService" />
+        <service android:name="com.warriormedia.app.service.AppUpdateService" />
+        <service android:name="com.warriormedia.app.service.DelOldFilesService" />
 
         <receiver
-            android:name="com.wrriormedia.app.service.MyReceiver"
+            android:name="com.warriormedia.app.service.MyReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="cn.jpush.android.intent.REGISTRATION" />
@@ -186,12 +186,12 @@
                 <!--Optional 用户接受Rich Push Javascript 回调函数的intent-->
                 <action android:name="cn.jpush.android.intent.CONNECTION" />
                 <!-- 接收网络变化 连接/断开 since 1.6.3 -->
-                <category android:name="com.wrriormedia.app" />
+                <category android:name="com.warriormedia.app" />
             </intent-filter>
         </receiver>
 
         <!-- 注册广播 -->
-        <receiver android:name="com.wrriormedia.app.listener.NetWorkChangeBroadcastReceiver">
+        <receiver android:name="com.warriormedia.app.listener.NetWorkChangeBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <!-- <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
