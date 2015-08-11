@@ -58,4 +58,8 @@ public class ConstantSet {
     public static final String KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_NORMAL = "KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_NORMAL";
     public static final String KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FAILED = "KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FAILED";
     public static final String KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FINISH = "KEY_EVENT_ACTION_DOWNLOAD_APP_STATUS_FINISH";
+
+    public static final String ACTION_REBOOT = "com.warriormedia.app.reboot";
+    public static final String ACTION_SLEEP = "com.warriormedia.app.sleep";
+    public static final String ACTION_WAKEUP = "com.warriormedia.app.wakeup";
 }

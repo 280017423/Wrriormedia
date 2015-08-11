@@ -179,7 +179,7 @@ public class AdManager {
             SharedPreferenceUtil.saveValue(WarriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_TEXT_AD_ACTIVITY, false);
             SharedPreferenceUtil.saveValue(WarriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN, true);
             //pm.goToSleep(SystemClock.uptimeMillis());
-            Intent intent = new Intent("com.wrriormedia.app.sleep");
+            Intent intent = new Intent(ConstantSet.ACTION_SLEEP);
             context.sendBroadcast(intent);
             EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PAUSE_PLAY, null));
         } else {
@@ -188,7 +188,7 @@ public class AdManager {
             if (SharedPreferenceUtil.getBooleanValueByKey(WarriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN)) {
                 SharedPreferenceUtil.saveValue(WarriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_IS_LOCK_SCREEN, false);
                 //pm.wakeUp(SystemClock.uptimeMillis());
-                Intent intent = new Intent("com.wrriormedia.app.wakeup");
+                Intent intent = new Intent(ConstantSet.ACTION_WAKEUP);
                 context.sendBroadcast(intent);
                 //EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NEXT, null));
                 //EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT, null));

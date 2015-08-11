@@ -14,7 +14,6 @@ import android.os.PowerManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.pdw.gson.Gson;
 import com.warriormedia.app.R;
@@ -111,7 +110,7 @@ public class MainActivity extends HtcBaseActivity {
                     tv_download.setVisibility(View.GONE);
                     break;
                 case WHAT_REBOOT:
-                    Intent iReboot = new Intent("com.wrriormedia.app.reboot");
+                    Intent iReboot = new Intent(ConstantSet.ACTION_REBOOT);
                     sendBroadcast(iReboot);
                     break;
             }
@@ -132,17 +131,9 @@ public class MainActivity extends HtcBaseActivity {
                     ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, false);
             EvtLog.d("aaa", "MainActivity onCreate, set KEY_GLOBAL_DOWNLOAD_APP false");
         }
-        wakeupMachine();
         new CmdTask().execute();
         mHandler.sendEmptyMessageDelayed(WHAT_START_PLAY, START_PLAY_DELAY);
         startService(mIntent);
-    }
-
-    private void wakeupMachine() {
-        Intent intent = new Intent("com.wrriormedia.app.wakeup");
-        sendBroadcast(intent);
-        EvtLog.d("aaa", "****** " + PackageUtil.getVersionName() + " ******");
-        Toast.makeText(this, "****** " + PackageUtil.getVersionName() + " ******", Toast.LENGTH_LONG).show();
     }
 
     private void initVariable() {

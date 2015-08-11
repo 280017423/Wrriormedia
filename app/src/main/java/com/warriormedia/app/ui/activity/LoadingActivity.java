@@ -34,25 +34,13 @@ public class LoadingActivity extends HtcBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
-        wakeupMachine();
         initVariable();
         initViews();
         getReadCmd();
         LogManager.saveLog(2, "" + (int) (System.currentTimeMillis() / 1000));
     }
 
-    private void wakeupMachine() {
-        Intent intent = new Intent("com.wrriormedia.app.wakeup");
-        sendBroadcast(intent);
-    }
-
     private void initVariable() {
-        /*if (!LibsChecker.checkVitamioLibs(this)) {
-            // 初始化Vitamio库
-            EvtLog.d("aaa", "init check vitamio lib fail.......");
-            Toast.makeText(this, "init check vitamio lib fail", Toast.LENGTH_SHORT).show();
-            return;
-        }*/
         EventBus.getDefault().register(this);
         mLoadingUpView = new LoadingUpView(this, false);
     }
@@ -103,8 +91,8 @@ public class LoadingActivity extends HtcBaseActivity {
             //TODO 记录日志
             showErrorMsg(result);
             // 现在由于机器没有IMEI，所以收到 id empty 的时候先跳到MainActivity界面
-            startActivity(new Intent(LoadingActivity.this, MainActivity.class));
-            finish();
+            /*startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+            finish();*/
         }
     }
 
