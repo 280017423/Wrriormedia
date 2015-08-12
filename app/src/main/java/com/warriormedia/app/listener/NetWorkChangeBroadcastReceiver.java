@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.warriormedia.app.app.WarriormediaApplication;
 import com.warriormedia.app.business.requst.DeviceRequest;
+import com.warriormedia.app.common.ConstantSet;
 import com.warriormedia.app.model.StatusModel;
 import com.warriormedia.app.util.ActionResult;
 import com.warriormedia.app.util.SharedPreferenceUtil;
@@ -36,12 +37,14 @@ public class NetWorkChangeBroadcastReceiver extends BroadcastReceiver {
                         if (null == model || StringUtil.isNullOrEmpty(model.getSerial())) {
                             EvtLog.d("aaa", "NetWorkChangeBroadcastReceiver, serial is null, start VerifyTask");
                             new VerifyTask().execute();
-                        } /*else {
-                            EvtLog.d("aaa", "NetWorkChangeBroadcastReceiver, model is not null, return jump to MainActivity");
+                        } else {
+                            /*EvtLog.d("aaa", "NetWorkChangeBroadcastReceiver, model is not null, return jump to MainActivity");
                             ActionResult result = new ActionResult();
                             result.ResultCode = ActionResult.RESULT_CODE_SUCCESS;
-                            EventBus.getDefault().post(result);
-                        }*/
+                            EventBus.getDefault().post(result);*/
+                            Intent cmdGetIntent = new Intent(ConstantSet.KEY_EVENT_ACTION_REQUEST_CMD_GET);
+                            context.sendBroadcast(cmdGetIntent);
+                        }
                         return;
                     }
                 }

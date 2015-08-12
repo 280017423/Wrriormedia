@@ -51,6 +51,7 @@ import com.warriormedia.library.imageloader.core.display.SimpleBitmapDisplayer;
 import com.warriormedia.library.util.EvtLog;
 import com.warriormedia.library.util.FileUtil;
 import com.warriormedia.library.util.MessageException;
+import com.warriormedia.library.util.NetUtil;
 import com.warriormedia.library.util.PackageUtil;
 import com.warriormedia.library.util.StringUtil;
 import com.warriormedia.library.util.TimerUtil;
@@ -131,9 +132,19 @@ public class MainActivity extends HtcBaseActivity {
                     ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, false);
             EvtLog.d("aaa", "MainActivity onCreate, set KEY_GLOBAL_DOWNLOAD_APP false");
         }
-        new CmdTask().execute();
+        SharedPreferenceUtil.saveValue(WarriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
+                ConstantSet.KEY_GLOBAL_REQUEST_CMD_GET_STATUS, false);
+        if (NetUtil.isNetworkAvailable()) {
+            execuCmdTask();
+        }
         mHandler.sendEmptyMessageDelayed(WHAT_START_PLAY, START_PLAY_DELAY);
         startService(mIntent);
+    }
+
+    private void execuCmdTask() {
+        SharedPreferenceUtil.saveValue(WarriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
+                ConstantSet.KEY_GLOBAL_REQUEST_CMD_GET_STATUS, true);
+        new CmdTask().execute();
     }
 
     private void initVariable() {
@@ -155,6 +166,7 @@ public class MainActivity extends HtcBaseActivity {
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_FAILED);
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_DOWNLOAD_SHOW_NORMAL);
         filter.addAction(ConstantSet.KEY_EVENT_ACTION_RESTART_PLAY_DOWNLOAD_APP_FAILED);
+        filter.addAction(ConstantSet.KEY_EVENT_ACTION_REQUEST_CMD_GET);
         registerReceiver(mPushBroadCast, filter);
     }
 
@@ -216,8 +228,6 @@ public class MainActivity extends HtcBaseActivity {
             showPosImg(downloadModel);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT.equals(model.getEventBusAction())) {
             TextModel textModel = (TextModel) model.getEventBusObject();
-            mTvAdPos10.setVisibility(View.GONE);
-            mTvAdPos11.setVisibility(View.GONE);
             if (textModel.getPos() == 10) {
                 mTvAdPos10.setVisibility(View.VISIBLE);
                 mTvAdPos10.setText(textModel.getMsg());
@@ -250,6 +260,8 @@ public class MainActivity extends HtcBaseActivity {
             hideAllImg();
             AdManager.getPlayAd(mPlayIndex);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_TEXT_NEXT.equals(model.getEventBusAction())) {
+            mTvAdPos10.setVisibility(View.GONE);
+            mTvAdPos11.setVisibility(View.GONE);
             mTextIndex++;
             AdManager.getTextAd(mTextIndex);
         } else if (ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD.equals(model.getEventBusAction())) {
@@ -679,6 +691,11 @@ public class MainActivity extends HtcBaseActivity {
                 SharedPreferenceUtil.saveValue(WarriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
                         ConstantSet.KEY_GLOBAL_DOWNLOAD_APP, false);
                 EvtLog.d("aaa", "download app success, set KEY_GLOBAL_DOWNLOAD_APP false");
+            } else if (ConstantSet.KEY_EVENT_ACTION_REQUEST_CMD_GET.equals(action)) {
+                if (!SharedPreferenceUtil.getBooleanValueByKey(WarriormediaApplication.getInstance().getBaseContext(),
+                        ConstantSet.KEY_GLOBAL_CONFIG_FILENAME, ConstantSet.KEY_GLOBAL_REQUEST_CMD_GET_STATUS)) {
+                    execuCmdTask();
+                }
             }
         }
     }

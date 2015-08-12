@@ -98,7 +98,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:process=":main"/>
         <activity
             android:name="com.warriormedia.app.ui.activity.UpdateStateActivity"
             android:label="@string/app_name"

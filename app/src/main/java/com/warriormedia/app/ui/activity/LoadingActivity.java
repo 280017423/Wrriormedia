@@ -91,8 +91,8 @@ public class LoadingActivity extends HtcBaseActivity {
             //TODO 记录日志
             showErrorMsg(result);
             // 现在由于机器没有IMEI，所以收到 id empty 的时候先跳到MainActivity界面
-            /*startActivity(new Intent(LoadingActivity.this, MainActivity.class));
-            finish();*/
+            startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+            finish();
         }
     }
 

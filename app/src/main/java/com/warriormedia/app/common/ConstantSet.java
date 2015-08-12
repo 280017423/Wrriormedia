@@ -7,6 +7,7 @@ public class ConstantSet {
 
     public static final String KEY_GLOBAL_CONFIG_FILENAME = "KEY_GLOBAL_CONFIG_FILENAME";
     public static final String KEY_GLOBAL_DOWNLOAD_APP = "KEY_GLOBAL_DOWNLOAD_APP";
+    public static final String KEY_GLOBAL_REQUEST_CMD_GET_STATUS = "KEY_GLOBAL_REQUEST_CMD_GET_STATUS";
     public static final int PAGE_SIZE = 20;
 
     public static final String KEY_IS_AD_ACTIVITY = "KEY_IS_AD_ACTIVITY";
@@ -46,6 +47,7 @@ public class ConstantSet {
     public static final String KEY_EVENT_ACTION_DOWNLOAD_SHOW_NORMAL = "KEY_EVENT_ACTION_DOWNLOAD_SHOW_NORMAL";
     public static final String KEY_EVENT_ACTION_RESTART_PLAY_DOWNLOAD_APP_FAILED = "KEY_EVENT_ACTION_RESTART_PLAY_DOWNLOAD_APP_FAILED";
     public static final String KEY_EVENT_ACTION_DOWNLOAD_APP_SUCCESS = "KEY_EVENT_ACTION_DOWNLOAD_APP_SUCCESS";
+    public static final String KEY_EVENT_ACTION_REQUEST_CMD_GET = "KEY_EVENT_ACTION_REQUEST_CMD_GET";
 
     //下载视频文件
     public static final String KEY_EVENT_ACTION_DOWNLOAD_STATUS_START = "KEY_EVENT_ACTION_DOWNLOAD_STATUS_START";
