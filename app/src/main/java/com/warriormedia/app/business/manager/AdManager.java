@@ -125,6 +125,11 @@ public class AdManager {
     }
 
     public static void deleteAd(String aid) {
+        DownloadTextModel textModel = DBMgr.getBaseModel(DownloadTextModel.class, DownloadTextModel.WHERE_CASE_SUB + " = " + aid);
+        if (null != textModel){
+            DBMgr.delete(DownloadTextModel.class, DownloadTextModel.WHERE_CASE_SUB + " = " + aid);
+            return;
+        }
         DownloadModel model = DBMgr.getBaseModel(DownloadModel.class, DownloadModel.WHERE_CASE_SUB + " = " + aid);
         if (null == model) {
             return;
