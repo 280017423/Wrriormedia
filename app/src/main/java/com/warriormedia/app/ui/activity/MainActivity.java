@@ -70,6 +70,7 @@ public class MainActivity extends HtcBaseActivity {
     private static final int WHAT_HIDE_AID_VIEW = 2;
     private static final int WHAT_HIDE_DOWNLOAD_VIEW = 3;
     private static final int WHAT_REBOOT = 4;
+    private static final int WHAT_SHOW_IMAGE_POS = 5;
     private int mPlayIndex;
     private int mTextIndex;
     private ImageView mIvAdPos0;
@@ -114,6 +115,9 @@ public class MainActivity extends HtcBaseActivity {
                 case WHAT_REBOOT:
                     Intent iReboot = new Intent(ConstantSet.ACTION_REBOOT);
                     sendBroadcast(iReboot);
+                    break;
+                case WHAT_SHOW_IMAGE_POS:
+                    UIUtil.setViewVisible(mIvAdPos0);
                     break;
             }
         }
@@ -445,6 +449,15 @@ public class MainActivity extends HtcBaseActivity {
         UIUtil.setViewInVisible(mIvAdPos7);
         UIUtil.setViewInVisible(mIvAdPos8);
         UIUtil.setViewInVisible(mIvAdPos9);
+        UIUtil.setViewTransparent(mIvAdPos1);
+        UIUtil.setViewTransparent(mIvAdPos2);
+        UIUtil.setViewTransparent(mIvAdPos3);
+        UIUtil.setViewTransparent(mIvAdPos4);
+        UIUtil.setViewTransparent(mIvAdPos5);
+        UIUtil.setViewTransparent(mIvAdPos6);
+        UIUtil.setViewTransparent(mIvAdPos7);
+        UIUtil.setViewTransparent(mIvAdPos8);
+        UIUtil.setViewTransparent(mIvAdPos9);
     }
 
     private void showPosImg(final DownloadModel downloadModel) {
@@ -485,6 +498,9 @@ public class MainActivity extends HtcBaseActivity {
             default:
                 break;
         }
+        if (position > 0) {
+            mIvAdPos0.setVisibility(View.INVISIBLE);
+        }
         mImageLoader.displayImage(mediaImageModel.getFirst(), displayView, new DisplayImageOptions.Builder()
                 .cacheInMemory().cacheOnDisc().displayer(new SimpleBitmapDisplayer())
                 .build(), new ImageLoadingListener() {
@@ -500,10 +516,10 @@ public class MainActivity extends HtcBaseActivity {
 
             @Override
             public void onLoadingComplete(Bitmap loadedImage) {
-                MediaImageModel mediaImageModel = downloadModel.getImage();
+                /*MediaImageModel mediaImageModel = downloadModel.getImage();
                 if (null != mediaImageModel && !StringUtil.isNullOrEmpty(mediaImageModel.getFirst()) && 1 != downloadModel.getIsImageFinish()) {
                     EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_LOADER_IMAGE, downloadModel));
-                }
+                }*/
             }
 
             @Override
@@ -511,9 +527,13 @@ public class MainActivity extends HtcBaseActivity {
 
             }
         });
-        UIUtil.setViewVisible(displayView);
+        if (position == 0) {
+            mHandler.sendEmptyMessageDelayed(WHAT_SHOW_IMAGE_POS, 500);
+        } else {
+            displayView.setVisibility(View.VISIBLE);
+        }
         picShowTime = mediaImageModel.getTime();
-        EvtLog.d("aaa", ">>>>  picShowTime = " + picShowTime);
+        EvtLog.d("aaa", ">>>>  picShowTime = " + picShowTime + ", pos = " + position);
         if (0 != picShowTime) {
             mPicCountTimer = new PicCountTimer(picShowTime * 1000, picShowTime * 1000);
             mPicCountTimer.start();

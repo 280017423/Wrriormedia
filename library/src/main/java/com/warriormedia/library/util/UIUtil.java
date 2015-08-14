@@ -23,6 +23,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.warriormedia.library.R;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -288,6 +290,12 @@ public class UIUtil {
     public static void setViewInVisible(View view) {
         if (view != null && view.getVisibility() != View.INVISIBLE) {
             view.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public static void setViewTransparent(ImageView view) {
+        if (view != null) {
+            view.setImageResource(R.color.transparent);
         }
     }
 
