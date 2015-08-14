@@ -40,6 +40,7 @@ import com.warriormedia.app.service.DownloadService;
 import com.warriormedia.app.ui.widget.AutoScrollTextView;
 import com.warriormedia.app.ui.widget.MyVideoView;
 import com.warriormedia.app.util.ActionResult;
+import com.warriormedia.app.util.JpushUtil;
 import com.warriormedia.app.util.SharedPreferenceUtil;
 import com.warriormedia.app.util.SystemUtil;
 import com.warriormedia.app.util.TimeUtil;
@@ -142,6 +143,7 @@ public class MainActivity extends HtcBaseActivity {
     }
 
     private void execuCmdTask() {
+        JpushUtil.getInstance().setAlias(PackageUtil.getTerminalSign());
         SharedPreferenceUtil.saveValue(WarriormediaApplication.getInstance().getBaseContext(), ConstantSet.KEY_GLOBAL_CONFIG_FILENAME,
                 ConstantSet.KEY_GLOBAL_REQUEST_CMD_GET_STATUS, true);
         new CmdTask().execute();
@@ -396,12 +398,12 @@ public class MainActivity extends HtcBaseActivity {
                     new UpdateTask(mIsTextAd ? "text_ad" : "ad").execute();
                 }
                 //if (!mIsTextAd) {
-                    if (mHandler.hasMessages(WHAT_HIDE_AID_VIEW)) {
-                        mHandler.removeMessages(WHAT_HIDE_AID_VIEW);
-                    }
-                    tv_aid.setText(DeviceRequest.aidFlag);
-                    tv_aid.setVisibility(View.VISIBLE);
-                    mHandler.sendEmptyMessageDelayed(WHAT_HIDE_AID_VIEW, HIDE_AID_VIEW_DELAY);
+                if (mHandler.hasMessages(WHAT_HIDE_AID_VIEW)) {
+                    mHandler.removeMessages(WHAT_HIDE_AID_VIEW);
+                }
+                tv_aid.setText(DeviceRequest.aidFlag);
+                tv_aid.setVisibility(View.VISIBLE);
+                mHandler.sendEmptyMessageDelayed(WHAT_HIDE_AID_VIEW, HIDE_AID_VIEW_DELAY);
                 //}
             } else {
                 showErrorMsg(result);
