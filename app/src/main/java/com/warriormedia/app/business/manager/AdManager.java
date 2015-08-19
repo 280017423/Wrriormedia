@@ -58,6 +58,18 @@ public class AdManager {
                     EvtLog.d("aaa", "getPlayAd, no play ad.");
                     EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
                     return;
+                } else {
+                    for (int i = 0; i < downloadModels.size(); i++) {
+                        if (current < downloadModels.get(i).getStart() || current > downloadModels.get(i).getEnd()) {
+                            EvtLog.d("aaa", "filter aid = " + downloadModels.get(i).getAid());
+                            downloadModels.remove(i);
+                        }
+                    }
+                    if (null == downloadModels || downloadModels.isEmpty()) {
+                        EvtLog.d("aaa", "after filter, getPlayAd, no play ad.");
+                        EventBus.getDefault().post(new EventBusModel(ConstantSet.KEY_EVENT_ACTION_PLAY_NO_AD, null));
+                        return;
+                    }
                 }
                 DownloadModel mediaModel = downloadModels.get(index % downloadModels.size());
                 MediaVideoModel mediaVideoModel = mediaModel.getVideo();
