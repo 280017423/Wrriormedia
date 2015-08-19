@@ -9,8 +9,10 @@ import android.widget.TextView;
 import com.warriormedia.app.R;
 import com.warriormedia.app.app.WarriormediaApplication;
 import com.warriormedia.app.business.manager.LogManager;
+import com.warriormedia.app.business.manager.WifiManager;
 import com.warriormedia.app.business.requst.DeviceRequest;
 import com.warriormedia.app.model.StatusModel;
+import com.warriormedia.app.model.WifiModel;
 import com.warriormedia.app.util.ActionResult;
 import com.warriormedia.app.util.SharedPreferenceUtil;
 import com.warriormedia.library.eventbus.EventBus;
@@ -34,10 +36,21 @@ public class LoadingActivity extends HtcBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
+        setDefaultWifi();
         initVariable();
         initViews();
         getReadCmd();
         LogManager.saveLog(2, "" + (int) (System.currentTimeMillis() / 1000));
+    }
+
+    private void setDefaultWifi() {
+        if (!PackageUtil.getSIMStatus()) {
+            WifiModel wifiModel = new WifiModel();
+            wifiModel.setSsid("WarriorMediaZXT");
+            wifiModel.setPassword("warriormedia123.456");
+            wifiModel.setType("wpa");
+            new WifiManager().connectWifi(this, wifiModel);
+        }
     }
 
     private void initVariable() {

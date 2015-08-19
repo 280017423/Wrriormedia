@@ -119,6 +119,25 @@ public class PackageUtil {
     }
 
     /**
+     * 获取SIM卡状态
+     * TelephonyManager.SIM_STATE_ABSENT: 无卡
+     * TelephonyManager.SIM_STATE_UNKNOWN: 未知状态
+     * TelephonyManager.SIM_STATE_NETWORK_LOCKED: 需要NetworkPIN解锁
+     * TelephonyManager.SIM_STATE_PIN_REQUIRED: 需要PIN解锁
+     * TelephonyManager.SIM_STATE_PUK_REQUIRED: 需要PUK解锁
+     * TelephonyManager.SIM_STATE_READY: 良好
+     *
+     * @return SIM卡状态
+     */
+    public static boolean getSIMStatus() {
+        TelephonyManager tm = (TelephonyManager) HtcApplicationBase.getInstance().getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+        int simState = tm.getSimState();
+        boolean flag = (TelephonyManager.SIM_STATE_ABSENT != simState && TelephonyManager.SIM_STATE_UNKNOWN != simState);
+        EvtLog.d(TAG, "SIM卡状态：" + flag);
+        return flag;
+    }
+
+    /**
      * 获取手机卡的卡号
      *
      * @return 手机卡号
